@@ -5,9 +5,14 @@ function [S, timeVec] = preprocAll(S, paramIdx, frameRate, dsRate)
 %S: x-y-c-t
 %frameRate: original sampling rage in Hz
 %dsRate: desired downsampling rate in Hz (default:1)
+%    paramIdx.cparamIdx
+%    paramIdx.gparamIdx
+%    paramIdx.nlparamIdx
+%    paramIdx.dsparamIdx
+%    paramIdx.nrmparamIdx
 
 %OUTPUT
-%S_fin: (frame number) - (filter number)
+%S_fin: (frame number) x (filter number)
 
 if nargin < 4 || isempty(dsRate)
     dsRate = 1;

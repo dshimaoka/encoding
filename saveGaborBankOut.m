@@ -1,6 +1,6 @@
-function [S_fin, TimeVec_stim_cat] = saveStimData(moviePath, c, stimInfo, ...
+function [S_fin, TimeVec_stim_cat] = saveGaborBankOut(moviePath, c, ...
     dsRate, gaborBankParamIdx, uploadResult)
-% S_fin = saveStimData(moviePath, c, dsRate)
+% S_fin = saveGaborBankOut(moviePath, c, dsRate)
 % returns output of gabor-wavelet bank
 
 S_fin = [];TimeVec_stim_cat=[];
@@ -17,10 +17,12 @@ for itr = 1:c.nrTrials
     %% preprocess movies ... SUPER SLOW!!!
     frames_reconstruct  = single(frames_reconstruct)/255;%is this necessary?
     
-    [frames_fin, TimeVec_stim] = preprocAll(gaborBankParamIdx, frames_reconstruct, c.screen.frameRate, ...
-        dsRate);
+    [frames_fin, TimeVec_stim] = preprocAll(frames_reconstruct, gaborBankParamIdx, ...
+        c.screen.frameRate, dsRate);
     
-    theseFrames = 1:round(dsRate*stimInfo.duration);
+    duration = get(c.movie.prms.duration,'atTrialTime',inf)/1e3;
+
+    theseFrames = 1:round(dsRate*duration);
     S_fin = cat(1,S_fin, frames_fin(theseFrames,:));
     
     if itr==1

@@ -9,7 +9,7 @@ function [RF_is, lagTimes_model] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ..
 %MUST BE IDENTICAL TO ONE USED FOR TRAINANEURON?
 %r0: [nNeurons]
 %rr: [nDelays of hemodynamic coupling x nFilters x nNeurons]
-%lagFrames: lag range provided as rr
+%lagFrames: lag range provided as rr (in frames not seconds)
 %tavg: whether r0/rr was obtained by time averaging. If yes, the model can still have temporal delays (specified in gparam Idx), but its output should be temporally monotonic
 %screenPix: screen # pixels [y - x] for in silico simulation (no need to match that for in vivo exp)
 %Fs: sampling rate of in-silico model AND visual stim (theres no point of having different Fs between them)

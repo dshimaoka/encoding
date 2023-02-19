@@ -1,4 +1,4 @@
-function observed = prepareObserved(imageProc, dsRate)
+function [observed, TimeVec_ds_c] = prepareObserved(imageProc, dsRate)
 %observed = prepareObserved(imageProc, dsRate)
 % returns observed signal (time x pixel) at dsRate [Hz]
 % from result of saveImageProcess.m
@@ -17,7 +17,10 @@ stimInfo = imageProc.stimInfo;
 %% resample (necessary for preprocDownsample)
 camOnTimes_rs = OETimes.camOnTimes(1):1/round(Fcam): OETimes.camOnTimes(end);
 V = interp1(OETimes.camOnTimes, V', camOnTimes_rs)';
-
+if size(V,2) == 1
+    V = V';
+end
+    
 %% align to visual stimulus onsets
 %mISI = mean(diff(OETimes.stimOnTimes));
 calcWin = [0 stimInfo.duration]; %chop off all trials at exact same time
@@ -38,8 +41,12 @@ for imov = 1:numel(stimLabels_ok)
     % dsparams.sampleSec
     % dsparams.frameshifts
     % dsparams.gaussParams
+    data = squeeze(singlePeriEventV(imov,:,:))';
+    if size(data,1)==1
+        data = data';
+    end
     
-    [Sds] = preprocDownsample(squeeze(singlePeriEventV(imov,:,:))', dsparams);
+    [Sds] = preprocDownsample(data, dsparams);
     TimeVec = winSamps';%1/dsparams.sampleSec*(0:size(singlePeriEventV,1)-1)';
     TimeVec_ds = preprocDownsample(TimeVec,dsparams);
     if imov==1
@@ -54,8 +61,12 @@ for imov = 1:numel(stimLabels_ok)
     % nrmparams.normalize
     % nrmparams.reduceChannels
     % nrmparams.crop
-    Snorm(imov,:,:) = preprocNormalize(Sds,nrmparams);
+    Snorm(:,imov,:) = preprocNormalize(Sds,nrmparams); %[time x imovie x pixel]
+    
+    %sanity check
+    %yyaxis left; plot(winSamps,squeeze(singlePeriEventV(1,7618,:)),TimeVec_ds, Sds(:,7618));
+    %yyaxis right; plot(TimeVec_ds, Snorm(1,:,7618))
 end
 
-observed = reshape(Snorm, size(Snorm,1)*size(Snorm,2),[]);
+observed = reshape(Snorm, size(Snorm,1)*size(Snorm,2),[]); %(movie1 time 0-end, movie2 time 0-end ) x pixels
 
