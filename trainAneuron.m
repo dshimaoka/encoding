@@ -22,12 +22,14 @@ function trained = trainAneuron(ds, S_fin, iNeuron, trainIdx,  ridgeParams, ...
 
 %Fs
 
+sanityCheck = 1;
 
 %% load neural data
 ds_tmp = ds;
-ds_tmp.SelectedVariableNames = {'Time', ['observed_' num2str(iNeuron)]};
+%ds_tmp.SelectedVariableNames = {'Time', ['observed_' num2str(iNeuron)]};
 neuroData = tall(ds_tmp);
-observed = gather(neuroData.(['observed_' num2str(iNeuron)]));%slow!!
+%observed = gather(neuroData.(['observed_' num2str(iNeuron)]));%slow!!
+observed = gather(neuroData.('observed'));%TMP
 observed_train = single(observed(trainIdx));
 
 S_fin_train = single(S_fin(trainIdx,:));
@@ -40,15 +42,15 @@ end
 timeVec_train = timeVec(trainIdx);
 %thisTimeVec = gather(neuroData.Time);%this is an cell aray with 'sec' suffix
 %timeVec_train = single(1/Fs*(1:size(observed_train))'); %hack for now
-%timeVec_test = single(1/Fs*(1:length(testIdx)));
 
 %% cross val to determine ridgeParameter
 if length(ridgeParams) > 1
     mse = zeros(length(ridgeParams),1);
+    mse_cvp = zeros(length(ridgeParams),KFolds);
     for rp = 1:length(ridgeParams)
-        mse_cvp = ridgeXs_cv(KFolds, timeVec_train, ...
+        mse_cvp(rp,:) = ridgeXs_cv(KFolds, timeVec_train, ...
             S_fin_train', observed_train', lagRange, ridgeParams(rp), tavg, useGPU);
-        mse(rp) = mean(mse_cvp);
+        mse(rp) = mean(mse_cvp(rp,:));
     end
     [~,thisIdx]=min(mse);
 else
@@ -61,11 +63,46 @@ ridgeParam_optimal = ridgeParams(thisIdx);
     observed_train', lagRange, ridgeParam_optimal, tavg, useGPU);
 
 mse = mean((observed_train - fitted').^2);
-%       plot(timeVec_train, observed_train, timeVec_train, fitted);
+expval = 100*(1 - mse / mean((observed_train - mean(observed_train)).^2));
 
-%% validating fitting
-% predicted = predictXs(timeVec_test, S_fin_test', r0e, rre,...
-%     lagRange, tavg);
+if sanityCheck
+    corr_fitted = corrcoef(observed_train, fitted);
+    ax(1)=subplot(211);
+    yyaxis left; plot(timeVec_train,observed_train);
+    yyaxis right; plot(timeVec_train,fitted)
+    legend('observed','fitted');
+    xlim([0 500])
+    ax(2)=subplot(212);
+    plot(observed_train,fitted,'.');
+    xlabel('observed\_train');ylabel('fitted');
+    title(['corr ' num2str(corr_fitted(2,1)) ', expval ' num2str(expval)]);
+    axis equal square;
+    
+    %% validating fitting
+%     testIdx = setxor(1:size(S_fin,1),trainIdx);
+%     timeVec_test = timeVec(testIdx);
+%     S_fin_test = single(S_fin(testIdx,:));
+%     predicted = predictXs(timeVec_test, S_fin_test', r0e, rre,...
+%         lagRange, tavg);
+%     observed_test = single(observed(testIdx));
+%     corr_pred = corrcoef(observed_test, predicted);
+%     mse_pred = mean((observed_test - predicted').^2);
+%     expval_pred = 100*(1 - mse_pred / mean((observed_test - mean(observed_test)).^2));
+% 
+%     ax(3)=subplot(223);
+%     yyaxis left; plot(observed_test);
+%     yyaxis right; plot(predicted)
+%     legend('observed','predicted');
+%     ax(4)=subplot(224);
+%     plot(observed_test, predicted,'.');
+%     xlabel('observed\_test');ylabel('predicted');
+%     title(['corr ' num2str(corr_pred(2,1)) ', expval ' num2str(expval_pred)]);
+%     axis equal square;
+%     linkaxes([ax(1) ax(3)]);xlim(ax(1),[0 numel(predicted)]);
+%     linkaxes([ax(2) ax(4)]);
+
+end
+
 % observed_test = observed(testIdx);
 % mse_test = mean((observed_test - predicted').^2);
 %plot(timeVec_test, observed_test, timeVec_test, predicted)
@@ -75,4 +112,6 @@ trained.ridgeParam_optimal = ridgeParam_optimal;
 trained.rre = rre;
 trained.r0e = r0e;
 trained.mse = mse;
+trained.mse_cvp = mse_cvp;
+trained.expval = expval;
 % trained.mse_test = mse_test;
