@@ -73,8 +73,8 @@ roiIdx = 7618;
 imageProc_s = imageProc;
 imageProc_s.V = imageProc.V(roiIdx,:);
 
-dsRate = [1 5];% 10]; %sampling rate of hemodynamic coupling function
-for ii = 3%1:numel(dsRate)
+dsRate = 3;% 10]; %sampling rate of hemodynamic coupling function
+for ii = 1%1:numel(dsRate)
     suffix = ['_dsRate' num2str(dsRate(ii))];
     
     %     %% convert processed signal to a format compatible with fitting

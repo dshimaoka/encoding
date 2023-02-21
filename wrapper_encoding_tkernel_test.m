@@ -28,9 +28,9 @@ dataPaths = getDataPaths(expInfo,rescaleFac);
 % load( dataPaths.stimSaveName, 'dsRate'); %NEI FIX THIS
 predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
-delayMax = (pen+3); %[s]
+delayMax = (pen+2); %[s]
 
-for jj = 1   
+for jj = 2   
    
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
@@ -39,7 +39,7 @@ for jj = 1
     trainParam.ridgeParam = [1 1e3 1e5 1e7]; %search the best within these values
     trainParam.tavg = 0; %tavg = 0 requires loads of ram. if 0, use avg within Param.lagFrames to estimate coefficients
     trainParam.Fs = dsRate(jj); %hz after downsampling
-    trainParam.lagFrames = round(3*dsRate(jj)):round(delayMax*dsRate(jj));%3:9 %frame delays to train a neuron
+    trainParam.lagFrames = round(0*dsRate(jj)):round(delayMax*dsRate(jj));%3:9 %frame delays to train a neuron
     trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
     
     
