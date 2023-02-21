@@ -20,6 +20,7 @@ end
 if nargin < 2 || isempty(paramIdx)
     paramIdx.cparamIdx = 1;
     paramIdx.gparamIdx = 2;
+    paramIdx.predsRate = [];
     paramIdx.nlparamIdx = 1;
     paramIdx.dsparamIdx = 1;
     paramIdx.nrmparamIdx = 1;
@@ -29,6 +30,17 @@ end
 if ~isempty(paramIdx.cparamIdx)
     cparams = preprocColorSpace_GetMetaParams(paramIdx.cparamIdx);
     [S, cparams] = preprocColorSpace(S, cparams);
+end
+
+%Down sampling of movie BEFORE gabor-wavelet filtering
+if ~isempty(paramIdx.predsRate)
+    timeVec = 1/frameRate*(0: size(S,3)-1)';
+    times_rs = (timeVec(1):1/round(paramIdx.predsRate): timeVec(end))';
+    Sflat = reshape(S, size(S,1)*size(S,2),size(S,3))';
+    Sflat = interp1(timeVec, Sflat, times_rs)';%FIXME: probably better way to downsample
+    S = reshape(Sflat, size(S,1), size(S,2),numel(times_rs));
+    clear Sflat
+    frameRate = paramIdx.predsRate;
 end
 
 % Gabor wavelet processing

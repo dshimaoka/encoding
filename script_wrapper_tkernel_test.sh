@@ -3,10 +3,12 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-user=daisuke.shimaoka@monash.edu
-#SBATCH --job-name=Wrapper_array
-#SBATCH --time=40:00:00
-#SBATCH --ntasks=2
+#SBATCH --job-name=Wrapper_tkernel
+#SBATCH --time=01:00:00
+#SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=33000
-#SBATCH --array=1-32
+#SBATCH --array=1-1
+#SBATCH --gres=gpu:A40:1
+#SBATCH --partition=gpu
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < wrapper_encoding_tkernel_test.m

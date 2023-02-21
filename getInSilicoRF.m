@@ -1,4 +1,4 @@
-function [RF_is, lagTimes_model] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
+function [RF_is, lagTimes_mdl] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
     tavg, screenPix, Fs, nRepeats)
 %[RF_is, lagRange] = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
 % estimate RF contour of the motion-energy model through in-silico noise
@@ -9,7 +9,7 @@ function [RF_is, lagTimes_model] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ..
 %MUST BE IDENTICAL TO ONE USED FOR TRAINANEURON?
 %r0: [nNeurons]
 %rr: [nDelays of hemodynamic coupling x nFilters x nNeurons]
-%lagFrames: lag range provided as rr (in frames not seconds)
+%lagFrames: response latency of the model output = lag range provided as rr (in frames not seconds)
 %tavg: whether r0/rr was obtained by time averaging. If yes, the model can still have temporal delays (specified in gparam Idx), but its output should be temporally monotonic
 %screenPix: screen # pixels [y - x] for in silico simulation (no need to match that for in vivo exp)
 %Fs: sampling rate of in-silico model AND visual stim (theres no point of having different Fs between them)
@@ -60,19 +60,22 @@ S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 
 %% 3 compute responese of the wavelet filter
-lagRange = [min(lagFrames)/Fs max(lagFrames)/Fs];%lag range provided as rr
-gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
-lagRange_model = [0 (gparams.tsize-1)/Fs];%motion energy model
-lagTimes_model = round(lagRange_model(1)*Fs):round(lagRange_model(2)*Fs);
-RF_is = zeros(screenPix(1), screenPix(2), length(lagTimes_model), nNeurons);
+lagRange = [min(lagFrames) max(lagFrames)];%/Fs? %lag range provided as rr
+%gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
+%lagRange_model = [0 (gparams.tsize-1)/Fs];%motion energy model
+%lagTimes_model = round(lagRange_model(1)*Fs):round(lagRange_model(2)*Fs);
+%lagTimes_model = round(lagRange(1)/Fs):round(lagRange(2)/Fs); %response time window in seconds not frames
+lagRange_mdl = [lagRange(1) 3*lagRange(2)]; %response latency of model in Frames
+lagTimes_mdl = linspace(lagRange_mdl(1)/Fs,lagRange_mdl(2)/Fs,round(diff(lagRange_mdl/Fs)*Fs+1)); %"surround time" from getSparseResponse 
+RF_is = zeros(screenPix(1), screenPix(2), length(lagTimes_mdl), nNeurons);
 for iNeuron = 1:nNeurons
     [observed] = predictXs(timeVec, S_nm, ...
         squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), lagRange, tavg);
     
     %% 4 estimate RF
     % stimulus-triggered avg (by AP)...fast
-    response_t = getSparseResponse(observed, timeVec, stim_is, ...
-        timeVec, lagRange_model, polarity);% [delay x 1 x ]
+    [response_t] = getSparseResponse(observed, timeVec, stim_is, ...
+        timeVec, lagRange_mdl/Fs, polarity);% [delay x 1 x ]
     % < getSparseResponse can deal with multiple variables but not scalable
     response_t = (squeeze(response_t))';
     RF_is(:,:,:,iNeuron) = reshape(response_t,screenPix(1),screenPix(2),[]);

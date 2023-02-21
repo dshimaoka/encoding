@@ -54,7 +54,8 @@ if length(ridgeParams) > 1
     end
     [~,thisIdx]=min(mse);
 else
-    thisidx = 1;
+    thisIdx = 1;
+    mse_cvp = [];
 end
 
 %% estimate coef with the optimal ridgeparam
@@ -114,4 +115,3 @@ trained.r0e = r0e;
 trained.mse = mse;
 trained.mse_cvp = mse_cvp;
 trained.expval = expval;
-% trained.mse_test = mse_test;
