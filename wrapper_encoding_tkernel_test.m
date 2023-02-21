@@ -46,7 +46,7 @@ for jj = 2
     %% stimuli
     load([dataPaths.imageSaveName(1:end-4) suffix '.mat'],'stimInfo')
     
-    nMovies = cic.nrTrials;
+    nMovies = numel(stimInfo.stimLabels);
     movDur = stimInfo.duration;%[s]
     omitSec = 5; %omit initial XX sec for training
     trainIdx = [];
