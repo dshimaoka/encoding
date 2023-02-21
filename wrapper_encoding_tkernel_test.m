@@ -45,7 +45,6 @@ for jj = 2
     
     %% stimuli
     load([dataPaths.imageSaveName(1:end-4) suffix '.mat'],'stimInfo')
-    stimInfo = getStimInfo(cic);
     
     nMovies = cic.nrTrials;
     movDur = stimInfo.duration;%[s]
