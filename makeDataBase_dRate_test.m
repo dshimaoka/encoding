@@ -29,10 +29,9 @@ gaborBankParamIdx.gparamIdx = 2;
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
-
+gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
 
 dataPaths = getDataPaths(expInfo, procParam.rescaleFac);
-moviePath = 'Z:\Shared\Daisuke\natural\nishimoto2011';
 
 
 
@@ -66,27 +65,27 @@ roiIdx = 7618;
 imageProc_s = imageProc;
 imageProc_s.V = imageProc.V(roiIdx,:);
 
-dsRate = [1 2 5 10];
-for ii = 1:2
+dsRate = [1 5];% 10];
+for ii = 3%1:numel(dsRate)
     suffix = ['_dsRate' num2str(dsRate(ii))];
     
-    %% convert processed signal to a format compatible with fitting
-    [observed, TimeVec_ds_c] = prepareObserved(imageProc_s, dsRate(ii));
-    %observed: time x pixel
-    %< TODO: BETTER WAY TO DO DOWNSAMPLING?
-    %< observed is NOT saved
+    %     %% convert processed signal to a format compatible with fitting
+    %     [observed, TimeVec_ds_c] = prepareObserved(imageProc_s, dsRate(ii));
+    %     %observed: time x pixel
+    %     %< TODO: BETTER WAY TO DO DOWNSAMPLING?
+    %     %< observed is NOT saved
+    %
+    %     %% save as timetable
+    %     TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
+    %     writetimetable(TT, [dataPaths.timeTableSaveName(1:end-4) suffix '.csv']);%slow
     
-    %% save as timetable
-    TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
-    writetimetable(TT, [dataPaths.timeTableSaveName(1:end-4) suffix '.csv']);%slow
-    
-    clear TT
+    %     clear TT
     
     
     
     %% prepare stimulus (~5h in my PC)
     %DUMM THIS TAKES AGES!
-    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(moviePath, imageProc.cic, ...
+    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
         dsRate(ii), gaborBankParamIdx, 0);
     
     %dirPref = getpref('nsAnalysis','dirPref');

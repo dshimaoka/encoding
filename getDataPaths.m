@@ -18,3 +18,9 @@ dataPaths.stimSaveName = fullfile(saveDirBase,expDate,...
 dataPaths.encodingSavePrefix = fullfile(saveDirBase,expDate,...
     ['encoding_' regexprep(expDate, filesep,'_') '_' expName '_resize' ...
     num2str(rescaleFac*100)]);% '_' num2str(roiIdx(pen)) '.mat']);
+
+switch getenv('COMPUTERNAME')
+    case 'MU00175834'
+        dataPaths.moviePath = 'Z:\Shared\Daisuke\natural\nishimoto2011';
+    case ''
+end
