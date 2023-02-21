@@ -37,8 +37,6 @@ gaborBankParamIdx.nrmparamIdx = 1;
 
 
 dataPaths = getDataPaths(expInfo, procParam.rescaleFac);
-moviePath = 'Z:\Shared\Daisuke\natural\nishimoto2011';
-
 
 
 expDate = [expInfo.date(1:4) filesep expInfo.date(5:6) filesep expInfo.date(7:8)];
