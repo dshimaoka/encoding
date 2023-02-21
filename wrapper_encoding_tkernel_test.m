@@ -3,6 +3,12 @@
 %fit one pixel with ridge regression
 %evaluate the fit result with in-silico simulation
 
+%%
+if ~ispc
+    addpath(genpath('~/git'));
+    addDirPrefs;
+end
+
 %% draw slurm ID for parallel computation
 pen = getPen;
 
@@ -27,7 +33,6 @@ delayMax = (pen+1); %[s]
 for jj = 2    
    
     suffix = ['_dsRate' num2str(dsRate(jj))];
-    suffix2 = [];%['_predsRate' num2str(predsRate)];
     
     %% estimation of filter-bank coefficients
     trainParam.KFolds = 5; %cross validation
@@ -39,7 +44,7 @@ for jj = 2
     
     
     %% stimuli
-    load(dataPaths.imageSaveName,'cic')
+    load([dataPaths.imageSaveName(1:end-4) suffix '.mat'],'cic')
     stimInfo = getStimInfo(cic);
     
     nMovies = cic.nrTrials;
@@ -69,7 +74,7 @@ for jj = 2
     
     %% load gabor bank prediction data
     %TODO load data tolocal
-    load( [dataPaths.stimSaveName(1:end-4) suffix suffix2 '.mat'], ...
+    load( [dataPaths.stimSaveName(1:end-4) suffix '.mat'], ...
         'TimeVec_stim_cat', 'S_fin','gaborBankParamIdx');
     
     % S_fin_train = single(S_fin(trainIdx,:));
@@ -87,7 +92,7 @@ for jj = 2
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) ...
-        '_delayMax' num2str(delayMax) suffix suffix2 '.mat'];
+        '_delayMax' num2str(delayMax) suffix '.mat'];
     save(encodingSaveName,'trained','trainParam');%'rre','r0e','mse','lagFrames','tavg')
       
     set(gcf,'position',[0 0 1900 1000])

@@ -3,6 +3,11 @@
 %fit one pixel with ridge regression
 %evaluate the fit result with in-silico simulation
 
+if ~ispc
+    addpath(genpath('~/git'));
+    addDirPrefs;
+end
+
 expInfo.subject = 'CJ224';
 expInfo.date = '20221004';
 expInfo.nsName = 'CJ224.runPassiveMovies.033059';

@@ -2,6 +2,11 @@
 %this script process and save imaging and stimulus data(saveImageProcess & saveStimData), 
 %that will be used for the model fitting (in MASSIVE) by wrapper_encoding.m
 
+if ~ispc
+    addpath(genpath('~/git'));
+    addDirPrefs;
+end
+
 % expInfo.nsName = 'CJ229.oriXYZc.170024';%'CJ229.runPassiveMovies.024114';
 % expInfo.expID = 5; %21;
 % expInfo.subject = 'CJ229';
@@ -44,8 +49,10 @@ expDate = [expInfo.date(1:4) filesep expInfo.date(5:6) filesep expInfo.date(7:8)
 if exist(dataPaths.imageSaveName,'file') % && 
     load(dataPaths.imageSaveName,'imageProc');
 else
+    %save .mat and .csv files
     imageProc = saveImageProcess(expInfo, procParam, rebuildImageData,...
         makeMask, uploadResult);
+    
     
     [~,imDataName] = fileparts(dataPaths.imageSaveName);
     

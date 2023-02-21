@@ -7,6 +7,11 @@
 % expInfo.subject = 'CJ229';
 % expInfo.date = '202210310';%'20221101';
 
+if ~ispc
+    addpath(genpath('~/git'));
+    addDirPrefs;
+end
+
 expInfo.subject = 'CJ224';
 expInfo.date = '20221004';
 expInfo.nsName = 'CJ224.runPassiveMovies.033059';
