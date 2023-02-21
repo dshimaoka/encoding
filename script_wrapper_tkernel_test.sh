@@ -8,7 +8,6 @@
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=33000
 #SBATCH --array=1-1
-#SBATCH --gres=gpu:A40:1
-#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < wrapper_encoding_tkernel_test.m
