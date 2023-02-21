@@ -1,5 +1,5 @@
 function [RF_is, lagTimes_mdl] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
-    tavg, screenPix, Fs, nRepeats)
+    tavg, Fs, RF_insilico)% screenPix, Fs, nRepeats)
 %[RF_is, lagRange] = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
 % estimate RF contour of the motion-energy model through in-silico noise
 % stimulation
@@ -11,10 +11,11 @@ function [RF_is, lagTimes_mdl] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
 %rr: [nDelays of hemodynamic coupling x nFilters x nNeurons]
 %lagFrames: response latency of the model output = lag range provided as rr (in frames not seconds)
 %tavg: whether r0/rr was obtained by time averaging. If yes, the model can still have temporal delays (specified in gparam Idx), but its output should be temporally monotonic
-%screenPix: screen # pixels [y - x] for in silico simulation (no need to match that for in vivo exp)
-%Fs: sampling rate of in-silico model AND visual stim (theres no point of having different Fs between them)
-%maxT: maximam time of in-silico visual stim
-%nRepeats: #presentation per screen pixel(default:20)
+%Fs: sampling rate of hemodynamic coupling function
+% (sampling rate of gabor-wavlet filter is given by paramIdx.predsRate = downsampling freq of vis stim)
+%RF_insilico
+%   .screenPix: screen # pixels [y - x] for in silico simulation (no need to match that for in vivo exp)
+%   .nRepeats: #presentation per screen pixel(default:20)
 %
 %OUTPUT
 %RF_is: stim-trig avg [screenY x screenX x nDelays x nNeurons ]
@@ -22,13 +23,8 @@ function [RF_is, lagTimes_mdl] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
 
 polarity = 'white';
 
-if nargin < 8
-    nRepeats = 20;
-end
-
-if length(screenPix)==1
-    screenPix(2) = screenPix(1);
-end
+screenPix = RF_insilico.screenPix;
+nRepeats = RF_insilico.nRepeats;
 
 nDelays = size(rr,1);
 nNeurons = size(rr,3);
@@ -39,7 +35,7 @@ end
 
 %%1 make sparse white noise
 nFrames = screenPix(1)*screenPix(2)*nRepeats;
-timeVec = 1/Fs*(1:nFrames);%0:1/Fs:maxT;%[s]
+timeVec = 1/paramIdx.predsRate*(1:nFrames);%0:1/Fs:maxT;%[s]
 
 dotStream = repmat(1:screenPix(1)*screenPix(2), 1, nRepeats);
 dotStream = dotStream(randperm(screenPix(1)*screenPix(2)*nRepeats));

@@ -35,6 +35,7 @@ gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
 gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
+%< sampling rate of gabor bank filter
 
 dataPaths = getDataPaths(expInfo, procParam.rescaleFac);
 
@@ -72,7 +73,7 @@ roiIdx = 7618;
 imageProc_s = imageProc;
 imageProc_s.V = imageProc.V(roiIdx,:);
 
-dsRate = [1 5];% 10];
+dsRate = [1 5];% 10]; %sampling rate of hemodynamic coupling function
 for ii = 3%1:numel(dsRate)
     suffix = ['_dsRate' num2str(dsRate(ii))];
     

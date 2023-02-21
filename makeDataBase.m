@@ -27,6 +27,7 @@ uploadResult = true;
 
 %downsample of stim & imaging data
 dsRate = procParam.lpFreq;%[Hz]
+%sampling rate of hemodynamic coupling function
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -34,6 +35,8 @@ gaborBankParamIdx.gparamIdx = 2;
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
+gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
+%< sampling rate of gabor bank filter
 
 
 dataPaths = getDataPaths(expInfo, procParam.rescaleFac);

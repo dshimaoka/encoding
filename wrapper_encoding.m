@@ -100,71 +100,14 @@ save(encodingSaveName,'trained','trainParam');%'rre','r0e','mse','lagFrames','ta
 %% in-silico simulation to obtain RF
 tic
 [RF_is, lagTimes_is] = getInSilicoRF(gaborBankParamIdx, trained.r0e, ...
-    trained.rre, trainParam.lagFrames, trainParam.tavg, RF_insilico.screenPix,...
-    trainParam.Fs, RF_insilico.nRepeats);
+    trained.rre, trainParam.lagFrames, trainParam.tavg, dsRate, RF_insilico);
 t2=toc
 %~1000s for 
 %rr:6555x504
 %screenPix:20
 
-xpix = 1:RF_insilico.screenPix(2);
-xaxis = stimInfo.width*(xpix - mean(xpix))./numel(xpix);
-ypix = 1:RF_insilico.screenPix(1);
-yaxis = stimInfo.height*(ypix - mean(ypix))./numel(ypix);
-
-%% fit RF position and size
-tic;
-mRF = squeeze(mean(RF_is,3));
-%RF_tmp = mat2cell(double(mRF), RF_insilico.screenPix(1), RF_insilico.screenPix(2));
-
-%USELESS:
-%[RF_contour, Cx_tmp, Cy_tmp, ok_tmp] = getRFContours(RF_tmp);
-% < Index in position 3 exceeds array bounds. @ ii=10, jj=1
-%computation time depends on screenPix_is
-% RF_Cx = cell2mat(Cx_tmp);
-% RF_Cy = cell2mat(Cy_tmp);
-% RF_ok = cell2mat(ok_tmp);
-
-RF_smooth = smooth2DGauss(mRF - mean(mRF(:)));
-RF_smooth(RF_smooth<0) = 0;
-p = fitGauss2(xaxis,yaxis,RF_smooth);%need smoothing before this
-RF_Cx = p(1);
-RF_Cy = p(2);
-RF_ok = 1;
-t3=toc
-
-
-crange = prctile(RF_is(:),[1 99]);
-figure('position',[0 0 1900 1000]);
-tiledlayout('flow');
-for ii= 1:size(RF_is,3)
-    cax=newplot;
-    imagesc(xaxis, yaxis, RF_is(:,:,ii));
-    axis equal tight;
-    caxis(crange);
-    if ii==1
-        title(['model delay ' num2str(lagTimes_is(ii))]);
-    else
-        title(lagTimes_is(ii));
-    end
-    nexttile;
-end
-imagesc(xaxis, yaxis, mRF);axis equal tight;
-title('mean across delays');
-caxis(crange);
-mcolorbar(gca,.5);
-
-if RF_ok
-    hold on;
-    plot(RF_Cx, RF_Cy, 'ro');
-end
-screen2png(encodingSaveName(1:end-4));
-close;
-
-RF_insilico.RF = RF_is;
-RF_insilico.RF_Cx = RF_Cx;
-RF_insilico.RF_Cy = RF_Cy;
-RF_insilico.RF_ok = RF_ok;
+RF_insilico = analyzeInSilicoRF(RF_insilico, stimInfo);
+showInSilicoRF(RF_insilico);
 
 % %looks like RF_Cx and RF_Cy is swapped??
 save(encodingSaveName,'RF_insilico','X','Y','Z','-append');
