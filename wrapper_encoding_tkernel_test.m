@@ -30,7 +30,7 @@ predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
 delayMax = (pen+1); %[s]
 
-for jj = 1    
+for jj = 2    
    
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
