@@ -30,14 +30,14 @@ predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
 delayMax = (pen+1); %[s]
 
-for jj = 2    
+for jj = 1   
    
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
     %% estimation of filter-bank coefficients
     trainParam.KFolds = 5; %cross validation
     trainParam.ridgeParam = [1 1e3 1e5 1e7]; %search the best within these values
-    trainParam.tavg = 1; %tavg = 0 requires loads of ram. if 0, use avg within Param.lagFrames to estimate coefficients
+    trainParam.tavg = 0; %tavg = 0 requires loads of ram. if 0, use avg within Param.lagFrames to estimate coefficients
     trainParam.Fs = dsRate(jj); %hz after downsampling
     trainParam.lagFrames = round(0*dsRate(jj)):round(delayMax*dsRate(jj));%3:9 %frame delays to train a neuron
     trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
@@ -91,7 +91,7 @@ for jj = 2
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) ...
-        '_delayMax' num2str(delayMax) suffix '.mat'];
+        '_lagFrames' num2str([trainParam.lagFrames(1) trainParam.lagFrames(end)]) suffix '.mat'];
     save(encodingSaveName,'trained','trainParam');%'rre','r0e','mse','lagFrames','tavg')
       
     set(gcf,'position',[0 0 1900 1000])
