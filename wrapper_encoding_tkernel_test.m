@@ -58,7 +58,7 @@ for jj = 1
     
     %% in-silico simulation
     RF_insilico = struct;
-    RF_insilico.nRepeats = 40;
+    RF_insilico.nRepeats = 40*15;
     RF_insilico.screenPix = stimInfo.screenPix/4; %[y x]
     %<screenPix(1)/screenPix(2) determines the #gabor filters
     
