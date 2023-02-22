@@ -28,7 +28,6 @@ end
 imagesc(xaxis, yaxis, mRF);axis equal tight;
 title('mean across delays');
 caxis(crange);
-mcolorbar(gca,.5);
 
 if RF_ok
     hold on;
