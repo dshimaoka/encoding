@@ -30,7 +30,7 @@ predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
 delayMax = (pen); %[s]
 
-for jj = 2   
+for jj = 2  
    
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
@@ -62,10 +62,7 @@ for jj = 2
     RF_insilico.screenPix = stimInfo.screenPix/4; %[y x]
     %<screenPix(1)/screenPix(2) determines the #gabor filters
     
-    
-    %% draw slurm ID for parallel computation
-    pen = getPen;
-    
+        
     %% load neural data
     %TODO: copy timetable data to local
     ds = tabularTextDatastore([dataPaths.timeTableSaveName(1:end-4) suffix '.csv']);
@@ -98,6 +95,21 @@ for jj = 2
     screen2png([encodingSaveName(1:end-4) '_tcourse']);
     close;
     
- 
+    
+    %% in-silico simulation
+    tic
+    RF_insilico = getInSilicoRF(gaborBankParamIdx, trained.r0e, trained.rre, ...
+        trainParam.lagFrames, trainParam.tavg, dsRate(jj), RF_insilico, ...
+        [stimInfo.height stimInfo.width]);
+    t2=toc
+
+    RF_insilico = analyzeInSilicoRF(RF_insilico, -1, [0 inf]);
+    showInSilicoRF(RF_insilico);
+    screen2png([encodingSaveName(1:end-4) '_RF']);
+    close;
+    
+    % %looks like RF_Cx and RF_Cy is swapped??
+    save(encodingSaveName,'RF_insilico','-append');
+
 end
 %TODO: upload result to server

@@ -1,16 +1,21 @@
-function RF_insilico = analyzeInSilicoRF(RF_insilico, stimInfo)
-%RF_insilico = analyzeInSilicoRF(RF_insilico, stimInfo)
+function RF_insilico = analyzeInSilicoRF(RF_insilico, peakPolarity, trange)
+%RF_insilico = analyzeInSilicoRF(RF_insilico, trange)
+if nargin < 2
+    peakPolarity = -1;
+end
 
-RF_is = RF_insilico.RF;
+if nargin < 3
+    trange = [-inf inf];
+end
 
-xpix = 1:RF_insilico.screenPix(2);
-xaxis = stimInfo.width*(xpix - mean(xpix))./numel(xpix);
-ypix = 1:RF_insilico.screenPix(1);
-yaxis = stimInfo.height*(ypix - mean(ypix))./numel(ypix);
+RF = RF_insilico.RF;
+xaxis = RF_insilico.xaxis;
+yaxis = RF_insilico.yaxis;
 
 %% fit RF position and size
 tic;
-mRF = squeeze(mean(RF_is,3));
+tidx = find(RF_insilico.RFdelay>=trange(1) & RF_insilico.RFdelay<=trange(2));
+mRF = squeeze(mean(RF(:,:,tidx),3));
 %RF_tmp = mat2cell(double(mRF), RF_insilico.screenPix(1), RF_insilico.screenPix(2));
 
 %USELESS:
@@ -22,11 +27,17 @@ mRF = squeeze(mean(RF_is,3));
 % RF_ok = cell2mat(ok_tmp);
 
 RF_smooth = smooth2DGauss(mRF - mean(mRF(:)));
+
+RF_smooth = peakPolarity * RF_smooth;
 RF_smooth(RF_smooth<0) = 0;
+  
 p = fitGauss2(xaxis,yaxis,RF_smooth);%need smoothing before this
 
 
 RF_insilico.RF_Cx = p(1);
 RF_insilico.RF_Cy = p(2);
-RF_insilico.RF_ok = 1; %FIX ME
-
+if (min(xaxis) < p(1)) && (max(xaxis) > p(1)) && (min(yaxis) < p(2)) && (max(yaxis) > p(2))
+    RF_insilico.RF_ok = 1;
+else
+    RF_insilico.RF_ok = 0;
+end

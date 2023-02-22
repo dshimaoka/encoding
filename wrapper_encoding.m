@@ -100,13 +100,12 @@ save(encodingSaveName,'trained','trainParam');%'rre','r0e','mse','lagFrames','ta
 %% in-silico simulation to obtain RF
 tic
 [RF_is, lagTimes_is] = getInSilicoRF(gaborBankParamIdx, trained.r0e, ...
-    trained.rre, trainParam.lagFrames, trainParam.tavg, dsRate, RF_insilico);
+    trained.rre, trainParam.lagFrames, trainParam.tavg, dsRate(jj), RF_insilico);
 t2=toc
 %~1000s for 
 %rr:6555x504
 %screenPix:20
 
-RF_insilico = analyzeInSilicoRF(RF_insilico, stimInfo);
 showInSilicoRF(RF_insilico);
 
 % %looks like RF_Cx and RF_Cy is swapped??

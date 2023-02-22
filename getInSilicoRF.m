@@ -1,6 +1,6 @@
-function [RF_is, lagTimes_mdl] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
-    tavg, Fs, RF_insilico)% screenPix, Fs, nRepeats)
-%[RF_is, lagRange] = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
+function RF_insilico = getInSilicoRF(paramIdx, r0, rr, lagRange, ...
+    tavg, Fs, RF_insilico, oriStimSize)
+%RF_insilico = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
 % estimate RF contour of the motion-energy model through in-silico noise
 % stimulation
 %
@@ -16,10 +16,12 @@ function [RF_is, lagTimes_mdl] = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
 %RF_insilico
 %   .screenPix: screen # pixels [y - x] for in silico simulation (no need to match that for in vivo exp)
 %   .nRepeats: #presentation per screen pixel(default:20)
+%oriStimSize: original stimulus window [height] in degree
 %
 %OUTPUT
-%RF_is: stim-trig avg [screenY x screenX x nDelays x nNeurons ]
-%lagTimes_model: axis of time delay corresponding to 3rd dim of RF_is in [s] (vector length = gparams.tsize)
+%append the following fields to RF_insilico:
+%   .RF: stim-trig avg [screenY x screenX x nDelays x nNeurons ]
+%   .RF_delay: axis of time delay after vis stim onset, corresponding to 3rd dim of RF_is in [s] 
 
 polarity = 'white';
 
@@ -29,13 +31,11 @@ nRepeats = RF_insilico.nRepeats;
 nDelays = size(rr,1);
 nNeurons = size(rr,3);
 
-if isempty(lagFrames)
-    lagFrames = 0:(nDelays-1);
-end
+Fs_visStim = paramIdx.predsRate;
 
 %%1 make sparse white noise
 nFrames = screenPix(1)*screenPix(2)*nRepeats;
-timeVec = 1/paramIdx.predsRate*(1:nFrames);%0:1/Fs:maxT;%[s]
+timeVec_stim = 1/Fs_visStim*(1:nFrames);%0:1/Fs:maxT;%[s]
 
 dotStream = repmat(1:screenPix(1)*screenPix(2), 1, nRepeats);
 dotStream = dotStream(randperm(screenPix(1)*screenPix(2)*nRepeats));
@@ -48,31 +48,39 @@ end
 stim_is = reshape(stim_is_flat, screenPix(1), screenPix(2), nFrames);
 
 
-%% 2 compute response of the filter bank
+%% 2 compute response of the filter bank, at Fs Hz
 paramIdx.cparamIdx = [];
-paramIdx.dsparamIdx = [];
-S_nm = preprocAll(stim_is, paramIdx, Fs);
+paramIdx.predsRate = [];
+[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, Fs_visStim, Fs);
 S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 
 %% 3 compute responese of the wavelet filter
-lagRange = [min(lagFrames) max(lagFrames)];%/Fs? %lag range provided as rr
-%gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
-%lagRange_model = [0 (gparams.tsize-1)/Fs];%motion energy model
-%lagTimes_model = round(lagRange_model(1)*Fs):round(lagRange_model(2)*Fs);
-%lagTimes_model = round(lagRange(1)/Fs):round(lagRange(2)/Fs); %response time window in seconds not frames
-lagRange_mdl = [lagRange(1) 3*lagRange(2)]; %response latency of model in Frames
-lagTimes_mdl = linspace(lagRange_mdl(1)/Fs,lagRange_mdl(2)/Fs,round(diff(lagRange_mdl/Fs)*Fs+1)); %"surround time" from getSparseResponse 
-RF_is = zeros(screenPix(1), screenPix(2), length(lagTimes_mdl), nNeurons);
+% lagRange = [min(lagFrames) max(lagFrames)];%/Fs? %lag range provided as rr
+gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
+filterWidth = gparams.tsize; %#frames
+lagRange_mdl = [lagRange(1) lagRange(2)]; %response latency of model in Frames
+lagRangeS_mdl = [mean(lagRange_mdl)-0.5*filterWidth mean(lagRange_mdl)+0.5*filterWidth]/Fs; %expected frame window of gabor wavelet bank
+
+RF_delay = linspace(lagRangeS_mdl(1),lagRangeS_mdl(2),round(diff(lagRangeS_mdl)*Fs+1)); %"surround time" from getSparseResponse ;
+RF_is = zeros(screenPix(1), screenPix(2), length(RF_delay), nNeurons);
 for iNeuron = 1:nNeurons
-    [observed] = predictXs(timeVec, S_nm, ...
+    [observed] = predictXs(timeVec_mdlResp, S_nm, ...
         squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), lagRange, tavg);
     
     %% 4 estimate RF
     % stimulus-triggered avg (by AP)...fast
-    [response_t] = getSparseResponse(observed, timeVec, stim_is, ...
-        timeVec, lagRange_mdl/Fs, polarity);% [delay x 1 x ]
+    [response_t] = getSparseResponse(observed, timeVec_mdlResp, stim_is, ...
+        timeVec_stim, lagRangeS_mdl, polarity);% [delay x 1 x ]
     % < getSparseResponse can deal with multiple variables but not scalable
     response_t = (squeeze(response_t))';
     RF_is(:,:,:,iNeuron) = reshape(response_t,screenPix(1),screenPix(2),[]);
 end
+RF_insilico.RF = RF_is;
+RF_insilico.RFdelay = RF_delay;
+
+xpix = 1:screenPix(2);
+RF_insilico.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
+ypix = 1:screenPix(1);
+RF_insilico.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
+

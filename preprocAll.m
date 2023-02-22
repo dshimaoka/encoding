@@ -26,7 +26,7 @@ if nargin < 2 || isempty(paramIdx)
     paramIdx.nrmparamIdx = 1;
 end
 
-
+%Converting color space ... [rgb2lab] ... takes most of the time in preprocAll
 if ~isempty(paramIdx.cparamIdx)
     cparams = preprocColorSpace_GetMetaParams(paramIdx.cparamIdx);
     [S, cparams] = preprocColorSpace(S, cparams);
