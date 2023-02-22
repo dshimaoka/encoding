@@ -28,9 +28,9 @@ dataPaths = getDataPaths(expInfo,rescaleFac);
 % load( dataPaths.stimSaveName, 'dsRate'); %NEI FIX THIS
 predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
-delayMax = (pen); %[s]
+delayMax = (pen+1); %[s]
 
-for jj = 2
+for jj = 1
    
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
