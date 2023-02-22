@@ -29,9 +29,9 @@ dataPaths = getDataPaths(expInfo,rescaleFac);
 predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
 delayMax = (pen+1); %[s]
-
+train = 0;
 for jj = 1
-   
+    
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
     %% estimation of filter-bank coefficients
@@ -62,7 +62,7 @@ for jj = 1
     RF_insilico.screenPix = stimInfo.screenPix/4; %[y x]
     %<screenPix(1)/screenPix(2) determines the #gabor filters
     
-        
+    
     %% load neural data
     %TODO: copy timetable data to local
     ds = tabularTextDatastore([dataPaths.timeTableSaveName(1:end-4) suffix '.csv']);
@@ -70,31 +70,33 @@ for jj = 1
     
     %% load gabor bank prediction data
     %TODO load data tolocal
-    load( [dataPaths.stimSaveName(1:end-4) suffix '.mat'], ...
-        'TimeVec_stim_cat', 'S_fin','gaborBankParamIdx');
-    
-    % S_fin_train = single(S_fin(trainIdx,:));
-    % S_fin_test = single(S_fin(testIdx,:));
-    % nFilters = size(S_fin,2);
-    
-    %% estimate the energy-model parameters w cross validation
-    tic;
-    trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
-        trainParam.KFolds, [trainParam.lagFrames(1) trainParam.lagFrames(end)], ...
-        trainParam.tavg, trainParam.useGPU);
-    t1=toc %6s!
-    
-    
+    load( [dataPaths.stimSaveName(1:end-4) suffix '.mat'], 'gaborBankParamIdx');
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) ...
         '_lagFrames' num2str([trainParam.lagFrames(1) trainParam.lagFrames(end)]) suffix '.mat'];
-    save(encodingSaveName,'trained','trainParam');%'rre','r0e','mse','lagFrames','tavg')
-      
-    set(gcf,'position',[0 0 1900 1000])
-    screen2png([encodingSaveName(1:end-4) '_tcourse']);
-    close;
     
+    if train
+        load( [dataPaths.stimSaveName(1:end-4) suffix '.mat'], ...
+            'TimeVec_stim_cat', 'S_fin');
+        
+        %% estimate the energy-model parameters w cross validation
+        tic;
+        trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
+            trainParam.KFolds, [trainParam.lagFrames(1) trainParam.lagFrames(end)], ...
+            trainParam.tavg, trainParam.useGPU);
+        t1=toc %6s!
+        
+        
+        
+        save(encodingSaveName,'trained','trainParam');%'rre','r0e','mse','lagFrames','tavg')
+        
+        set(gcf,'position',[0 0 1900 1000])
+        screen2png([encodingSaveName(1:end-4) '_tcourse']);
+        close;
+    else
+        load(encodingSaveName,'trained','trainParam');
+    end
     
     %% in-silico simulation
     tic
@@ -102,7 +104,7 @@ for jj = 1
         trainParam.lagFrames, trainParam.tavg, dsRate(jj), RF_insilico, ...
         [stimInfo.height stimInfo.width]);
     t2=toc
-
+    
     RF_insilico = analyzeInSilicoRF(RF_insilico, -1, [0 inf]);
     showInSilicoRF(RF_insilico);
     screen2png([encodingSaveName(1:end-4) '_RF']);
@@ -110,6 +112,6 @@ for jj = 1
     
     % %looks like RF_Cx and RF_Cy is swapped??
     save(encodingSaveName,'RF_insilico','-append');
-
+    
 end
 %TODO: upload result to server
