@@ -1,4 +1,4 @@
-function RF_insilico = getInSilicoRF(paramIdx, r0, rr, lagRange, ...
+function RF_insilico = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
     tavg, Fs, RF_insilico, oriStimSize)
 %RF_insilico = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
 % estimate RF contour of the motion-energy model through in-silico noise
@@ -59,14 +59,13 @@ S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 % lagRange = [min(lagFrames) max(lagFrames)];%/Fs? %lag range provided as rr
 gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
 filterWidth = gparams.tsize; %#frames
-lagRange_mdl = [lagRange(1) lagRange(2)]; %response latency of model in Frames
-lagRangeS_mdl = [mean(lagRange_mdl)-0.5*filterWidth mean(lagRange_mdl)+0.5*filterWidth]/Fs; %expected frame window of gabor wavelet bank
+lagRangeS_mdl = [mean(lagFrames)-0.5*filterWidth mean(lagFrames)+0.5*filterWidth]/Fs; %expected frame window of gabor wavelet bank
 
 RF_delay = linspace(lagRangeS_mdl(1),lagRangeS_mdl(2),round(diff(lagRangeS_mdl)*Fs+1)); %"surround time" from getSparseResponse ;
 RF_is = zeros(screenPix(1), screenPix(2), length(RF_delay), nNeurons);
 for iNeuron = 1:nNeurons
     [observed] = predictXs(timeVec_mdlResp, S_nm, ...
-        squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), lagRange, tavg);
+        squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), [lagFrames(1) lagFrames(end)], tavg);
     
     %% 4 estimate RF
     % stimulus-triggered avg (by AP)...fast
