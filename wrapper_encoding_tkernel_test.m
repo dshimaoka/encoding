@@ -28,7 +28,7 @@ dataPaths = getDataPaths(expInfo,rescaleFac);
 % load( dataPaths.stimSaveName, 'dsRate'); %NEI FIX THIS
 predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
-delayMax = (pen+1); %[s]
+delayMax = (pen); %[s]
 doTrain = 1;
 for jj = 2
     
@@ -82,8 +82,9 @@ for jj = 2
         
         %% estimate the energy-model parameters w cross validation
         tic;
+        lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
         trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
-            trainParam.KFolds, [trainParam.lagFrames(1) trainParam.lagFrames(end)], ...
+            trainParam.KFolds, lagRangeS, ...
             trainParam.tavg, trainParam.useGPU);
         t1=toc %6s!
         
