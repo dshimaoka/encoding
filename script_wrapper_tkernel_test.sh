@@ -10,6 +10,7 @@
 #SBATCH --mem-per-cpu=65000
 #SBATCH --array=1-3
 #SBATCH --gres=gpu:1
-#SBATCH --partition=m3h
+#SBATCH --partition=m3g
+#SBATCH --constraint=V100-32G
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < wrapper_encoding_tkernel_test.m
