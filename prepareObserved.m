@@ -5,8 +5,6 @@ function [observed, TimeVec_ds_c] = prepareObserved(imageProc, dsRate)
 %
 % 2023 - 02 - 09 DS created from quickAnalysisCJ224_runPassiveMovies2.m
 %
-% TODO:
-% compute dI/I just once across conditions?
 % 
 
 OETimes = imageProc.OETimes;
@@ -29,7 +27,7 @@ calcWin = [0 stimInfo.duration]; %chop off all trials at exact same time
     = eventLockedAvg(V, camOnTimes_rs, OETimes.stimOnTimes, stimInfo.stimLabels, ...
     calcWin);
 
-dsparams = preprocDownsample_GetMetaParams(1); % for TR=1; use (2) for TR=2　%SLOW
+dsparams = preprocDownsample_GetMetaParams(1); %SLOW
 dsparams.imHz = round(Fcam);
 dsparams.sampleSec = 1/dsRate;
 nrmparams = preprocNormalize_GetMetaParams(1);%FAST
@@ -54,6 +52,7 @@ for imov = 1:numel(stimLabels_ok)
     else
         TimeVec_ds_c = [TimeVec_ds_c; TimeVec_ds_c(end) + dsparams.sampleSec + TimeVec_ds];
     end
+    
     %% compute dI/I
     % baseWin = ones(1,numel(winSamps));
     % dFFmethod = 2;

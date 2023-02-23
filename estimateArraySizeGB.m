@@ -1,7 +1,7 @@
 T = 7200; %original movie duration [s]
-R = 2; %down sampling rate [Hz]
+R = 5; %down sampling rate [Hz]
 P = 3014; %number of parameters of the gabor wavlet filter bank
-W = 2:4; %temporal kernel window size [s]
+W = 1; %temporal kernel window size [s]
 
 predX_numel = (T*R + P*W*R) .* (P*W*R); %array size
 

@@ -69,39 +69,42 @@ else
 
 end
 
+
+%% TMP
 roiIdx = 7618;
 imageProc_s = imageProc;
 imageProc_s.V = imageProc.V(roiIdx,:);
+%%
 
 dsRate = 3;% 10]; %sampling rate of hemodynamic coupling function
 for ii = 1%1:numel(dsRate)
     suffix = ['_dsRate' num2str(dsRate(ii))];
     
-    %     %% convert processed signal to a format compatible with fitting
-    %     [observed, TimeVec_ds_c] = prepareObserved(imageProc_s, dsRate(ii));
-    %     %observed: time x pixel
-    %     %< TODO: BETTER WAY TO DO DOWNSAMPLING?
-    %     %< observed is NOT saved
-    %
-    %     %% save as timetable
-    %     TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
-    %     writetimetable(TT, [dataPaths.timeTableSaveName(1:end-4) suffix '.csv']);%slow
+        %% convert processed signal to a format compatible with fitting
+        [observed, TimeVec_ds_c] = prepareObserved(imageProc_s, dsRate(ii));
+        %observed: time x pixel
+        %< TODO: BETTER WAY TO DO DOWNSAMPLING?
+        %< observed is NOT saved
     
-    %     clear TT
+        %% save as timetable
+        TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
+        writetimetable(TT, [dataPaths.timeTableSaveName(1:end-4) suffix '.csv']);%slow
+    
+        clear TT
     
     
     
     %% prepare stimulus (~5h in my PC)
     %DUMM THIS TAKES AGES!
-    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
-        dsRate(ii), gaborBankParamIdx, 0);
-    
-    %dirPref = getpref('nsAnalysis','dirPref');
-    %oeOriServer = dirPref.oeOriServer; %direct ethernet connection
-    %saveDir = fullfile(oeOriDir, fullOEName);
-    
-    
-    %% save gabor filter output as .mat
-    save( [dataPaths.stimSaveName(1:end-4) suffix '.mat'], 'TimeVec_stim_cat', 'S_fin', ...
-        'gaborBankParamIdx', 'dsRate');
+%     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
+%         dsRate(ii), gaborBankParamIdx, 0);
+%     
+%     %dirPref = getpref('nsAnalysis','dirPref');
+%     %oeOriServer = dirPref.oeOriServer; %direct ethernet connection
+%     %saveDir = fullfile(oeOriDir, fullOEName);
+%     
+%     
+%     %% save gabor filter output as .mat
+%     save( [dataPaths.stimSaveName(1:end-4) suffix '.mat'], 'TimeVec_stim_cat',...
+%         'S_fin', 'gaborBankParamIdx', 'dsRate');
 end

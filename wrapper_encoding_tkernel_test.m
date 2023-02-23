@@ -29,8 +29,8 @@ dataPaths = getDataPaths(expInfo,rescaleFac);
 predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
 delayMax = (pen+1); %[s]
-train = 0;
-for jj = 1
+doTrain = 1;
+for jj = 2
     
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
@@ -76,7 +76,7 @@ for jj = 1
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) ...
         '_lagFrames' num2str([trainParam.lagFrames(1) trainParam.lagFrames(end)]) suffix '.mat'];
     
-    if train
+    if doTrain
         load( [dataPaths.stimSaveName(1:end-4) suffix '.mat'], ...
             'TimeVec_stim_cat', 'S_fin');
         
