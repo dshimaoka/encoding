@@ -28,17 +28,23 @@ polarity = 'white';
 screenPix = RF_insilico.screenPix;
 nRepeats = RF_insilico.nRepeats;
 
-nDelays = size(rr,1);
+%nDelays = size(rr,1);
 nNeurons = size(rr,3);
 
-Fs_visStim = paramIdx.predsRate;
+if isempty(RF_insilico.Fs_visStim)
+    RF_insilico.Fs_visStim = paramIdx.predsRate;
+end
 
 %%1 make sparse white noise
-nFrames = screenPix(1)*screenPix(2)*nRepeats;
-timeVec_stim = 1/Fs_visStim*(1:nFrames);%0:1/Fs:maxT;%[s]
 
 dotStream = repmat(1:screenPix(1)*screenPix(2), 1, nRepeats);
 dotStream = dotStream(randperm(screenPix(1)*screenPix(2)*nRepeats));
+dotStream = repmat(dotStream,RF_insilico.dwell,1);
+dotStream = dotStream(:)';
+
+nFrames = numel(dotStream);
+timeVec_stim = 1/RF_insilico.Fs_visStim*(1:nFrames);%0:1/Fs:maxT;%[s]
+
 %[dotYidxStream, dotXidxStream] = ind2sub([screenPix screenPix], dotStream);
 stim_is_flat = single(zeros(screenPix(1)*screenPix(2), nFrames));
 for tt = 1:nFrames
@@ -51,7 +57,7 @@ stim_is = reshape(stim_is_flat, screenPix(1), screenPix(2), nFrames);
 %% 2 compute response of the filter bank, at Fs Hz
 paramIdx.cparamIdx = [];
 paramIdx.predsRate = [];
-[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, Fs_visStim, Fs);
+[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.Fs_visStim, Fs);
 S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 

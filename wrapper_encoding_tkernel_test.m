@@ -28,7 +28,7 @@ dataPaths = getDataPaths(expInfo,rescaleFac);
 % load( dataPaths.stimSaveName, 'dsRate'); %NEI FIX THIS
 predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
-delayMax = (pen); %[s]
+delayMax = (pen+1); %[s] %pen
 doTrain = 1;
 for jj = 2
     
@@ -58,8 +58,10 @@ for jj = 2
     
     %% in-silico simulation
     RF_insilico = struct;
-    RF_insilico.nRepeats = 40*15;
+    RF_insilico.nRepeats = 10;
     RF_insilico.screenPix = stimInfo.screenPix/4; %[y x]
+    RF_insilico.Fs_visStim = predsRate;
+    RF_insilico.dwell = 5; %number of consecutive frames of noise patch stim
     %<screenPix(1)/screenPix(2) determines the #gabor filters
     
     
@@ -106,8 +108,9 @@ for jj = 2
         [stimInfo.height stimInfo.width]);
     t2=toc
     
-    RF_insilico = analyzeInSilicoRF(RF_insilico, -1, [0 inf]);
-    showInSilicoRF(RF_insilico);
+    analysisTwin = [0 trainParam.lagFrames(end)/dsRate(jj)];
+    RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
+    showInSilicoRF(RF_insilico, analysisTwin);
     screen2png([encodingSaveName(1:end-4) '_RF']);
     close;
     
