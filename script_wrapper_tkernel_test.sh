@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem-per-cpu=65000
-#SBATCH --array=1-8
+#SBATCH --array=1-1
 #SBATCH --gres=gpu:1
 #SBATCH --partition=m3h
 module load matlab
