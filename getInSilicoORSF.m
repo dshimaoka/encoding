@@ -1,5 +1,4 @@
-function [mresp, oriList, sfList] = getInSilicoORSF(gparamIdx, r0, rr, ...
-    lagFrames, tavg, screenPix, Fs, nRepeats, nORs, sfList)
+function RF_insilico = getInSilicoORSF(paramIdx, trained, trainParam, RF_insilico)
 %INPUT:
 %gparamIdx: parameter Idx supplied to preprocWavelets_grid_GetMetaParams
 %r0: scalar
@@ -10,33 +9,40 @@ function [mresp, oriList, sfList] = getInSilicoORSF(gparamIdx, r0, rr, ...
 %nOR: number of ORs (equally spaced between 0-pi
 %sfList: list of SFs (cycles per pixel)
 %
-% OUTPUT:
+%OUTPUT:
 %mresp: resp across repeats and delays [nORs x nSFs x nNeurons]
 %oriList: list of ORs (1st dim of mresp) (rad)
 %sfList: list of SFs (2nd dim of mresp) (cycles per pixel)
 
-if nargin < 9 || isempty(nORs)
+r0 = trained.r0e;
+rr = trained.rre;
+lagFrames = trainParam.lagFrames;
+tavg = trainParam.tavg;
+Fs = trainParam.Fs;
+
+screenPix = RF_insilico.screenPix;
+
+if ~isfield(RF_insilico.ORSF,'oriList') && isempty(RF_insilico.ORSF.oriList)
     nORs = 10;
+    oriList = pi/180*linspace(0,180,nORs+1)';
+    oriList = oriList(1:end-1);
+    RF_insilico.ORSF.oriList = oriList;
 end
-if nargin < 10
-    sfList = linspace(1/screenPix, 1/2, 5);
-%sfList = [0.05 0.1 0.15 0.2]';
+
+if  ~isfield(RF_insilico.ORSF,'sfList') && isempty(RF_insilico.ORSF.sfList)
+    sfList = linspace(1/screenPix, 1/2, 5); %cycles per pixel
+    %sfList = [0.05 0.1 0.15 0.2]';
+    RF_insilico.ORSF.sfList = sfList;
 end
+
+if isempty(RF_insilico.ORSF.Fs_visStim)
+    RF_insilico.ORSF.Fs_visStim = paramIdx.predsRate;
+end
+
 nNeurons = size(rr,3);
 nSF = length(sfList);
 
-gparams = preprocWavelets_grid_GetMetaParams(gparamIdx);
-gparams.show_or_preprocess = 0;
-[gab, pp] = preprocWavelets_grid(zeros(screenPix,screenPix), gparams);
-nFilters = length(gab);
-if ~isequal(size(rr,2), nFilters)
-    error('#filters does not match. Check 1st and 3rd inputs');
-end
-
-
-%%1 make sparse white noise
-oriList = pi/180*linspace(0,180,nORs+1)';
-oriList = oriList(1:end-1);
+nRepeats = RF_insilico.ORSF.nRepeats;
 
 if size(sfList,1) < size(sfList,2)
     sfList = sfList';
@@ -51,17 +57,21 @@ sfStream = sfList(sfIdxStream);
 
 nOns = length(oriStream);
 
-onFrames = gparams.tsize*(1:nOns);
-timeVec = 1/Fs*(1:(onFrames(end)+gparams.tsize));
+gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
+checkGparam(gparams, screenPix);
+
+filterWidth = gparams.tsize; %#frames
+onFrames = filterWidth*(1:nOns);
+timeVec_stim = 1/Fs*(1:(onFrames(end) + filterWidth));
 
 
-%making 2dgabor
+%1 make visual stimulus (2D stripes)
 phaseStream = 2*pi*rand(1,nOns);
 %pix2deg = 1;
 xdeg = (1:screenPix)-0.5*screenPix;
 ydeg = xdeg;
 [X,Y]=meshgrid(xdeg,ydeg);
-stim_is = single(zeros(screenPix,screenPix,length(timeVec)));
+stim_is = single(zeros(screenPix,screenPix,length(timeVec_stim)));
 for ff = 1:nOns
     XY = X*cos(oriStream(ff))+Y*sin(oriStream(ff));
     AngFreqs = 2*pi* sfStream(ff) * XY + phaseStream(ff);
@@ -71,31 +81,43 @@ stim_is = 0.5*(stim_is+1); %[0-1]
 
 
 %% 2 compute response of the filter bank
-gparams = preprocWavelets_grid_GetMetaParams(gparamIdx);
-[S_gab, gparams] = preprocWavelets_grid(stim_is, gparams);%<use future times
-nlparams = preprocNonLinearOut_GetMetaParams(1);
-[S_nl, nlparams] = preprocNonLinearOut(S_gab, nlparams);
-nrmparams = preprocNormalize_GetMetaParams(1);
-[S_nm, nrmparams] = preprocNormalize(S_nl, nrmparams);
-S_nm = S_nm';
-%impose delay so the filter uses signal only from the past
-S_nm = circshift(S_nm, round(gparams.tsize/2), 2);
-%< up to here nNeurons does not matter
+paramIdx.cparamIdx = [];
+paramIdx.predsRate = [];
+[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.Fs_visStim, Fs);
+S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
+
 
 %% 3 compute responese of the wavelet filter
-lagRange = [min(lagFrames)/Fs max(lagFrames)/Fs];%lag range provided as rr
-lagRange_model = [0 (gparams.tsize-1)/Fs];
+%lagRange = [min(lagFrames)/Fs max(lagFrames)/Fs];%lag range provided as rr
+%lagRange_model = [0 (gparams.tsize-1)/Fs];
+lagRangeS_mdl = [mean(lagFrames)-0.5*filterWidth mean(lagFrames)+0.5*filterWidth]/Fs; %expected frame window of gabor wavelet bank
+
 mresp = zeros(nSF, nORs, nNeurons);
-parfor iNeuron = 1:nNeurons
-    [observed] = predictXs(timeVec, S_nm, ...
-        squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), lagRange, tavg);
+for iNeuron = 1:nNeurons
+    [observed] = predictXs(timeVec_mdlResp, S_nm, ...
+        squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), [lagFrames(1) lagFrames(end)], tavg);
     
     %% 4 test OR tuning
-    avgPeriEventV = eventLockedAvg(observed, timeVec, timeVec(onFrames), ...
-        oriSfStream, lagRange_model);
+    avgPeriEventV = eventLockedAvg(observed, timeVec_mdlResp, ...
+        timeVec_stim(onFrames), oriSfStream, lagRangeS_mdl);
     %      avgPeriEventV: nEventTypes x nCells x nTimePoints
     mresp_tmp = squeeze(mean(avgPeriEventV,3))';
     mresp(:,:,iNeuron) = reshape(mresp_tmp, nSF, nORs);
     %sresp = squeeze(mean(periEventV,3));
     
+end
+
+RF_insilico.ORSF.mresp = mresp;
+% RF_insilico.ORSF.kernel = kernel; %FIX ME
+RF_insilico.ORSF.oriList = oriList;
+RF_insilico.ORSF.sfList = sfList;
+end
+
+function checkGparam(gparams, screenPix)
+gparams.show_or_preprocess = 0;
+[gab, pp] = preprocWavelets_grid(zeros(screenPix,screenPix), gparams);
+nFilters = length(gab);
+if ~isequal(size(rr,2), nFilters)
+    error('#filters does not match. Check 1st and 3rd inputs');
+end
 end

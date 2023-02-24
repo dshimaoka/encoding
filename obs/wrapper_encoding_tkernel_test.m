@@ -28,9 +28,9 @@ dataPaths = getDataPaths(expInfo,rescaleFac);
 % load( dataPaths.stimSaveName, 'dsRate'); %NEI FIX THIS
 predsRate = 15; %hz
 dsRate = [1 5];%[1 2 5 10];
-delayMax = (pen+1); %[s] %pen
-doTrain = 1;
-for jj = 2
+delayMax = (4); %[s] %pen
+doTrain = 0;
+for jj = 1
     
     suffix = ['_dsRate' num2str(dsRate(jj))];
     
@@ -102,17 +102,24 @@ for jj = 2
     end
     
     %% in-silico simulation
-    tic
-    RF_insilico = getInSilicoRF(gaborBankParamIdx, trained.r0e, trained.rre, ...
-        trainParam.lagFrames, trainParam.tavg, dsRate(jj), RF_insilico, ...
-        [stimInfo.height stimInfo.width]);
-    t2=toc
-    
-    analysisTwin = [0 trainParam.lagFrames(end)/dsRate(jj)];
-    RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
-    showInSilicoRF(RF_insilico, analysisTwin);
-    screen2png([encodingSaveName(1:end-4) '_RF']);
-    close;
+    dwells = [1 3 5 10 15];
+    for rr = 1:numel(dwells)
+        
+        RF_insilico.dwell = dwells(rr);
+        RF_insilico.nRepeats = 60/dwells(rr);
+        
+        tic
+        RF_insilico = getInSilicoRF(gaborBankParamIdx, trained.r0e, trained.rre, ...
+            trainParam.lagFrames, trainParam.tavg, dsRate(jj), RF_insilico, ...
+            [stimInfo.height stimInfo.width]);
+        t2=toc
+        
+        analysisTwin = [0 trainParam.lagFrames(end)/dsRate(jj)];
+        RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
+        showInSilicoRF(RF_insilico, analysisTwin);
+        screen2png([encodingSaveName(1:end-4) '_RF_dwell' num2str(dwells(rr))]);
+        close;
+    end
     
     % %looks like RF_Cx and RF_Cy is swapped??
     save(encodingSaveName,'RF_insilico','-append');

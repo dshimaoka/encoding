@@ -33,7 +33,7 @@ ds_tmp = ds;
 %observed = gather(neuroData.('observed'));%TMP
 %READ WO GPU
 neuroData = ds_tmp.readall;
-observed = neuroData.('observed');%TMP
+observed = neuroData.(['observed_' num2str(iNeuron)]);
 observed_train = single(observed(trainIdx));
 
 S_fin_train = single(S_fin(trainIdx,:));

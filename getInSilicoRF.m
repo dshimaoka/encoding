@@ -1,5 +1,4 @@
-function RF_insilico = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
-    tavg, Fs, RF_insilico, oriStimSize)
+function RF_insilico = getInSilicoRF(paramIdx, trained, trainParam, RF_insilico, oriStimSize)
 %RF_insilico = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
 % estimate RF contour of the motion-energy model through in-silico noise
 % stimulation
@@ -25,25 +24,29 @@ function RF_insilico = getInSilicoRF(paramIdx, r0, rr, lagFrames, ...
 
 polarity = 'white';
 
+r0 = trained.r0e;
+rr = trained.rre;
+lagFrames = trainParam.lagFrames;
+tavg = trainParam.tavg;
+Fs = trainParam.Fs;
 screenPix = RF_insilico.screenPix;
-nRepeats = RF_insilico.nRepeats;
+nRepeats = RF_insilico.noiseRF.nRepeats;
 
 %nDelays = size(rr,1);
 nNeurons = size(rr,3);
 
-if isempty(RF_insilico.Fs_visStim)
-    RF_insilico.Fs_visStim = paramIdx.predsRate;
+if ~isfield(RF_insilico.noiseRF,'Fs_visStim') || isempty(RF_insilico.noiseRF.Fs_visStim)
+   Fs_visStim = paramIdx.predsRate;
 end
 
 %%1 make sparse white noise
-
 dotStream = repmat(1:screenPix(1)*screenPix(2), 1, nRepeats);
 dotStream = dotStream(randperm(screenPix(1)*screenPix(2)*nRepeats));
-dotStream = repmat(dotStream,RF_insilico.dwell,1);
+dotStream = repmat(dotStream,RF_insilico.noiseRF.dwell,1);
 dotStream = dotStream(:)';
 
 nFrames = numel(dotStream);
-timeVec_stim = 1/RF_insilico.Fs_visStim*(1:nFrames);%0:1/Fs:maxT;%[s]
+timeVec_stim = 1/Fs_visStim*(1:nFrames);%0:1/Fs:maxT;%[s]
 
 %[dotYidxStream, dotXidxStream] = ind2sub([screenPix screenPix], dotStream);
 stim_is_flat = single(zeros(screenPix(1)*screenPix(2), nFrames));
@@ -57,7 +60,7 @@ stim_is = reshape(stim_is_flat, screenPix(1), screenPix(2), nFrames);
 %% 2 compute response of the filter bank, at Fs Hz
 paramIdx.cparamIdx = [];
 paramIdx.predsRate = [];
-[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.Fs_visStim, Fs);
+[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, Fs_visStim, Fs);
 S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 
@@ -81,11 +84,11 @@ for iNeuron = 1:nNeurons
     response_t = (squeeze(response_t))';
     RF_is(:,:,:,iNeuron) = reshape(response_t,screenPix(1),screenPix(2),[]);
 end
-RF_insilico.RF = RF_is;
-RF_insilico.RFdelay = RF_delay;
+RF_insilico.noiseRF.RF = RF_is;
+RF_insilico.noiseRF.RFdelay = RF_delay;
 
 xpix = 1:screenPix(2);
-RF_insilico.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
+RF_insilico.noiseRF.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
 ypix = 1:screenPix(1);
-RF_insilico.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
+RF_insilico.noiseRF.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
 
