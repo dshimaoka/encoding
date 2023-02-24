@@ -29,7 +29,7 @@ rr = trained.rre;
 lagFrames = trainParam.lagFrames;
 tavg = trainParam.tavg;
 Fs = trainParam.Fs;
-screenPix = RF_insilico.screenPix;
+screenPix = RF_insilico.noiseRF.screenPix;
 nRepeats = RF_insilico.noiseRF.nRepeats;
 
 %nDelays = size(rr,1);
@@ -55,7 +55,7 @@ for tt = 1:nFrames
 end
 %stim_is_flat(dotStreamIdx) = 1; %<this is what I want to do wo for loop
 stim_is = reshape(stim_is_flat, screenPix(1), screenPix(2), nFrames);
-
+clear stim_is_flat
 
 %% 2 compute response of the filter bank, at Fs Hz
 paramIdx.cparamIdx = [];

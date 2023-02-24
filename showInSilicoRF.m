@@ -5,15 +5,15 @@ if nargin < 2
     trange = [-inf inf];
 end
 
-RF = RF_insilico.RF;
-RF_delay = RF_insilico.RFdelay;
-RF_Cx = RF_insilico.RF_Cx;
-RF_Cy = RF_insilico.RF_Cy;
-RF_ok = RF_insilico.RF_ok;
-xaxis = RF_insilico.xaxis;
-yaxis = RF_insilico.yaxis;
+RF = RF_insilico.noiseRF.RF;
+RF_delay = RF_insilico.noiseRF.RFdelay;
+RF_Cx = RF_insilico.noiseRF.RF_Cx;
+RF_Cy = RF_insilico.noiseRF.RF_Cy;
+RF_ok = RF_insilico.noiseRF.RF_ok;
+xaxis = RF_insilico.noiseRF.xaxis;
+yaxis = RF_insilico.noiseRF.yaxis;
 
-tidx = find(RF_insilico.RFdelay>=trange(1) & RF_insilico.RFdelay<=trange(2));
+tidx = find(RF_delay>=trange(1) & RF_delay<=trange(2));
 mRF = squeeze(mean(RF(:,:,tidx),3));
 
 crange = prctile(abs(RF(:)),[99]);

@@ -3,7 +3,7 @@ function [S, timeVec] = preprocAll(S, paramIdx, frameRate, dsRate)
 %
 %INPUT
 %S: x-y-c-t
-%frameRate: original sampling rage in Hz
+%frameRate: sampling rate in Hz before gabor bank filtering
 %dsRate: desired downsampling rate in Hz (default:1)
 %    paramIdx.cparamIdx
 %    paramIdx.gparamIdx

@@ -16,20 +16,15 @@ expInfo.expID = 19;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.25;
-%roiIdx = 7618;%1658;%roiIdx_tmp(noNanIdx);
+roiIdx = 7618:7627;%1658;%roiIdx_tmp(noNanIdx);
 
 %% draw slurm ID for parallel computation specifying ROI position
-if ~ispc
-    pen = getPen + 7617;
-else
-    pen = 7618;
-end
-
+pen = getPen;
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
 %TODO: save data locally
-encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(pen) '.mat'];
+encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx(pen)) '.mat'];
 
 load( dataPaths.stimSaveName, 'dsRate', 'gaborBankParamIdx'); %NEI FIX THIS
 
@@ -37,9 +32,9 @@ load( dataPaths.stimSaveName, 'dsRate', 'gaborBankParamIdx'); %NEI FIX THIS
 %% estimation of filter-bank coefficients
 trainParam.KFolds = 5; %cross validation
 trainParam.ridgeParam = [1 1e3 1e5 1e7]; %search the best within these values
-trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
+trainParam.tavg = 1; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = round(0/dsRate):round(5/dsRate);%0:6;%3:6;%0:9 %frame delays to train a neuron
+trainParam.lagFrames = round(0/dsRate):round(1/dsRate);%0:6;%3:6;%0:9 %frame delays to train a neuron
 trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 
@@ -48,11 +43,19 @@ load(dataPaths.imageSaveName,'stimInfo')
 
 %% in-silico simulation
 RF_insilico = struct;
-RF_insilico.noiseRF.nRepeats = 5;
+RF_insilico.noiseRF.nRepeats = 4;
 RF_insilico.noiseRF.dwell = 15; %frames
-RF_insilico.screenPix = stimInfo.screenPix/4; %[y x]
+RF_insilico.noiseRF.screenPix = stimInfo.screenPix/4; %[y x]
 %<screenPix(1)/screenPix(2) determines the #gabor filters
 
+RF_insilico.ORSF.screenPix = stimInfo.screenPix/4; %[y x]
+nORs = 10;
+oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
+RF_insilico.ORSF.oriList = oriList(1:end-1);
+%sfList = linspace(1/RF_insilico.ORSF.screenPix, 1/2, 5); %cycles per pixel
+sfList = [0.05 0.1 0.15 0.2 0.25 0.3]';
+RF_insilico.ORSF.sfList = sfList;
+RF_insilico.ORSF.nRepeats = 20;
 
 
 % load(dataPaths.imageSaveName, 'imageData');
@@ -76,15 +79,17 @@ if doTrain
     
     %% load neural data
     %TODO: copy timetable data to local
+    disp('Loading tabular text datastore');
     ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
     tic;
     lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
-    trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
+    trained = trainAneuron(ds, S_fin, roiIdx(pen), trainIdx, trainParam.ridgeParam,  ...
         trainParam.KFolds, lagRangeS, ...
         trainParam.tavg, trainParam.useGPU);
     t1=toc %6s!
     
+    clear S_fin
     save(encodingSaveName,'trained','trainParam');
 else
     load(encodingSaveName,'trained','trainParam');
@@ -97,12 +102,17 @@ RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, RF_insilico,
     [stimInfo.height stimInfo.width]);
 t2=toc
 
+
 analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
 RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
 showInSilicoRF(RF_insilico, analysisTwin);
-screen2png([encodingSaveName(1:end-4) '_RF_dwell' num2str(dwells(rr))]);
+screen2png([encodingSaveName(1:end-4) '_RF']);
+close;
 
-%RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, RF_insilico);
+RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, RF_insilico);
+showInSilicoORSF(RF_insilico);
+screen2png([encodingSaveName(1:end-4) '_ORSF']);
+close;
 
 % %looks like RF_Cx and RF_Cy is swapped??
 save(encodingSaveName,'RF_insilico','-append');

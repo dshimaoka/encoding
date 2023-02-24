@@ -20,25 +20,31 @@ lagFrames = trainParam.lagFrames;
 tavg = trainParam.tavg;
 Fs = trainParam.Fs;
 
-screenPix = RF_insilico.screenPix;
+screenPix = RF_insilico.ORSF.screenPix;
 
-if ~isfield(RF_insilico.ORSF,'oriList') && isempty(RF_insilico.ORSF.oriList)
+if ~isfield(RF_insilico.ORSF,'oriList') || isempty(RF_insilico.ORSF.oriList)
     nORs = 10;
     oriList = pi/180*linspace(0,180,nORs+1)';
     oriList = oriList(1:end-1);
     RF_insilico.ORSF.oriList = oriList;
 end
 
-if  ~isfield(RF_insilico.ORSF,'sfList') && isempty(RF_insilico.ORSF.sfList)
-    sfList = linspace(1/screenPix, 1/2, 5); %cycles per pixel
+if  ~isfield(RF_insilico.ORSF,'sfList') || isempty(RF_insilico.ORSF.sfList)
+    sfList = linspace(1/screenPix(1), 1/2, 5); %cycles per pixel
     %sfList = [0.05 0.1 0.15 0.2]';
     RF_insilico.ORSF.sfList = sfList;
 end
 
-if isempty(RF_insilico.ORSF.Fs_visStim)
+if ~isfield(RF_insilico.ORSF,'Fs_visStim') || isempty(RF_insilico.ORSF.Fs_visStim)
     RF_insilico.ORSF.Fs_visStim = paramIdx.predsRate;
 end
 
+
+oriList = RF_insilico.ORSF.oriList;
+sfList = RF_insilico.ORSF.sfList;
+Fs_visStim = RF_insilico.ORSF.Fs_visStim;
+
+nORs = numel(oriList);
 nNeurons = size(rr,3);
 nSF = length(sfList);
 
@@ -58,20 +64,20 @@ sfStream = sfList(sfIdxStream);
 nOns = length(oriStream);
 
 gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
-checkGparam(gparams, screenPix);
+checkGparam(gparams, screenPix, rr);
 
 filterWidth = gparams.tsize; %#frames
 onFrames = filterWidth*(1:nOns);
-timeVec_stim = 1/Fs*(1:(onFrames(end) + filterWidth));
+timeVec_stim = 1/Fs_visStim*(1:(onFrames(end) + filterWidth));
 
 
 %1 make visual stimulus (2D stripes)
 phaseStream = 2*pi*rand(1,nOns);
 %pix2deg = 1;
-xdeg = (1:screenPix)-0.5*screenPix;
-ydeg = xdeg;
+xdeg = (1:screenPix(2))-0.5*screenPix(2);
+ydeg = (1:screenPix(1))-0.5*screenPix(1);
 [X,Y]=meshgrid(xdeg,ydeg);
-stim_is = single(zeros(screenPix,screenPix,length(timeVec_stim)));
+stim_is = single(zeros(screenPix(1),screenPix(2),length(timeVec_stim)));
 for ff = 1:nOns
     XY = X*cos(oriStream(ff))+Y*sin(oriStream(ff));
     AngFreqs = 2*pi* sfStream(ff) * XY + phaseStream(ff);
@@ -91,31 +97,32 @@ S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 %lagRange = [min(lagFrames)/Fs max(lagFrames)/Fs];%lag range provided as rr
 %lagRange_model = [0 (gparams.tsize-1)/Fs];
 lagRangeS_mdl = [mean(lagFrames)-0.5*filterWidth mean(lagFrames)+0.5*filterWidth]/Fs; %expected frame window of gabor wavelet bank
+respDelay = lagRangeS_mdl(1):1/Fs:lagRangeS_mdl(2);
 
-mresp = zeros(nSF, nORs, nNeurons);
+resp = zeros(nSF, nORs, numel(respDelay),nNeurons);
 for iNeuron = 1:nNeurons
     [observed] = predictXs(timeVec_mdlResp, S_nm, ...
         squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), [lagFrames(1) lagFrames(end)], tavg);
     
     %% 4 test OR tuning
-    avgPeriEventV = eventLockedAvg(observed, timeVec_mdlResp, ...
+    [avgPeriEventV, ~, periEventV] = eventLockedAvg(observed, timeVec_mdlResp, ...
         timeVec_stim(onFrames), oriSfStream, lagRangeS_mdl);
     %      avgPeriEventV: nEventTypes x nCells x nTimePoints
-    mresp_tmp = squeeze(mean(avgPeriEventV,3))';
-    mresp(:,:,iNeuron) = reshape(mresp_tmp, nSF, nORs);
+    %mresp_tmp = squeeze(mean(avgPeriEventV,3))';
+    resp(:,:,:,iNeuron) = reshape(squeeze(avgPeriEventV), nSF, nORs, []);
     %sresp = squeeze(mean(periEventV,3));
-    
 end
+RF_insilico.ORSF.respDelay = respDelay;
 
-RF_insilico.ORSF.mresp = mresp;
+RF_insilico.ORSF.resp = resp;
 % RF_insilico.ORSF.kernel = kernel; %FIX ME
 RF_insilico.ORSF.oriList = oriList;
 RF_insilico.ORSF.sfList = sfList;
 end
 
-function checkGparam(gparams, screenPix)
+function checkGparam(gparams, screenPix, rr)
 gparams.show_or_preprocess = 0;
-[gab, pp] = preprocWavelets_grid(zeros(screenPix,screenPix), gparams);
+[gab, pp] = preprocWavelets_grid(zeros(screenPix(1),screenPix(2)), gparams);
 nFilters = length(gab);
 if ~isequal(size(rr,2), nFilters)
     error('#filters does not match. Check 1st and 3rd inputs');

@@ -8,13 +8,13 @@ if nargin < 3
     trange = [-inf inf];
 end
 
-RF = RF_insilico.RF;
-xaxis = RF_insilico.xaxis;
-yaxis = RF_insilico.yaxis;
+RF = RF_insilico.noiseRF.RF;
+xaxis = RF_insilico.noiseRF.xaxis;
+yaxis = RF_insilico.noiseRF.yaxis;
 
 %% fit RF position and size
 tic;
-tidx = find(RF_insilico.RFdelay>=trange(1) & RF_insilico.RFdelay<=trange(2));
+tidx = find(RF_insilico.noiseRF.RFdelay>=trange(1) & RF_insilico.noiseRF.RFdelay<=trange(2));
 mRF = squeeze(mean(RF(:,:,tidx),3));
 %RF_tmp = mat2cell(double(mRF), RF_insilico.screenPix(1), RF_insilico.screenPix(2));
 
@@ -34,10 +34,10 @@ RF_smooth(RF_smooth<0) = 0;
 p = fitGauss2(xaxis,yaxis,RF_smooth);%need smoothing before this
 
 
-RF_insilico.RF_Cx = p(1);
-RF_insilico.RF_Cy = p(2);
+RF_insilico.noiseRF.RF_Cx = p(1);
+RF_insilico.noiseRF.RF_Cy = p(2);
 if (min(xaxis) < p(1)) && (max(xaxis) > p(1)) && (min(yaxis) < p(2)) && (max(yaxis) > p(2))
-    RF_insilico.RF_ok = 1;
+    RF_insilico.noiseRF.RF_ok = 1;
 else
-    RF_insilico.RF_ok = 0;
+    RF_insilico.noiseRF.RF_ok = 0;
 end

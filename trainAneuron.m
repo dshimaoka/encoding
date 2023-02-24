@@ -28,12 +28,12 @@ sanityCheck = 1;
 ds_tmp = ds;
 %ds_tmp.SelectedVariableNames = {'Time', ['observed_' num2str(iNeuron)]};
 %READ W GPU    
-%neuroData = tall(ds_tmp);
-%observed = gather(neuroData.(['observed_' num2str(iNeuron)]));%slow!!
+neuroData = tall(ds_tmp);
+observed = gather(neuroData.(['observed_' num2str(iNeuron)]));%slow!!
 %observed = gather(neuroData.('observed'));%TMP
 %READ WO GPU
-neuroData = ds_tmp.readall;
-observed = neuroData.(['observed_' num2str(iNeuron)]);
+%neuroData = ds_tmp.readall;
+%observed = neuroData.(['observed_' num2str(iNeuron)]);
 observed_train = single(observed(trainIdx));
 
 S_fin_train = single(S_fin(trainIdx,:));
