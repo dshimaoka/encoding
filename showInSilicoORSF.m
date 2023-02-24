@@ -22,7 +22,7 @@ for isf = 1:size(resp,1)
     if isf==1
         title(['SF (cycles/pix) ' num2str(sfList(isf))]);
     else
-        title(respDelay(isf));
+        title(num2str(sfList(isf)));
     end
 end
 xlabel('delay [s]');

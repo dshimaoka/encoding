@@ -55,7 +55,7 @@ RF_insilico.ORSF.oriList = oriList(1:end-1);
 %sfList = linspace(1/RF_insilico.ORSF.screenPix, 1/2, 5); %cycles per pixel
 sfList = [0.05 0.1 0.15 0.2 0.25 0.3]';
 RF_insilico.ORSF.sfList = sfList;
-RF_insilico.ORSF.nRepeats = 20;
+RF_insilico.ORSF.nRepeats = 30;
 
 
 % load(dataPaths.imageSaveName, 'imageData');
