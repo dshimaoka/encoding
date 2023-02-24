@@ -64,7 +64,7 @@ sfStream = sfList(sfIdxStream);
 nOns = length(oriStream);
 
 gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
-checkGparam(gparams, screenPix, rr);
+%checkGparam(gparams, screenPix, rr);
 
 filterWidth = gparams.tsize; %#frames
 onFrames = filterWidth*(1:nOns);
@@ -121,6 +121,17 @@ RF_insilico.ORSF.sfList = sfList;
 end
 
 function checkGparam(gparams, screenPix, rr)
+%NG in massive??
+% Making wavelets...
+% {^HThe following error occurred converting from gpuArray to single:
+% Conversion to single from gpuArray is not possible.
+% 
+% Error in preprocWavelets_grid (line 358)
+%                 gaborbank(:,:,:,wcount) = rgc;
+% 
+% Error in getInSilicoORSF>checkGparam (line 125)
+% [gab, pp] = preprocWavelets_grid(zeros(screenPix(1),screenPix(2)), gparams);
+
 gparams.show_or_preprocess = 0;
 [gab, pp] = preprocWavelets_grid(zeros(screenPix(1),screenPix(2)), gparams);
 nFilters = length(gab);
