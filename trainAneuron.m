@@ -23,17 +23,20 @@ function trained = trainAneuron(ds, S_fin, iNeuron, trainIdx,  ridgeParams, ...
 %Fs
 
 sanityCheck = 1;
+GPUread = 0; %somehow NG in MASSIVE, but works in local PC
 
 %% load neural data
 ds_tmp = ds;
 %ds_tmp.SelectedVariableNames = {'Time', ['observed_' num2str(iNeuron)]};
-%READ W GPU    
-neuroData = tall(ds_tmp);
-observed = gather(neuroData.(['observed_' num2str(iNeuron)]));%slow!!
-%observed = gather(neuroData.('observed'));%TMP
-%READ WO GPU
-%neuroData = ds_tmp.readall;
-%observed = neuroData.(['observed_' num2str(iNeuron)]);
+if GPUread
+    %READ W GPU
+    neuroData = tall(ds_tmp);
+    observed = gather(neuroData.(['observed_' num2str(iNeuron)]));%slow!!
+else
+    %READ WO GPU
+    neuroData = ds_tmp.readall;
+    observed = neuroData.(['observed_' num2str(iNeuron)]);
+end
 observed_train = single(observed(trainIdx));
 
 S_fin_train = single(S_fin(trainIdx,:));

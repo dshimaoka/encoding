@@ -34,7 +34,7 @@ trainParam.KFolds = 5; %cross validation
 trainParam.ridgeParam = [1 1e3 1e5 1e7]; %search the best within these values
 trainParam.tavg = 1; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = round(0/dsRate):round(1/dsRate);%0:6;%3:6;%0:9 %frame delays to train a neuron
+trainParam.lagFrames = round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
 trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 
