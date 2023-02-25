@@ -16,7 +16,8 @@ expInfo.expID = 19;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.25;
-roiIdx = 7600:7600+120;%7618:7627;%1658;%roiIdx_tmp(noNanIdx);
+%roiIdx = 7600:7600+120;%7618:7627;%1658;%roiIdx_tmp(noNanIdx);
+roiIdx = 7719:7719+430;
 
 %% draw slurm ID for parallel computation specifying ROI position
 pen = getPen;
