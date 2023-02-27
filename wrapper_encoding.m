@@ -20,7 +20,7 @@ rescaleFac = 0.25;
 
 JID = 300;
 ncpus_per_task = 4;
-narrays = 5; %1000
+narrays = 10; %1000
 totJobs = narrays*ncpus_per_task;
 
 
@@ -60,9 +60,9 @@ ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 parfor iworker = 1:ncpus_per_task
     roiIdx = (iworker-1)*narrays + pen + (JID-1)*ncpus_per_task*narrays;
     
-    [Y,X,Z] = ind2sub(size(nanMask), roiIdx(pen));
+    [Y,X,Z] = ind2sub(size(nanMask), roiIdx);
     %TODO: save data locally
-    encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx(pen)) '.mat'];
+    encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
     
     %% in-silico simulation
     RF_insilico = struct;
@@ -101,7 +101,7 @@ parfor iworker = 1:ncpus_per_task
         %% fitting!
         tic;
         lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
-        trained = trainAneuron(ds, S_fin, roiIdx(pen), trainIdx, trainParam.ridgeParam,  ...
+        trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
             trainParam.KFolds, lagRangeS, ...
             trainParam.tavg, trainParam.useGPU);
         t1=toc %6s!
