@@ -25,7 +25,7 @@ totJobs = narrays*ncpus_per_task;
 
 
 %% draw slurm ID for parallel computation specifying ROI position
-pen = getPen;
+pen = getPen; %1-narrays
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
@@ -51,6 +51,11 @@ load(dataPaths.imageSaveName, 'nanMask');
 thisROI = imageData.meanImage;
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin','gaborBankParamIdx');
+
+%% load neural data
+%TODO: copy timetable data to local
+disp('Loading tabular text datastore');
+ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 parfor iworker = 1:ncpus_per_task
     roiIdx = (iworker-1)*narrays + pen + (JID-1)*ncpus_per_task*narrays;
@@ -91,12 +96,9 @@ parfor iworker = 1:ncpus_per_task
         for imov = 1:nMovies
             trainIdx = [trainIdx (omitSec*dsRate+1:movDur*dsRate)+(imov-1)*movDur*dsRate];
         end
+                
         
-        %% load neural data
-        %TODO: copy timetable data to local
-        disp('Loading tabular text datastore');
-        ds = tabularTextDatastore(dataPaths.timeTableSaveName);
-        
+        %% fitting!
         tic;
         lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
         trained = trainAneuron(ds, S_fin, roiIdx(pen), trainIdx, trainParam.ridgeParam,  ...
