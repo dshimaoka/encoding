@@ -36,6 +36,7 @@ p = fitGauss2(xaxis,yaxis,RF_smooth);%need smoothing before this
 
 RF_insilico.noiseRF.RF_Cx = p(1);
 RF_insilico.noiseRF.RF_Cy = p(2);
+RF_insilico.noiseRF.sigma = (p(3)+p(4))/2;
 if (min(xaxis) < p(1)) && (max(xaxis) > p(1)) && (min(yaxis) < p(2)) && (max(yaxis) > p(2))
     RF_insilico.noiseRF.RF_ok = 1;
 else
