@@ -18,7 +18,7 @@ expInfo.expID = 19;
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.25;
 
-JID = 300;
+JID = 301;
 ncpus_per_task = 4;
 narrays = 10; %1000
 totJobs = narrays*ncpus_per_task;
