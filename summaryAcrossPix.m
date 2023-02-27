@@ -16,6 +16,16 @@ load(dataPaths.imageSaveName, 'imageData');%SLOOOOW!!!
 thisROI = imageData.meanImage; %153x120
 clear imageData;
 
+%% create mask
+% imagesc(thisROI);colormap(gray);axis equal tight;
+% roiAhand = images.roi.AssistedFreehand;
+% draw(roiAhand);
+% roi = createMask(roiAhand);
+% nanMask = nan(size(roi));
+% nanMask(roi) = 1;
+% save(dataPaths.imageSaveName, 'nanMask','-append');
+
+
 [Y,X,Z] = ind2sub(size(thisROI), roiIdx);
 
 RF_Cx = nan(size(thisROI));
@@ -25,6 +35,7 @@ expVal = nan(size(thisROI));
 bestSF = nan(size(thisROI));
 bestOR = nan(size(thisROI));
 bestAmp = nan(size(thisROI));
+ridgeParam = nan(size(thisROI));
 for ii = 1:numel(roiIdx)
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
@@ -48,6 +59,8 @@ for ii = 1:numel(roiIdx)
     bestSF(Y(ii),X(ii)) = RF_insilico.ORSF.sfList(sfidx);
     bestOR(Y(ii),X(ii)) = 180/pi*RF_insilico.ORSF.oriList(oridx);
     bestAmp(Y(ii),X(ii)) = amp;
+    
+    ridgeParam(Y(ii),X(ii)) = trained.ridgeParam_optimal;
 end
 
 subplot(241);
@@ -86,7 +99,9 @@ axis equal tight
 mcolorbar;
 
 subplot(247);
-imagesc(bestOR)
+imagesc(bestOR);
+colormap(gca, 'hsv');
+caxis([0 180]);
 title('orientation [deg]');
 axis equal tight
 mcolorbar;
