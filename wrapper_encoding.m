@@ -18,7 +18,7 @@ omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.25;
 %roiIdx = 7600:7600+120;%7618:7627;%1658;%roiIdx_tmp(noNanIdx);
 %roiIdx = 7719:7719+430;
-roiIdx = 8149:8149+1; 
+roiIdx = 8150:8150+1; 
 
 %% draw slurm ID for parallel computation specifying ROI position
 pen = getPen;
