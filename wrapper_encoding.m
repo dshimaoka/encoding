@@ -16,12 +16,10 @@ expInfo.expID = 19;
 
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 omitSec = 5; %omit initial XX sec for training
-rescaleFac = 0.25;
+rescaleFac = 0.10;%0.25;
 
-% JID = 301;
-% ncpus_per_task = 4;
-% narrays = 10; %1000
-% totJobs = narrays*ncpus_per_task;
+JID=1;
+narrays=1000;
 
 
 %% draw slurm ID for parallel computation specifying ROI position
@@ -58,9 +56,9 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 %roiIdx = (iworker-1)*narrays + pen + (JID-1)*ncpus_per_task*narrays;
-roiIdx = 7865;%7618;%7860+pen;
+roiIdx = pen + (JID-1)*narrays;
 
-[Y,X,Z] = ind2sub(size(nanMask), roiIdx);
+%[Y,X,Z] = ind2sub(size(nanMask), roiIdx);
 %TODO: save data locally
 encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
 
