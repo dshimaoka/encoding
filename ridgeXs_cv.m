@@ -77,8 +77,8 @@ for fold = 1:KFolds
     [predicted] = predictXs(timeVec(cvp.test{fold}), stim_is(:,cvp.test{fold}), ...
         r0e_cvp(fold), rre_cvp(:,:,fold), lagRange, tavg);
     mse(fold) = mean((observed(cvp.test{fold}) - predicted).^2);
-    expval(fold) = 100*(1 - mse(fold) / mean(observed(cvp.test{fold})- mean(observed(cvp.test{fold})).^2));
-    
+    expval(fold) = 100*(1 - mse(fold) / mean((observed(cvp.test{fold})- mean(observed(cvp.test{fold}))).^2));
+
 %     subplot(211);
 %     plot(timeVec(cvp.training{fold}),observed(cvp.training{fold}),...
 %         timeVec(cvp.training{fold}),fitted);

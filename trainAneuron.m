@@ -54,8 +54,9 @@ timeVec_train = timeVec(trainIdx);
 if length(ridgeParams) > 1
     mse = zeros(length(ridgeParams),1);
     mse_cvp = zeros(length(ridgeParams),KFolds);
+    expval_cvp = zeros(length(ridgeParams),KFolds);
     for rp = 1:length(ridgeParams)
-        mse_cvp(rp,:) = ridgeXs_cv(KFolds, timeVec_train, ...
+        [mse_cvp(rp,:),~,~,expval_cvp(rp,:)] = ridgeXs_cv(KFolds, timeVec_train, ...
             S_fin_train', observed_train', lagRange, ridgeParams(rp), tavg, useGPU);
         mse(rp) = mean(mse_cvp(rp,:));
     end
@@ -63,6 +64,7 @@ if length(ridgeParams) > 1
 else
     thisIdx = 1;
     mse_cvp = [];
+    expval_cvp = [];
 end
 
 %% estimate coef with the optimal ridgeparam
@@ -122,5 +124,6 @@ trained.rre = rre;
 trained.r0e = r0e;
 trained.mse = mse;
 trained.mse_cvp = mse_cvp;
+trained.expval_cvp = expval_cvp;
 trained.expval = expval;
 trained.corr = corr;

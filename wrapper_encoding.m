@@ -113,26 +113,26 @@ else
 end
 
 
-%% in-silico simulation to obtain RF
-tic
-RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, RF_insilico, ...
-    [stimInfo.height stimInfo.width]);
-t2=toc
-
-
-analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
-RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
-showInSilicoRF(RF_insilico, analysisTwin);
-screen2png([encodingSaveName(1:end-4) '_RF']);
-close;
-
-RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, RF_insilico);
-showInSilicoORSF(RF_insilico);
-RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, [0 RF_insilico.ORSF.dwell/RF_insilico.ORSF.Fs_visStim]);
-screen2png([encodingSaveName(1:end-4) '_ORSF']);
-close;
-
-% %looks like RF_Cx and RF_Cy is swapped??
-save(encodingSaveName,'RF_insilico','-append');
-%par_save(encodingSaveName, 'trained','trainParam','RF_insilico');
-
+% % %% in-silico simulation to obtain RF
+% % tic
+% % RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, RF_insilico, ...
+% %     [stimInfo.height stimInfo.width]);
+% % t2=toc
+% % 
+% % 
+% % analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
+% % RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
+% % showInSilicoRF(RF_insilico, analysisTwin);
+% % screen2png([encodingSaveName(1:end-4) '_RF']);
+% % close;
+% % 
+% % RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, RF_insilico);
+% % showInSilicoORSF(RF_insilico);
+% % RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, [0 RF_insilico.ORSF.dwell/RF_insilico.ORSF.Fs_visStim]);
+% % screen2png([encodingSaveName(1:end-4) '_ORSF']);
+% % close;
+% % 
+% % % %looks like RF_Cx and RF_Cy is swapped??
+% % save(encodingSaveName,'RF_insilico','-append');
+% % %par_save(encodingSaveName, 'trained','trainParam','RF_insilico');
+% % 
