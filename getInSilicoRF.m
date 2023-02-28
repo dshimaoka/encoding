@@ -46,7 +46,7 @@ dotStream = repmat(dotStream,RF_insilico.noiseRF.dwell,1);
 dotStream = dotStream(:)';
 
 nFrames = numel(dotStream);
-timeVec_stim = 1/Fs_visStim*(1:nFrames);%0:1/Fs:maxT;%[s]
+timeVec_stim = 1/Fs_visStim*(0:nFrames-1);%0:1/Fs:maxT;%[s]
 
 %[dotYidxStream, dotXidxStream] = ind2sub([screenPix screenPix], dotStream);
 stim_is_flat = single(zeros(screenPix(1)*screenPix(2), nFrames));

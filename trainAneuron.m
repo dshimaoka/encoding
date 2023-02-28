@@ -72,9 +72,10 @@ ridgeParam_optimal = ridgeParams(thisIdx);
 
 mse = mean((observed_train - fitted').^2);
 expval = 100*(1 - mse / mean((observed_train - mean(observed_train)).^2));
+corr_fitted = corrcoef(observed_train, fitted);
+corr = corr_fitterd(2,1);
 
 if sanityCheck
-    corr_fitted = corrcoef(observed_train, fitted);
     ax(1)=subplot(211);
     yyaxis left; plot(timeVec_train,observed_train);
     yyaxis right; plot(timeVec_train,fitted)
@@ -122,3 +123,4 @@ trained.r0e = r0e;
 trained.mse = mse;
 trained.mse_cvp = mse_cvp;
 trained.expval = expval;
+trained.corr = corr;

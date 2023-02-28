@@ -43,6 +43,7 @@ end
 oriList = RF_insilico.ORSF.oriList;
 sfList = RF_insilico.ORSF.sfList;
 Fs_visStim = RF_insilico.ORSF.Fs_visStim;
+dwell = RF_insilico.ORSF.dwell;
 
 nORs = numel(oriList);
 nNeurons = size(rr,3);
@@ -66,9 +67,9 @@ nOns = length(oriStream);
 gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
 %checkGparam(gparams, screenPix, rr);
 
-filterWidth = gparams.tsize; %#frames
-onFrames = filterWidth*(1:nOns);
-timeVec_stim = 1/Fs_visStim*(1:(onFrames(end) + filterWidth));
+filterWidth = gparams.tsize; %#frames of visual stimulus
+onFrames = dwell*(1:nOns);%filterWidth*(1:nOns);
+timeVec_stim = 1/Fs_visStim*(0:(onFrames(end) + dwell - 1));
 
 
 %1 make visual stimulus (2D stripes)
@@ -81,7 +82,7 @@ stim_is = single(zeros(screenPix(1),screenPix(2),length(timeVec_stim)));
 for ff = 1:nOns
     XY = X*cos(oriStream(ff))+Y*sin(oriStream(ff));
     AngFreqs = 2*pi* sfStream(ff) * XY + phaseStream(ff);
-    stim_is(:,:,onFrames(ff)) = sin(AngFreqs);
+    stim_is(:,:,onFrames(ff):onFrames(ff)+dwell-1) = repmat(sin(AngFreqs),1,1,dwell);
 end
 stim_is = 0.5*(stim_is+1); %[0-1]
 
@@ -89,7 +90,7 @@ stim_is = 0.5*(stim_is+1); %[0-1]
 %% 2 compute response of the filter bank
 paramIdx.cparamIdx = [];
 paramIdx.predsRate = [];
-[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.Fs_visStim, Fs);
+[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.ORSF.Fs_visStim, Fs);
 S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 

@@ -6,9 +6,9 @@
 #SBATCH --job-name=Wrapper_430arrays
 #SBATCH --time=55:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=33000
-#SBATCH --array=1-10
+#SBATCH --array=1-5
 #SBATCH --gres=gpu:1
 #SBATCH --partition=m3h
 module load matlab
