@@ -73,7 +73,7 @@ ridgeParam_optimal = ridgeParams(thisIdx);
 mse = mean((observed_train - fitted').^2);
 expval = 100*(1 - mse / mean((observed_train - mean(observed_train)).^2));
 corr_fitted = corrcoef(observed_train, fitted);
-corr = corr_fitterd(2,1);
+corr = corr_fitted(2,1);
 
 if sanityCheck
     ax(1)=subplot(211);
