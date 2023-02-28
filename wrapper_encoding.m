@@ -18,7 +18,7 @@ doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.10;%0.25;
 
-JID=1;
+JID=2;
 narrays=1000;
 
 
