@@ -14,7 +14,7 @@ expInfo.nsName = 'CJ224.runPassiveMovies.033059';
 expInfo.expID = 19;
 
 
-doTrain = 0; %train a gabor bank filter or use it for insilico simulation
+doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.25;
 
