@@ -45,7 +45,7 @@ load(dataPaths.imageSaveName,'stimInfo')
 
 
 
-load(dataPaths.imageSaveName, 'nanMask');
+%load(dataPaths.imageSaveName, 'nanMask');
 %thisROI = imageData.meanImage;
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin','gaborBankParamIdx');
