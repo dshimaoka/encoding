@@ -18,12 +18,12 @@ expInfo.date = '20221004';
 expInfo.nsName = 'CJ224.runPassiveMovies.033059';
 expInfo.expID = 19;
 
-procParam.rescaleFac = 0.25;
+procParam.rescaleFac = 0.10;%0.25;
 procParam.cutoffFreq = 0.02;%0.1;
 procParam.lpFreq = []; %2
 
 rebuildImageData = false;
-makeMask = false;
+makeMask = true;
 uploadResult = true;
 
 %sampling rate of hemodynamic coupling function
@@ -68,6 +68,12 @@ end
 %< TODO: BETTER WAY TO DO DOWNSAMPLING?
 %< observed is NOT saved
 
+
+%% extract data within mask
+theseIdx = find(~isnan(imageProc.nanMask));
+[Y,X,Z] = ind2sub(size(imageProc.nanMask), theseIdx);
+observed = observed(:,theseIdx);
+save(dataPaths.imageSaveName, 'X','Y','theseIdx','-append');
 
 %% save as timetable
 TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous

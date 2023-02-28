@@ -35,7 +35,7 @@ load( dataPaths.stimSaveName, 'dsRate', 'gaborBankParamIdx'); %NEI FIX THIS
 
 %% estimation of filter-bank coefficients
 trainParam.KFolds = 5; %cross validation
-trainParam.ridgeParam = logspace(5,7,5); %[1 1e3 1e5 1e7]; %search the best within these values
+trainParam.ridgeParam = logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
 trainParam.lagFrames = round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
@@ -58,7 +58,7 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 %roiIdx = (iworker-1)*narrays + pen + (JID-1)*ncpus_per_task*narrays;
-roiIdx = 7860+pen;
+roiIdx = 7618;%7860+pen;
 
 [Y,X,Z] = ind2sub(size(nanMask), roiIdx);
 %TODO: save data locally
@@ -81,9 +81,6 @@ RF_insilico.ORSF.sfList = sfList;
 RF_insilico.ORSF.nRepeats = 30;
 RF_insilico.ORSF.dwell = 45; %#stimulus frames
 
-if isnan(nanMask(Y,X))
-    return;
-end
 
 if doTrain
     %% load gabor bank prediction data
