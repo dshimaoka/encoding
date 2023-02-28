@@ -136,6 +136,6 @@ screen2png([encodingSaveName(1:end-4) '_ORSF']);
 close;
 
 % %looks like RF_Cx and RF_Cy is swapped??
-%save(encodingSaveName,'RF_insilico','-append');
-par_save(encodingSaveName, 'trained','trainParam','RF_insilico');
+save(encodingSaveName,'RF_insilico','-append');
+%par_save(encodingSaveName, 'trained','trainParam','RF_insilico');
 
