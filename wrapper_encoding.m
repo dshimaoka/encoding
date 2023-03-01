@@ -18,8 +18,8 @@ doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.10;%0.25;
 
-JID=1;
-narrays=1000;
+%JID=1;
+%narrays=1000;
 
 
 %% draw slurm ID for parallel computation specifying ROI position
@@ -56,7 +56,7 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 %roiIdx = (iworker-1)*narrays + pen + (JID-1)*ncpus_per_task*narrays;
-roiIdx = pen + (JID-1)*narrays;
+roiIdx = pen + 1534;%(JID-1)*narrays;
 
 %[Y,X,Z] = ind2sub(size(nanMask), roiIdx);
 %TODO: save data locally
