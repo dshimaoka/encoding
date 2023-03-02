@@ -56,7 +56,7 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 %roiIdx = (iworker-1)*narrays + pen + (JID-1)*ncpus_per_task*narrays;
-roiIdx = pen + 1534;%(JID-1)*narrays;
+roiIdx = pen + 605;%(JID-1)*narrays;
 
 %[Y,X,Z] = ind2sub(size(nanMask), roiIdx);
 %TODO: save data locally
@@ -124,7 +124,8 @@ showInSilicoRF(RF_insilico, analysisTwin);
 screen2png([encodingSaveName(1:end-4) '_RF']);
 close;
 
-RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, RF_insilico);
+RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, RF_insilico, ...
+     [stimInfo.height stimInfo.width]);
 showInSilicoORSF(RF_insilico);
 RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, [0 RF_insilico.ORSF.dwell/RF_insilico.ORSF.Fs_visStim]);
 screen2png([encodingSaveName(1:end-4) '_ORSF']);
