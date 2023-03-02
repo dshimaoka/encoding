@@ -10,6 +10,6 @@
 #SBATCH --mem-per-cpu=33000
 #SBATCH --array=1-536
 #SBATCH --gres=gpu:1
-#SBATCH --partition=gpu
+#SBATCH --partition=m3h
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < wrapper_encoding.m
