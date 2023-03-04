@@ -3,20 +3,24 @@
 %that will be used for the model fitting (in MASSIVE) by wrapper_encoding.m
 % as of 24/2, took 1.5h to complete
 
-% expInfo.nsName = 'CJ229.oriXYZc.170024';%'CJ229.runPassiveMovies.024114';
-% expInfo.expID = 5; %21;
-% expInfo.subject = 'CJ229';
-% expInfo.date = '202210310';%'20221101';
 
 if ~ispc
     addpath(genpath('~/git'));
     addDirPrefs;
 end
 
-expInfo.subject = 'CJ224';
-expInfo.date = '20221004';
-expInfo.nsName = 'CJ224.runPassiveMovies.033059';
-expInfo.expID = 19;
+% expInfo.subject = 'CJ224';
+% expInfo.date = '20221004';
+% expInfo.nsName = 'CJ224.runPassiveMovies.033059';
+% expInfo.expID = 19;
+% expInfo.nsName = 'CJ229.runPassiveMovies.024114';
+% expInfo.expID = 21;
+% expInfo.subject = 'CJ229';
+% expInfo.date = '20221101';
+expInfo.nsName = 'CJ231.runPassiveMovies.010848';
+expInfo.expID = 16;
+expInfo.subject = 'CJ231';
+expInfo.date = '20221130';
 
 procParam.rescaleFac = 0.10;%0.25;
 procParam.cutoffFreq = 0.02;%0.1;
@@ -52,6 +56,9 @@ else
     
     dirPref = getpref('nsAnalysis','dirPref');
     imageSaveName = fullfile(fullfile(dirPref.rootDir,expInfo.subject,'processed'), [imDataName '.mat']);
+    
+    
+    mkdir(fileparts(dataPaths.imageSaveName))
     
     status = movefile(imageSaveName, dataPaths.imageSaveName);
     if status==1

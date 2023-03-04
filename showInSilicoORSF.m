@@ -20,7 +20,7 @@ for isf = 1:size(resp,1)
     imagesc(respDelay, oriList, squeeze(resp(isf,:,:)));
     caxis([-crange crange]);
     if isf==1
-        title(['SF (cycles/pix) ' num2str(sfList(isf))]);
+        title(['SF (cycles/deg) ' num2str(sfList(isf))]);
     else
         title(num2str(sfList(isf)));
     end
@@ -29,9 +29,12 @@ xlabel('delay [s]');
 ylabel('orientation [rad]');
 
 subplot(212);
-imagesc(sfList, oriList, mresp');
+[SFLIST, ORLIST] = meshgrid(sfList, oriList);
+s = surf(SFLIST, ORLIST, mresp');
+s.EdgeColor = 'none';view(2);axis ij tight;
+set(gca,'xtick',sfList,'xticklabel',sfList);
 ylabel('orientation [rad]');
-xlabel('SF (cycles/pix)');
+xlabel('SF (cycles/deg)');
 
     title('mean across delays');
     caxis([-crange crange]);

@@ -1,4 +1,4 @@
-function RF_insilico = getInSilicoORSF(paramIdx, trained, trainParam, RF_insilico)
+function RF_insilico = getInSilicoORSF(paramIdx, trained, trainParam, RF_insilico, oriStimSize)
 %INPUT:
 %gparamIdx: parameter Idx supplied to preprocWavelets_grid_GetMetaParams
 %r0: scalar
@@ -7,7 +7,8 @@ function RF_insilico = getInSilicoORSF(paramIdx, trained, trainParam, RF_insilic
 %Fs: sampling rate of in-silico visual stim
 %nRepeats: number of stimulus presentation per OR and SF
 %nOR: number of ORs (equally spaced between 0-pi
-%sfList: list of SFs (cycles per pixel)
+%sfList: list of SFs (cycles per deg)
+%oriStimSize: [height x width] [deg]
 %
 %OUTPUT:
 %mresp: resp across repeats and delays [nORs x nSFs x nNeurons]
@@ -55,12 +56,18 @@ if size(sfList,1) < size(sfList,2)
     sfList = sfList';
 end
 
+
+A = 0.5*(screenPix(2)/oriStimSize(2) + screenPix(1)/oriStimSize(1)); %[pix/deg]
+
+%maxSF =  %[cpd] %FIXME
+%minSF = %[cpd]  %FIXME
+
 %random varibles: spatial phase and OR and SF
 oriSfStream = repmat(1:nORs*nSF, 1, nRepeats);
 oriSfStream = oriSfStream(randperm(nORs*nSF*nRepeats));
 [sfIdxStream, oriIdxStream] = ind2sub([nSF nORs], oriSfStream);
 oriStream = oriList(oriIdxStream);
-sfStream = sfList(sfIdxStream);
+sfStream = 1/A * sfList(sfIdxStream); %convert cycles/deg to cycles/pix
 
 nOns = length(oriStream);
 
@@ -118,7 +125,7 @@ RF_insilico.ORSF.respDelay = respDelay;
 RF_insilico.ORSF.resp = resp;
 % RF_insilico.ORSF.kernel = kernel; %FIX ME
 RF_insilico.ORSF.oriList = oriList;
-RF_insilico.ORSF.sfList = sfList;
+RF_insilico.ORSF.sfList = 1/A * sfList;
 end
 
 function checkGparam(gparams, screenPix, rr)
