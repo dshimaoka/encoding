@@ -1,5 +1,10 @@
 expInfo.subject = 'CJ224';
 expInfo.date = '20221004';
+if ~ispc
+    addpath(genpath('~/git'));
+    addDirPrefs;
+end
+
 expInfo.nsName = 'CJ224.runPassiveMovies.033059';
 expInfo.expID = 19;
 
@@ -37,7 +42,7 @@ bestAmp = nan(numel(thisROI),1);
 ridgeParam = nan(numel(thisROI),1);
 ngidx = [];
 tic; %18h for CJ224 @officePC
-parfor ii = 1:12%numel(roiIdx)
+for ii = 1%:12%numel(roiIdx)
     disp(ii)
     encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
@@ -78,7 +83,7 @@ parfor ii = 1:12%numel(roiIdx)
     RF_insilico.ORSF.oriList = oriList(1:end-1);
     RF_insilico.ORSF.sfList = logspace(-1.1, 0.3, 10); %[cycles/deg]
     RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
-        RF_insilico, stimSz, 1);
+        RF_insilico, stimSz, 0);
     trange = [2 trainParam.lagFrames(end)/dsRate];
     RF_insilico = analyzeInSilicoORSF(RF_insilico, -1,trange,0);
     bestSF(ii) = RF_insilico.ORSF.bestSF;
