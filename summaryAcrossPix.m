@@ -41,7 +41,7 @@ bestAmp = nan(numel(thisROI),1);
 ridgeParam = nan(numel(thisROI),1);
 ngidx = [];
 tic; %18h for CJ224 @officePC
-for ii = 1%:numel(roiIdx)
+parfor ii = 1:numel(roiIdx)
     disp(ii)
     encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
@@ -55,8 +55,8 @@ for ii = 1%:numel(roiIdx)
         continue;
     end
     
-    thisY = Y(roiIdx(ii));
-    thisX = X(roiIdx(ii));
+    %thisY = Y(roiIdx(ii));
+    %thisX = X(roiIdx(ii));
     
     expVal(ii) = trained.expval;
     ridgeParam(ii) = trained.ridgeParam_optimal;
