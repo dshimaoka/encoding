@@ -1,25 +1,23 @@
-expInfo.subject = 'CJ224';
-expInfo.date = '20221004';
 if ~ispc
     addpath(genpath('~/git'));
     addDirPrefs;
 end
 
-expInfo.nsName = 'CJ224.runPassiveMovies.033059';
-expInfo.expID = 19;
 
+ID = 1;
 rescaleFac = 0.10;
-roiIdx = 1:2070;
 dsRate = 1;
 
 
 %% path
+expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac);
 %TODO: save data locally
 encodingSavePrefix = dataPaths.encodingSavePrefix;
 
 load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
 thisROI = imageData.meanImage; %153x120
+roiIdx = 1:numel(X);
 clear imageData;
 
 load(dataPaths.imageSaveName,'stimInfo')
@@ -42,7 +40,7 @@ bestAmp = nan(numel(thisROI),1);
 ridgeParam = nan(numel(thisROI),1);
 ngidx = [];
 tic; %18h for CJ224 @officePC
-for ii = 1%:12%numel(roiIdx)
+for ii = 1%:numel(roiIdx)
     disp(ii)
     encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
@@ -110,16 +108,16 @@ bestSF2 = nan(size(thisROI));
 bestOR2 = nan(size(thisROI));
 expVal2 = nan(size(thisROI));
 ridgeParam2 = nan(size(thisROI));
-RF_mean2 = nan(size(thisROI,1),size(thisROI,2),size(RF_mean{2},1),size(RF_mean{2},2));
+RF_mean2 = nan(size(thisROI,1),size(thisROI,2),RF_insilico.noiseRF.screenPix(1),RF_insilico.noiseRF.screenPix(2));
 for ii = 1:numel(roiIdx)
     RF_Cx2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cx(ii);
     RF_Cy2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cy(ii);
     RF_sigma2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_sigma(ii);
-    bestSF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSF(ii);
-    bestOR2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestOR(ii);
     expVal2(Y(roiIdx(ii)),X(roiIdx(ii))) = expVal(ii);
     ridgeParam2(Y(roiIdx(ii)),X(roiIdx(ii))) = ridgeParam(ii);
-    RF_mean2(Y(roiIdx(ii)),X(roiIdx(ii)),:,:) = RF_mean{ii};
+    RF_mean2(Y(roiIdx(ii)),X(roiIdx(ii)),:,:) = RF_mean{ii}; 
+    bestSF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSF(ii);
+    bestOR2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestOR(ii);
 end
 
 summary.RF_Cx = RF_Cx2;

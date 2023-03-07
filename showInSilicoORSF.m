@@ -5,7 +5,7 @@ if nargin < 2
     trange = [-inf inf];
 end
 
-oriList = RF_insilico.ORSF.oriList;
+oriList = 180/pi*RF_insilico.ORSF.oriList;
 sfList = RF_insilico.ORSF.sfList;
 resp = RF_insilico.ORSF.resp;
 respDelay = RF_insilico.ORSF.respDelay;
@@ -26,7 +26,7 @@ for isf = 1:size(resp,1)
     end
 end
 xlabel('delay [s]');
-ylabel('orientation [rad]');
+ylabel('orientation [deg]');
 
 subplot(212);
 [SFLIST, ORLIST] = meshgrid(sfList, oriList);
@@ -36,10 +36,16 @@ set(gca,'xtick',sfList,'xticklabel',sfList);
 ylabel('orientation [rad]');
 xlabel('SF (cycles/deg)');
 
-    title('mean across delays');
-    caxis([-crange crange]);
-    colorbar;
+title('mean across delays');
+caxis([-crange crange]);
+colorbar;
 
+if isfield(RF_insilico.ORSF, 'bestSF')
+    vline(RF_insilico.ORSF.bestSF);
+end
+if isfield(RF_insilico.ORSF, 'bestOR')
+    hline(RF_insilico.ORSF.bestOR);
+end
 % if RF_ok
 %     hold on;
 %     plot(RF_Cx, RF_Cy, 'ro');
