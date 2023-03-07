@@ -1,4 +1,4 @@
-function [S, timeVec] = preprocAll(S, paramIdx, frameRate, dsRate)
+function [S, timeVec] = preprocAll(S, paramIdx, frameRate, dsRate, useGPU)
 %[S, timeVec] = preprocAll(S, paramIdx, frameRate, dsRate)
 %
 %INPUT
@@ -13,6 +13,10 @@ function [S, timeVec] = preprocAll(S, paramIdx, frameRate, dsRate)
 
 %OUTPUT
 %S_fin: (frame number) x (filter number)
+
+if nargin < 5
+    useGPU = 1;
+end
 
 if nargin < 4 || isempty(dsRate)
     dsRate = 1;
@@ -46,7 +50,7 @@ end
 % Gabor wavelet processing
 if ~isempty(paramIdx.gparamIdx)
     gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
-    [S, gparams] = preprocWavelets_grid(S, gparams);%filter assumes no time delay
+    [S, gparams] = preprocWavelets_grid(S, gparams, useGPU);%filter assumes no time delay
 end
 
 % Compute log of each channel to scale down very large values
