@@ -1,4 +1,5 @@
-function RF_insilico = getInSilicoORSF(paramIdx, trained, trainParam, RF_insilico, oriStimSize)
+function RF_insilico = getInSilicoORSF(paramIdx, trained, trainParam, ...
+    RF_insilico, oriStimSize, useGPU)
 %INPUT:
 %gparamIdx: parameter Idx supplied to preprocWavelets_grid_GetMetaParams
 %r0: scalar
@@ -9,6 +10,7 @@ function RF_insilico = getInSilicoORSF(paramIdx, trained, trainParam, RF_insilic
 %nOR: number of ORs (equally spaced between 0-pi
 %sfList: list of SFs (cycles per deg)
 %oriStimSize: [height x width] [deg]
+%useGPU: whether to use GPU for proprocAll/preprocWavelets_grid (default:1)
 %
 %OUTPUT:
 %mresp: resp across repeats and delays [nORs x nSFs x nNeurons]
@@ -97,7 +99,8 @@ stim_is = 0.5*(stim_is+1); %[0-1]
 %% 2 compute response of the filter bank
 paramIdx.cparamIdx = [];
 paramIdx.predsRate = [];
-[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.ORSF.Fs_visStim, Fs);
+[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.ORSF.Fs_visStim, ...
+    Fs, useGPU);
 S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 

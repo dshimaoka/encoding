@@ -8,24 +8,78 @@ if ~ispc
     addDirPrefs;
 end
 
-% expInfo.subject = 'CJ224';
-% expInfo.date = '20221004';
-% expInfo.nsName = 'CJ224.runPassiveMovies.033059';
-% expInfo.expID = 19;
-expInfo.nsName = 'CJ231.runPassiveMovies.010848';
-expInfo.expID = 16;
-expInfo.subject = 'CJ231';
-expInfo.date = '20221130';
 
-
+ID=2;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.10;%0.25;
 
-
+expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position
-pen = getPen+2096; %1-narrays
+ngIdx = [ 298
+         347
+         362
+         388
+         533
+         866
+        1298
+        1347
+        1362
+        1388
+        1533
+        1866
+        2120
+        2121
+        2122
+        2123
+        2124
+        2125
+        2126
+        2127
+        2128
+        2129
+        2130
+        2131
+        2132
+        2133
+        2134
+        2135
+        2136
+        2137
+        2138
+        2139
+        2140
+        2141
+        2142
+        2143
+        2144
+        2145
+        2146
+        2169
+        2170
+        2171
+        2172
+        2173
+        2174
+        2175
+        2176
+        2177
+        2178
+        2179
+        2180
+        2181
+        2182
+        2183
+        2184
+        2185
+        2186
+        2187
+        2188
+        2189
+        2190];
+    
+pen = getPen; %1-narrays
 narrays = 50;%1000;
 
 %% path
@@ -59,8 +113,8 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 
-for JID = 1:2
-    roiIdx = pen + (JID-1)*narrays;
+for JID = 1
+    roiIdx = ngIdx(pen) + (JID-1)*narrays;
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
