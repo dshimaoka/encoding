@@ -25,7 +25,7 @@ rescaleFac = 0.10;%0.25;
 
 
 %% draw slurm ID for parallel computation specifying ROI position
-pen = getPen; %1-narrays
+pen = getPen+1999; %1-narrays
 narrays = 1000;
 
 %% path
@@ -59,7 +59,7 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 
-for JID = 1:2
+for JID = 1%:2
     roiIdx = pen + (JID-1)*narrays;
     
     %TODO: save data locally
