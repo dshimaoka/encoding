@@ -5,6 +5,7 @@ end
 
 
 ID = 1;
+useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
 
@@ -83,7 +84,7 @@ for ii = 1%:numel(roiIdx)
     RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
         RF_insilico, stimSz, 0);
     trange = [2 trainParam.lagFrames(end)/dsRate];
-    RF_insilico = analyzeInSilicoORSF(RF_insilico, -1,trange,0);
+    RF_insilico = analyzeInSilicoORSF(RF_insilico, -1,trange,useGPU);
     bestSF(ii) = RF_insilico.ORSF.bestSF;
     bestOR(ii) = RF_insilico.ORSF.bestOR;
     try
