@@ -6,7 +6,7 @@
 #SBATCH --job-name=Summary
 #SBATCH --time=24:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=9
+#SBATCH --cpus-per-task=6
 #SBATCH --mem-per-cpu=33000
 #SBATCH --gres=gpu:1
 #SBATCH --partition=m3h
