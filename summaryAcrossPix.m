@@ -135,49 +135,92 @@ summary.roiIdx = roiIdx;
 
 save([dataPaths.encodingSavePrefix '_summary'],'summary');
 
+%% re-estimate RF center after subtracting out grand avg
+gavg = squeeze(nanmean(nanmean(summary.RF_mean,1),2));
+xaxis = RF_insilico.noiseRF.xaxis;
+yaxis = RF_insilico.noiseRF.yaxis;
+%xlim = [ min(xaxis) 5];
+
+maxRFsize = 10; %diamter in [deg]
+winIdxLen = floor(maxRFsize/mean(diff(xaxis))/2);
+RF_Cx3 = nan(size(thisROI));
+RF_Cy3 = nan(size(thisROI));
+RF_sigma3 = nan(size(thisROI));
+tic;
+for ii = 1:numel(roiIdx)
+    try
+    mRFori = squeeze(summary.RF_mean(Y(roiIdx(ii)),X(roiIdx(ii)),:,:));
+    k = gavg(:)\mRFori(:);
+    mRF = mRFori - k*gavg;
+    
+    RF_smooth = smooth2DGauss(mRF);% - mean(mRF(:)));
+    
+    RF_smooth = (-1) * RF_smooth;
+    RF_smooth(RF_smooth<0) = 0;
+    
+    %initial fitting using all pixels
+    p0 = fitGauss2(xaxis,yaxis,RF_smooth);%need smoothing before this
+   
+    %second fitting w limted pixels
+    [~,xcent] = min(abs(p0(1)-xaxis));
+    [~,ycent] = min(abs(p0(2)-yaxis));
+    winXidx = max(xcent-winIdxLen,1):min(xcent+winIdxLen,numel(xaxis));
+    winYidx = max(ycent-winIdxLen,1):min(ycent+winIdxLen,numel(yaxis));
+    
+    p = fitGauss2(xaxis(winXidx),yaxis(winYidx),RF_smooth(winYidx,winXidx));%need smoothing before this
+    
+    RF_Cx3(Y(roiIdx(ii)),X(roiIdx(ii))) = p(1);
+    RF_Cy3(Y(roiIdx(ii)),X(roiIdx(ii))) = p(2);
+    RF_sigma3(Y(roiIdx(ii)),X(roiIdx(ii))) = (p(3)+p(4))/2;
+    catch err
+        continue;
+    end
+end
+t=toc
+
 
 %% summary figure
 subplot(241);
-imagesc(thisROI);
+imagesc(summary.thisROI);
 axis equal tight
 colormap(gca,'gray');
 
 subplot(242);
-imagesc(RF_Cx2);
-caxis(prctile(RF_Cx2(:),[1 99]));
+imagesc(summary.RF_Cx);
+caxis(prctile(summary.RF_Cx(:),[1 99]));
 title('Cx [deg]');
 axis equal tight
 mcolorbar;
 
 subplot(243);
-imagesc(RF_Cy2)
-caxis(prctile(RF_Cy2(:),[1 99]));
+imagesc(summary.RF_Cy)
+caxis(prctile(summary.RF_Cy(:),[1 99]));
 title('Cy [deg]');
 axis equal tight
 mcolorbar;
 
 subplot(244);
-imagesc(RF_sigma2)
+imagesc(summary.RF_sigma)
 title('sigma [deg]');
 axis equal tight
 mcolorbar;
 
 subplot(245);
-imagesc(expVal2);
+imagesc(summary.expVar);
 title('explained variance [%]');
 axis equal tight
 colormap(gca,'gray');
 mcolorbar;
 
 subplot(246);
-imagesc(log(ridgeParam2));
+imagesc(log(summary.ridgeParam));
 title('log(ridge param)');
 axis equal tight
 colormap(gca,'gray');
 mcolorbar;
 
 subplot(247);
-imagesc(log(bestSF2));
+imagesc(log(summary.bestSF));
 %sfList = logspace(-1.1, 0.3, 5);
 %caxis(log(prctile(sfList,[0 100])));
 caxis([-4 -1]);
@@ -186,7 +229,7 @@ axis equal tight
 mcolorbar;
 
 subplot(248);
-imagesc(mod(bestOR2,180));
+imagesc(mod(summary.bestOR,180));
 colormap(gca, 'hsv');
 caxis([0 180]);
 title('orientation [deg]');
@@ -196,15 +239,50 @@ mcolorbar;
 screen2png([dataPaths.encodingSavePrefix '_summary']);
 
 
-%%
-xx = 21:30;
-yy = (21:40)-20;
+%% show mRFs
+
+xx = (21:30);
+yy = (31:40);
+
 figure;
-all = RF_mean(yy, xx,:,:);
+
+subplot_tight(numel(yy)+1, 2, 1)
+imagesc(summary.RF_Cx);hold on;
+rectangle('position', [min(xx) min(yy) numel(xx) numel(yy)]);
+caxis(prctile(summary.RF_Cx(:),[1 99]));
+title('Cx [deg]');
+axis equal tight
+mcolorbar;
+
+subplot_tight(numel(yy)+1, 2, 2)
+imagesc(summary.RF_Cy);hold on;
+rectangle('position', [min(xx) min(yy) numel(xx) numel(yy)]);
+caxis(prctile(summary.RF_Cy(:),[1 99]));
+title('Cy [deg]');
+axis equal tight
+mcolorbar;
+
+
+all = summary.RF_mean(yy, xx,:,:);
+xaxis = RF_insilico.noiseRF.xaxis;
+yaxis = RF_insilico.noiseRF.yaxis;
 for ix = 1:numel(xx)
     for iy = 1:numel(yy)
-        subplot_tight(numel(yy), numel(xx), ix + numel(xx)*(iy-1), 0.01);
-        imagesc(squeeze(RF_mean(yy(iy), xx(ix),:,:))); axis off
+        subplot_tight(numel(yy)+1, numel(xx), ix + numel(xx)*iy, 0.02);
+        imagesc(xaxis, yaxis, squeeze(summary.RF_mean(yy(iy), xx(ix),:,:))-gavg);
+       
+        hold on
+        plot(summary.RF_Cx(yy(iy), xx(ix)),summary.RF_Cy(yy(iy), xx(ix)), 'ro');
+       
+        if ix>1 || iy > 1
+            set(gca,'xtick',[],'ytick',[]);
+        end
+        if ix==1
+            ylabel(yy(iy));
+        end
+        if iy==numel(yy)
+            xlabel(xx(ix));
+        end
         %title(['x: ' num2str(xx(ix)) ', y: ' num2str(yy(iy))])
         %caxis(prctile(all(:),[1 99])); %better not to impose same color range
     end
