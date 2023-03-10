@@ -9,84 +9,25 @@ if ~ispc
 end
 
 
-ID=2;
-doTrain = 1; %train a gabor bank filter or use it for insilico simulation
+ID = 1;
+doTrain = 0; %train a gabor bank filter or use it for insilico simulation
+doRF = 1;
+doORSF = 1;
+
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.10;%0.25;
 
 expInfo = getExpInfoNatMov(ID);
 
-%% draw slurm ID for parallel computation specifying ROI position
-ngIdx = [ 298
-         347
-         362
-         388
-         533
-         866
-        1298
-        1347
-        1362
-        1388
-        1533
-        1866
-        2120
-        2121
-        2122
-        2123
-        2124
-        2125
-        2126
-        2127
-        2128
-        2129
-        2130
-        2131
-        2132
-        2133
-        2134
-        2135
-        2136
-        2137
-        2138
-        2139
-        2140
-        2141
-        2142
-        2143
-        2144
-        2145
-        2146
-        2169
-        2170
-        2171
-        2172
-        2173
-        2174
-        2175
-        2176
-        2177
-        2178
-        2179
-        2180
-        2181
-        2182
-        2183
-        2184
-        2185
-        2186
-        2187
-        2188
-        2189
-        2190];
-    
-pen = getPen; %1-narrays
-narrays = 50;%1000;
+%% draw slurm ID for parallel computation specifying ROI position    
+pen = getPen; 
+narrays = 1000;
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
 
-load( dataPaths.stimSaveName, 'dsRate', 'gaborBankParamIdx'); %NEI FIX THIS
-
+load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
+    'gaborBankParamIdx');
 
 %% estimation of filter-bank coefficients
 trainParam.KFolds = 5; %cross validation
@@ -99,41 +40,39 @@ trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 %% stimuli
 load(dataPaths.imageSaveName,'stimInfo')
+stimSz = [stimInfo.height stimInfo.width];
 
-
-
-%load(dataPaths.imageSaveName, 'nanMask');
-%thisROI = imageData.meanImage;
-
-load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin','gaborBankParamIdx');
 
 %% load neural data
 %TODO: copy timetable data to local
 disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
-
-for JID = 1
-    roiIdx = ngIdx(pen) + (JID-1)*narrays;
+nTotPix = numel(ds.VariableNames)-1;
+maxJID = numel(pen:narrays:nTotPix);
+for JID = 1:maxJID
+    roiIdx = pen + (JID-1)*narrays;
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
     
-    %% in-silico simulation
+    %% in-silico RF estimation
     RF_insilico = struct;
     RF_insilico.noiseRF.nRepeats = 80; %4
     RF_insilico.noiseRF.dwell = 15; %frames
     RF_insilico.noiseRF.screenPix = stimInfo.screenPix/8;%4 %[y x]
+    RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
     %<screenPix(1)/screenPix(2) determines the #gabor filters
     
-    RF_insilico.ORSF.screenPix = stimInfo.screenPix/4; %[y x]
+    
+    %% in-silico ORSF estimation
+    RF_insilico.ORSF.screenPix = stimInfo.screenPix; %[y x]
     nORs = 10;
     oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
     RF_insilico.ORSF.oriList = oriList(1:end-1);
-    %sfList = linspace(1/RF_insilico.ORSF.screenPix, 1/2, 5); %cycles per pixel
-    sfList = [0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4]';
-    RF_insilico.ORSF.sfList = sfList;
-    RF_insilico.ORSF.nRepeats = 30;
+    SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
+    RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 6); %[cycles/deg];
+    RF_insilico.ORSF.nRepeats = 15;
     RF_insilico.ORSF.dwell = 45; %#stimulus frames
     
     
@@ -169,26 +108,30 @@ for JID = 1
     
     
     %% in-silico simulation to obtain RF
-    tic
-    RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, RF_insilico, ...
-        [stimInfo.height stimInfo.width]);
-    t2=toc
+    if doRF
+        RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, ...
+            RF_insilico, stimSz, 1);
+        
+        analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
+        RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
+        showInSilicoRF(RF_insilico, analysisTwin);
+        screen2png([encodingSaveName(1:end-4) '_RF']);
+        close;        
+        save(encodingSaveName,'RF_insilico','-append');
+    end
     
-    
-    analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
-    RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
-    showInSilicoRF(RF_insilico, analysisTwin);
-    screen2png([encodingSaveName(1:end-4) '_RF']);
-    close;
-    
-%     RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, RF_insilico, ...
-%         [stimInfo.height stimInfo.width]);
-%     showInSilicoORSF(RF_insilico);
-%     RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, [0 RF_insilico.ORSF.dwell/RF_insilico.ORSF.Fs_visStim]);
-%     screen2png([encodingSaveName(1:end-4) '_ORSF']);
-%     close;
-    
-    % %looks like RF_Cx and RF_Cy is swapped??
-    save(encodingSaveName,'RF_insilico','-append');
-    %par_save(encodingSaveName, 'trained','trainParam','RF_insilico');
+    %% in-silico simulation to obtain ORSF
+    if doORSF
+        RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
+            RF_insilico, stimSz);
+        showInSilicoORSF(RF_insilico);
+        
+        trange = [2 trainParam.lagFrames(end)/dsRate];
+
+        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange);
+        screen2png([encodingSaveName(1:end-4) '_ORSF']);
+        close;        
+        save(encodingSaveName,'RF_insilico','-append');
+    end
+
 end

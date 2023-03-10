@@ -59,17 +59,22 @@ if size(sfList,1) < size(sfList,2)
 end
 
 
-A = 0.5*(screenPix(2)/oriStimSize(2) + screenPix(1)/oriStimSize(1)); %[pix/deg]
+sfrange = getSFrange_stim(screenPix, oriStimSize);
 
-%maxSF =  %[cpd] %FIXME
-%minSF = %[cpd]  %FIXME
+if max(sfList) > sfrange(2)
+    warning(['specified SF deviates maximum SF of vis stim ' num2str(sfrange(2)) '[cpd]']);
+end
+if min(sfList) < sfrange(1)
+       warning(['specified SF deviates minimum SF of vis stim ' num2str(sfrange(1)) '[cpd]']);
+end 
 
 %random varibles: spatial phase and OR and SF
 oriSfStream = repmat(1:nORs*nSF, 1, nRepeats);
 oriSfStream = oriSfStream(randperm(nORs*nSF*nRepeats));
 [sfIdxStream, oriIdxStream] = ind2sub([nSF nORs], oriSfStream);
 oriStream = oriList(oriIdxStream);
-sfStream = 1/A * sfList(sfIdxStream); %convert cycles/deg to cycles/pix
+pixPerDeg = mean(screenPix./oriStimSize);
+sfStream = 1/pixPerDeg * sfList(sfIdxStream); %convert cycles/deg to cycles/pix
 
 nOns = length(oriStream);
 
@@ -127,8 +132,8 @@ RF_insilico.ORSF.respDelay = respDelay;
 
 RF_insilico.ORSF.resp = resp;
 % RF_insilico.ORSF.kernel = kernel; %FIX ME
-RF_insilico.ORSF.oriList = oriList;
-RF_insilico.ORSF.sfList = 1/A * sfList;
+%RF_insilico.ORSF.oriList = oriList;
+%RF_insilico.ORSF.sfList = 1/pixPerDeg * sfList;
 end
 
 function checkGparam(gparams, screenPix, rr)

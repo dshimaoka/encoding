@@ -41,7 +41,7 @@ bestAmp = nan(numel(thisROI),1);
 ridgeParam = nan(numel(thisROI),1);
 ngidx = [];
 tic; %18h for CJ224 @officePC
-parfor ii = 1:numel(roiIdx)
+for ii = 1261;%1648;%1:numel(roiIdx)
     disp(ii)
     encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
@@ -54,9 +54,6 @@ parfor ii = 1:numel(roiIdx)
         ngidx = [ngidx roiIdx(ii)];
         continue;
     end
-    
-    %thisY = Y(roiIdx(ii));
-    %thisX = X(roiIdx(ii));
     
     expVal(ii) = trained.expval;
     ridgeParam(ii) = trained.ridgeParam_optimal;
@@ -75,16 +72,17 @@ parfor ii = 1:numel(roiIdx)
     
     
     %% ORSF ... too heavy for officePC
-    RF_insilico.ORSF.screenPix = [144 256]/2;
+    RF_insilico.ORSF.screenPix = [144 256];%/2;
     RF_insilico.ORSF.nRepeats = 15;
-    nORs=18;
+    nORs=10;
     oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
+    RF_insilico.ORSF.dwell = 0.5*numel(trainParam.lagFrames)*RF_insilico.ORSF.Fs_visStim;
     RF_insilico.ORSF.oriList = oriList(1:end-1);
-    RF_insilico.ORSF.sfList = logspace(-1.1, 0.3, 10); %[cycles/deg]
+    SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
+    RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 6); %[cycles/deg]
     RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
         RF_insilico, stimSz, 0);
-    trange = [2 trainParam.lagFrames(end)/dsRate];
-    RF_insilico = analyzeInSilicoORSF(RF_insilico, -1,trange,useGPU);
+    RF_insilico = analyzeInSilicoORSF(RF_insilico, -1,trange,3);
     bestSF(ii) = RF_insilico.ORSF.bestSF;
     bestOR(ii) = RF_insilico.ORSF.bestOR;
     try
@@ -150,10 +148,10 @@ tic;
 for ii = 1:numel(roiIdx)
     try
     mRFori = squeeze(summary.RF_mean(Y(roiIdx(ii)),X(roiIdx(ii)),:,:));
-    k = gavg(:)\mRFori(:);
-    mRF = mRFori - k*gavg;
+    %     k = gavg(:)\mRFori(:);
+    %     mRF = mRFori - k*gavg;
     
-    RF_smooth = smooth2DGauss(mRF);% - mean(mRF(:)));
+    RF_smooth = smooth2DGauss(mRFori);% - mean(mRF(:)));
     
     RF_smooth = (-1) * RF_smooth;
     RF_smooth(RF_smooth<0) = 0;
@@ -238,6 +236,10 @@ mcolorbar;
 
 screen2png([dataPaths.encodingSavePrefix '_summary']);
 
+%% visual field sign
+prefMaps_xy(:,:,1)=summary.RF_Cx;
+prefMaps_xy(:,:,2)=summary.RF_Cy;
+vfs=getVFS(prefMaps_xy);
 
 %% show mRFs
 

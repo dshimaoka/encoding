@@ -48,7 +48,13 @@ switch method
             
             [~, bestSFidx] = min(abs(log(RF_insilico.ORSF.sfList) - log(RF_insilico.ORSF.bestSF)));
             p2 = fitOritune180(RF_insilico.ORSF.oriList, resp(bestSFidx,:));
-            RF_insilico.ORSF.bestOR = p2(1);
-            
+            RF_insilico.ORSF.bestOR = p2(1);            
         end
+    case 3 %peak in SF, then fit in OR
+         [amp, idx] = max(resp(:));
+        [sfidx, oridx, tidx] = ind2sub(size(RF_insilico.ORSF.resp), idx);
+        
+        RF_insilico.ORSF.bestSF = RF_insilico.ORSF.sfList(sfidx);
+        p2 = fitOritune180(RF_insilico.ORSF.oriList, resp(sfidx,:));
+        RF_insilico.ORSF.bestOR = p2(1);
 end

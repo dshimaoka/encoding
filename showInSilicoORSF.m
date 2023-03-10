@@ -29,10 +29,11 @@ xlabel('delay [s]');
 ylabel('orientation [deg]');
 
 subplot(212);
-[SFLIST, ORLIST] = meshgrid(sfList, oriList);
-s = surf(SFLIST, ORLIST, mresp');
-s.EdgeColor = 'none';view(2);axis ij tight;
-set(gca,'xtick',sfList,'xticklabel',sfList);
+imagesc(sfList,oriList, mresp');
+% [SFLIST, ORLIST] = meshgrid(sfList, oriList);
+% s = surf(SFLIST, ORLIST, mresp');
+% s.EdgeColor = 'none';view(2);axis ij tight;
+% set(gca,'xtick',sfList,'xticklabel',sfList);
 ylabel('orientation [rad]');
 xlabel('SF (cycles/deg)');
 
@@ -40,12 +41,12 @@ title('mean across delays');
 caxis([-crange crange]);
 colorbar;
 
-if isfield(RF_insilico.ORSF, 'bestSF')
-    vline(RF_insilico.ORSF.bestSF);
-end
-if isfield(RF_insilico.ORSF, 'bestOR')
-    hline(RF_insilico.ORSF.bestOR);
-end
+% if isfield(RF_insilico.ORSF, 'bestSF')
+%     vline(RF_insilico.ORSF.bestSF);
+% end
+% if isfield(RF_insilico.ORSF, 'bestOR')
+%     hline(RF_insilico.ORSF.bestOR);
+% end
 % if RF_ok
 %     hold on;
 %     plot(RF_Cx, RF_Cy, 'ro');

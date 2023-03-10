@@ -33,6 +33,17 @@ RF_smooth(RF_smooth<0) = 0;
   
 p = fitGauss2(xaxis,yaxis,RF_smooth);%need smoothing before this
 
+%second fitting w limted pixels
+if isfield(RF_insilico.noiseRF, 'maxRFsize')
+    maxRFsize = RF_insilico.noiseRF.maxRFsize;
+    winIdxLen = floor(maxRFsize/mean(diff(xaxis))/2);
+    [~,xcent] = min(abs(p(1)-xaxis));
+    [~,ycent] = min(abs(p(2)-yaxis));
+    winXidx = max(xcent-winIdxLen,1):min(xcent+winIdxLen,numel(xaxis));
+    winYidx = max(ycent-winIdxLen,1):min(ycent+winIdxLen,numel(yaxis));
+    
+    p = fitGauss2(xaxis(winXidx),yaxis(winYidx),RF_smooth(winYidx,winXidx));%need smoothing before this
+end
 
 RF_insilico.noiseRF.RF_Cx = p(1);
 RF_insilico.noiseRF.RF_Cy = p(2);
