@@ -110,7 +110,7 @@ for JID = 1:maxJID
     %% in-silico simulation to obtain RF
     if doRF
         RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimSz, 1);
+            RF_insilico, stimSz);
         
         analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
         RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
@@ -123,7 +123,7 @@ for JID = 1:maxJID
     %% in-silico simulation to obtain ORSF
     if doORSF
         RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimSz);
+            RF_insilico, stimSz, 1);
         showInSilicoORSF(RF_insilico);
         
         trange = [2 trainParam.lagFrames(end)/dsRate];
