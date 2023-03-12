@@ -10,7 +10,7 @@ if ~ispc
 end
 
 
-expInfo = getExpInfoNatMov(3);
+expInfo = getExpInfoNatMov(4);
 
 procParam.rescaleFac = 0.10;%0.25;
 procParam.cutoffFreq = 0.02;%0.1;
