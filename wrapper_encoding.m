@@ -25,6 +25,7 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 1000;
+ngIdx = [284 1233];
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
@@ -52,11 +53,17 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 nTotPix = numel(ds.VariableNames)-1;
-maxJID = numel(pen:narrays:nTotPix);
-ngIdx = [2 1 28         233         284        1028        1233        1284        2028];
-for JID = 1%:maxJID
-    %roiIdx = pen + (JID-1)*narrays;
-    roiIdx = ngIdx(pen);
+if ~isempty(ngIdx)
+    maxJID=1;
+else
+    maxJID = numel(pen:narrays:nTotPix);
+end
+for JID = 1:maxJID
+    if ~isempty(ngIdx)
+        roiIdx = ngIdx(pen);
+    else
+        roiIdx = pen + (JID-1)*narrays;
+    end
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
@@ -128,7 +135,7 @@ for JID = 1%:maxJID
     %% in-silico simulation to obtain ORSF
     if doORSF
         RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimSz, 1);
+            RF_insilico, stimSz, 3);
         showInSilicoORSF(RF_insilico);
         
         trange = [2 trainParam.lagFrames(end)/dsRate];
