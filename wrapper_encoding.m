@@ -50,8 +50,10 @@ ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 nTotPix = numel(ds.VariableNames)-1;
 maxJID = numel(pen:narrays:nTotPix);
-for JID = 1:maxJID
-    roiIdx = pen + (JID-1)*narrays;
+ngIdx = [28         233         284        1028        1233        1284        2028];
+for JID = 1%:maxJID
+    %roiIdx = pen + (JID-1)*narrays;
+    roiIdx = ngIdx(pen);
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
@@ -128,7 +130,7 @@ for JID = 1:maxJID
         
         trange = [2 trainParam.lagFrames(end)/dsRate];
 
-        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange);
+        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, 3);
         screen2png([encodingSaveName(1:end-4) '_ORSF']);
         close;        
         save(encodingSaveName,'RF_insilico','-append');

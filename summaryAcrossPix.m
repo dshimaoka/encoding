@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 2;
+ID = 3;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -14,7 +14,8 @@ dsRate = 1;
 expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac);
 %TODO: save data locally
-encodingSavePrefix = dataPaths.encodingSavePrefix;
+%dataPaths.encodingSavePrefix = ['Z:\Shared\Daisuke\recording\processed\2022\11\30\resize10_obs\encoding_2022_11_30_16_resize10'];
+encodingSavePrefix = [dataPaths.encodingSavePrefix];
 
 load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
 thisROI = imageData.meanImage; %153x120
@@ -61,7 +62,8 @@ for ii = 1:numel(roiIdx)
     %% RF
     analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
     %RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
-
+    %showInSilicoRF(RF_insilico, analysisTwin);
+            
     RF_Cx(ii) = RF_insilico.noiseRF.RF_Cx;
     RF_Cy(ii) = RF_insilico.noiseRF.RF_Cy;
     RF_sigma(ii) = RF_insilico.noiseRF.sigma;
@@ -73,8 +75,9 @@ for ii = 1:numel(roiIdx)
     
     %% ORSF ... too heavy for officePC
     try
-    bestSF(ii) = RF_insilico.ORSF.bestSF;
-    bestOR(ii) = RF_insilico.ORSF.bestOR;
+        %RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, [2 trainParam.lagFrames(end)/dsRate], 3);
+        bestSF(ii) = RF_insilico.ORSF.bestSF;
+        bestOR(ii) = RF_insilico.ORSF.bestOR;
     catch err
         ngIdx = [ngIdx ii];
     end
@@ -93,14 +96,18 @@ expVal2 = nan(size(thisROI));
 ridgeParam2 = nan(size(thisROI));
 RF_mean2 = nan(size(thisROI,1),size(thisROI,2),RF_insilico.noiseRF.screenPix(1),RF_insilico.noiseRF.screenPix(2));
 for ii = 1:numel(roiIdx)
-    RF_Cx2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cx(ii);
-    RF_Cy2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cy(ii);
-    RF_sigma2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_sigma(ii);
-    expVal2(Y(roiIdx(ii)),X(roiIdx(ii))) = expVal(ii);
-    ridgeParam2(Y(roiIdx(ii)),X(roiIdx(ii))) = ridgeParam(ii);
-    RF_mean2(Y(roiIdx(ii)),X(roiIdx(ii)),:,:) = RF_mean{ii}; 
-    bestSF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSF(ii);
-    bestOR2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestOR(ii);
+    try
+        RF_Cx2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cx(ii);
+        RF_Cy2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cy(ii);
+        expVal2(Y(roiIdx(ii)),X(roiIdx(ii))) = expVal(ii);
+        ridgeParam2(Y(roiIdx(ii)),X(roiIdx(ii))) = ridgeParam(ii);
+        RF_mean2(Y(roiIdx(ii)),X(roiIdx(ii)),:,:) = RF_mean{ii};
+        bestSF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSF(ii);
+        bestOR2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestOR(ii);
+        RF_sigma2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_sigma(ii);
+    catch err
+        continue
+    end
 end
 
 summary.RF_Cx = RF_Cx2;
@@ -115,7 +122,7 @@ summary.expVar = expVal2;
 summary.thisROI = thisROI;
 summary.roiIdx = roiIdx;
 
-save([dataPaths.encodingSavePrefix '_summary2'],'summary');
+save([dataPaths.encodingSavePrefix '_summary'],'summary');
 
 %% summary figure
 subplot(241);
@@ -167,7 +174,7 @@ axis equal tight
 mcolorbar;
 
 subplot(248);
-imagesc(mod(summary.bestOR,180));
+imagesc(summary.bestOR);
 colormap(gca, 'hsv');
 caxis([0 180]);
 title('orientation [deg]');
@@ -177,57 +184,37 @@ mcolorbar;
 screen2png([dataPaths.encodingSavePrefix '_summary']);
 
 %% visual field sign
+sfFac = 1;
 prefMaps_xy(:,:,1)=summary.RF_Cx;
 prefMaps_xy(:,:,2)=summary.RF_Cy;
-vfs=getVFS(prefMaps_xy);
+
+%test = interp2(i,j,prefMaps_xy(:,:,1), );
+vfs=getVFS(prefMaps_xy, sfFac);
+
+ax(1)=subplot(131);
+imagesc(summary.RF_Cx);
+axis equal tight
+mcolorbar;
+
+ax(2)=subplot(132);
+imagesc(summary.RF_Cy);
+axis equal tight
+mcolorbar;
+
+ax(3)=subplot(133);
+imagesc(vfs);
+axis equal tight;
+caxis([-1 1]);
+% colormap(gca,RedWhiteBlue);
+mcolorbar;
+linkaxes(ax);
+screen2png([dataPaths.encodingSavePrefix '_vfs']);
+
 
 %% show mRFs
 
-xx = (21:30);
-yy = (31:40);
-
-figure;
-
-subplot_tight(numel(yy)+1, 2, 1)
-imagesc(summary.RF_Cx);hold on;
-rectangle('position', [min(xx) min(yy) numel(xx) numel(yy)]);
-caxis(prctile(summary.RF_Cx(:),[1 99]));
-title('Cx [deg]');
-axis equal tight
-mcolorbar;
-
-subplot_tight(numel(yy)+1, 2, 2)
-imagesc(summary.RF_Cy);hold on;
-rectangle('position', [min(xx) min(yy) numel(xx) numel(yy)]);
-caxis(prctile(summary.RF_Cy(:),[1 99]));
-title('Cy [deg]');
-axis equal tight
-mcolorbar;
-
-
-all = summary.RF_mean(yy, xx,:,:);
-xaxis = RF_insilico.noiseRF.xaxis;
-yaxis = RF_insilico.noiseRF.yaxis;
-for ix = 1:numel(xx)
-    for iy = 1:numel(yy)
-        subplot_tight(numel(yy)+1, numel(xx), ix + numel(xx)*iy, 0.02);
-        imagesc(xaxis, yaxis, squeeze(summary.RF_mean(yy(iy), xx(ix),:,:))-gavg);
-       
-        hold on
-        plot(summary.RF_Cx(yy(iy), xx(ix)),summary.RF_Cy(yy(iy), xx(ix)), 'ro');
-       
-        if ix>1 || iy > 1
-            set(gca,'xtick',[],'ytick',[]);
-        end
-        if ix==1
-            ylabel(yy(iy));
-        end
-        if iy==numel(yy)
-            xlabel(xx(ix));
-        end
-        %title(['x: ' num2str(xx(ix)) ', y: ' num2str(yy(iy))])
-        %caxis(prctile(all(:),[1 99])); %better not to impose same color range
-    end
-end
-
-% rectangle('position', [min(xx) min(yy) numel(xx) numel(yy)]);
+yy = 43+(1:5);
+xx = 20+(1:5);
+stimXaxis = RF_insilico.noiseRF.xaxis;
+stimYaxis = RF_insilico.noiseRF.yaxis;
+[f_panel, f_location] = showRFpanels(summary, xx, yy, stimXaxis, stimYaxis);

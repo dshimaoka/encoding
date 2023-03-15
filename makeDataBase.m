@@ -10,7 +10,7 @@ if ~ispc
 end
 
 
-expInfo = getExpInfoNatMov(4);
+expInfo = getExpInfoNatMov(3);
 
 procParam.rescaleFac = 0.10;%0.25;
 procParam.cutoffFreq = 0.02;%0.1;
@@ -78,7 +78,7 @@ writetimetable(TT, dataPaths.timeTableSaveName);%slow
 clear TT
 
 
-%% prepare model output
+%% prepare model output SLOW
 [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
      dsRate, gaborBankParamIdx, 0);
 
