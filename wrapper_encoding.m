@@ -5,6 +5,9 @@
 
 if ~ispc
     addpath(genpath('~/git'));
+    if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
+        delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    end
     addDirPrefs;
 end
 
