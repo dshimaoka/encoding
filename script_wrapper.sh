@@ -4,9 +4,9 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=daisuke.shimaoka@monash.edu
 #SBATCH --job-name=Wrapper_7arrays
-#SBATCH --time=99:00:00
+#SBATCH --time=09:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=3
+#SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=33000
 #SBATCH --array=1-7
 #SBATCH --gres=gpu:1

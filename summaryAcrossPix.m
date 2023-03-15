@@ -75,7 +75,8 @@ for ii = 1:numel(roiIdx)
     
     %% ORSF ... too heavy for officePC
     try
-        %RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, [2 trainParam.lagFrames(end)/dsRate], 3);
+        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, ...
+            [2 trainParam.lagFrames(end)/dsRate], 3);
         bestSF(ii) = RF_insilico.ORSF.bestSF;
         bestOR(ii) = RF_insilico.ORSF.bestOR;
     catch err
@@ -213,8 +214,8 @@ screen2png([dataPaths.encodingSavePrefix '_vfs']);
 
 %% show mRFs
 
-yy = 43+(1:5);
-xx = 20+(1:5);
+yy = 46+(1:5);
+xx = 33+(1:5);
 stimXaxis = RF_insilico.noiseRF.xaxis;
 stimYaxis = RF_insilico.noiseRF.yaxis;
 [f_panel, f_location] = showRFpanels(summary, xx, yy, stimXaxis, stimYaxis);
