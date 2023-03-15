@@ -50,7 +50,7 @@ ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 nTotPix = numel(ds.VariableNames)-1;
 maxJID = numel(pen:narrays:nTotPix);
-ngIdx = [28         233         284        1028        1233        1284        2028];
+ngIdx = [2 1 28         233         284        1028        1233        1284        2028];
 for JID = 1%:maxJID
     %roiIdx = pen + (JID-1)*narrays;
     roiIdx = ngIdx(pen);
