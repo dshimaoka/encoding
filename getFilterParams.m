@@ -35,10 +35,10 @@ gaborparams = gparams.gaborparams;
 
 
 %% convert to real space
-%pix2deg = mean(screenDeg./screenPix); %[deg/pix]
+% pix2deg = mean(screenDeg./screenPix); %[deg/pix]
 gaborparams_real = gaborparams;
-% gaborparams_real(1,:) 
-% gaborparams_real(2,:) 
+gaborparams_real(1,:) = screenDeg(2) * gaborparams(1,:) - screenDeg(2)/2; %pos_x [deg]
+gaborparams_real(2,:) = screenDeg(1) * gaborparams(2,:) - screenDeg(1)/2; %pos_y [deg]
 % gaborparams_real(3,:) 
 gaborparams_real(4,:) = 1/max(screenDeg)* gaborparams(4,:);%s_freq [cpd]
 % gaborparams_real(5,:) 

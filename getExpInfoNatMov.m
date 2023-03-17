@@ -16,6 +16,9 @@ switch ID
         expInfo.expID = 21;
         expInfo.subject = 'CJ229';
         expInfo.date = '20221101';
+%         expInfo.RFxlim = [-inf 5];
+%         expInfo.RFylim = [];
+
     case 4
         expInfo.nsName = 'CJ220.runPassiveMovies.021959';
         expInfo.expID = 17;

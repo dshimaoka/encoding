@@ -45,6 +45,7 @@ switch method
             p = fitGauss1(xx, resp); %NG
             %p = fitGauss1(log(RF_insilico.ORSF.sfList), mean(resp,2)); %NG
             RF_insilico.ORSF.bestSF = exp(p(1));
+            RF_insilico.ORSF.bestSF = max(min(RF_insilico.ORSF.bestSF, max(RF_insilico.ORSF.sfList)), min(RF_insilico.ORSF.sfList));
             
             [~, bestSFidx] = min(abs(log(RF_insilico.ORSF.sfList) - log(RF_insilico.ORSF.bestSF)));
             p2 = fitOritune180(RF_insilico.ORSF.oriList, resp(bestSFidx,:));
@@ -55,6 +56,6 @@ switch method
         [sfidx, oridx, tidx] = ind2sub(size(RF_insilico.ORSF.resp), idx);
         
         RF_insilico.ORSF.bestSF = RF_insilico.ORSF.sfList(sfidx);
-        p2 = fitOritune180(RF_insilico.ORSF.oriList, resp(sfidx,:));
+        p2 = fitOritune180(180/pi*RF_insilico.ORSF.oriList, resp(sfidx,:));
         RF_insilico.ORSF.bestOR = p2(1);
 end

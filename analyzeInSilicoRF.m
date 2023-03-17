@@ -1,4 +1,4 @@
-function RF_insilico = analyzeInSilicoRF(RF_insilico, peakPolarity, trange)
+function RF_insilico = analyzeInSilicoRF(RF_insilico, peakPolarity, trange, xlim, ylim)
 %RF_insilico = analyzeInSilicoRF(RF_insilico, trange)
 if nargin < 2
     peakPolarity = -1;
@@ -6,6 +6,14 @@ end
 
 if nargin < 3
     trange = [-inf inf];
+end
+
+if nargin < 4
+    xlim = [];
+end
+
+if nargin < 5
+    ylim = [];
 end
 
 RF = RF_insilico.noiseRF.RF;
@@ -31,7 +39,18 @@ RF_smooth = smooth2DGauss(mRF - mean(mRF(:)));
 RF_smooth = peakPolarity * RF_smooth;
 RF_smooth(RF_smooth<0) = 0;
   
-p = fitGauss2(xaxis,yaxis,RF_smooth);%need smoothing before this
+
+if ~isempty(xlim)
+    xidx = find(xaxis>=xlim(1) & xaxis <= xlim(2));
+else
+    xidx = 1:numel(xaxis);
+end
+if ~isempty(ylim)
+    yidx = find(yaxis>=ylim(1) & yaxis <= ylim(2));
+else
+    yidx = 1:numel(yaxis);
+end  
+p = fitGauss2(xaxis(xidx),yaxis(yidx),RF_smooth(yidx,xidx));%need smoothing before this
 
 %second fitting w limted pixels
 if isfield(RF_insilico.noiseRF, 'maxRFsize')

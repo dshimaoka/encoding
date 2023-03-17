@@ -11,7 +11,8 @@ end
 %% approach 1: spatial
 %filtContours = squeeze(mean(abs(S),3));
 filtContours = squeeze(S(:,:,round(size(S,3)/2),:));
-images(filtContours(:,:,showFiltIdx),[],[],[],showFiltIdx);
+[~,a]=images(filtContours(:,:,showFiltIdx),[],[],[],showFiltIdx);
+axis(a(:),'equal','tight');
 
 
 %% temporal

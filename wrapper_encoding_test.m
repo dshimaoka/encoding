@@ -12,7 +12,7 @@ if ~ispc
 end
 
 
-ID = 4;
+ID = 2;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
@@ -25,48 +25,7 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 1000;
-ngIdx = [2 
-    1
-           7
-          21
-          26
-         140
-         152
-         270
-         327
-         356
-         430
-         474
-         487
-         496
-         506
-         525
-         540
-         545
-         562
-         748
-         830
-         834
-         872
-         883
-        1001
-        1007
-        1021
-        1026
-        1140
-        1152
-        1270
-        1327
-        1356
-        1430
-        1474
-        1487
-        1496
-        1506
-        1525
-        1540
-        1545
-        1562];
+ngIdx = [1971];
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
@@ -75,11 +34,11 @@ load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx');
 
 %% estimation of filter-bank coefficients
-trainParam.KFolds = 5; %cross validation
-trainParam.ridgeParam = logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
+trainParam.KFolds = 1;%5; %cross validation
+trainParam.ridgeParam = 1e5; %logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+trainParam.lagFrames = 3:4;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
 trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 
@@ -147,8 +106,7 @@ for JID = 1:maxJID
         tic;
         lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
         trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
-            trainParam.KFolds, lagRangeS, ...
-            trainParam.tavg, trainParam.useGPU);
+            trainParam.KFolds, lagRangeS, trainParam.tavg, trainParam.useGPU);
         t1=toc %6s!
         screen2png([encodingSaveName(1:end-4) '_corr']);
         close;

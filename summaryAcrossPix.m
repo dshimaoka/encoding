@@ -4,10 +4,12 @@ if ~ispc
 end
 
 
-ID = 3;
+ID = 4;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
+reAnalyze = 1;
+ORSFfitOption = 1; %3:peakSF,fitOR
 
 
 %% path
@@ -36,6 +38,7 @@ RF_Cy = nan(numel(thisROI),1);
 RF_sigma = nan(numel(thisROI),1);
 RF_mean =cell(numel(thisROI),1);% nan(scrSz(1), scrSz(2),18,32);
 expVal = nan(numel(thisROI),1);
+correlation = nan(numel(thisROI),1);
 bestSF = nan(numel(thisROI),1);
 bestOR = nan(numel(thisROI),1);
 bestAmp = nan(numel(thisROI),1);
@@ -56,27 +59,38 @@ for ii = 1:numel(roiIdx)
         continue;
     end
     
+    correlation(ii) = trained.corr;
     expVal(ii) = trained.expval;
     ridgeParam(ii) = trained.ridgeParam_optimal;
 
     %% RF
-    analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
-    %RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
+    %trange = [0 trainParam.lagFrames(end)/dsRate];
+    trange = [2 trainParam.lagFrames(end)/dsRate];
+
+    if reAnalyze
+        if ID==2
+            xlim = [-10 inf];
+        else
+            xlim = [-inf 5];
+        end
+        ylim = [];
+        RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim);
+    end
     %showInSilicoRF(RF_insilico, analysisTwin);
             
     RF_Cx(ii) = RF_insilico.noiseRF.RF_Cx;
     RF_Cy(ii) = RF_insilico.noiseRF.RF_Cy;
     RF_sigma(ii) = RF_insilico.noiseRF.sigma;
     
-    trange = [0 trainParam.lagFrames(end)/dsRate];
     tidx = find(RF_insilico.noiseRF.RFdelay>=trange(1) & RF_insilico.noiseRF.RFdelay<=trange(2));
     RF_mean{ii} = mean(RF_insilico.noiseRF.RF(:,:,tidx),3);  
     
     
     %% ORSF ... too heavy for officePC
     try
-        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, ...
-            [2 trainParam.lagFrames(end)/dsRate], 3);
+        if reAnalyze
+            RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, ORSFfitOption); 
+        end
         bestSF(ii) = RF_insilico.ORSF.bestSF;
         bestOR(ii) = RF_insilico.ORSF.bestOR;
     catch err
@@ -94,13 +108,16 @@ RF_sigma2 = nan(size(thisROI));
 bestSF2 = nan(size(thisROI));
 bestOR2 = nan(size(thisROI));
 expVal2 = nan(size(thisROI));
+correlation2 = nan(size(thisROI));
 ridgeParam2 = nan(size(thisROI));
-RF_mean2 = nan(size(thisROI,1),size(thisROI,2),RF_insilico.noiseRF.screenPix(1),RF_insilico.noiseRF.screenPix(2));
+RF_mean2 = nan(size(thisROI,1),size(thisROI,2),RF_insilico.noiseRF.screenPix(1),...
+    RF_insilico.noiseRF.screenPix(2));
 for ii = 1:numel(roiIdx)
     try
         RF_Cx2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cx(ii);
         RF_Cy2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cy(ii);
         expVal2(Y(roiIdx(ii)),X(roiIdx(ii))) = expVal(ii);
+        correlation2(Y(roiIdx(ii)),X(roiIdx(ii))) = correlation(ii);
         ridgeParam2(Y(roiIdx(ii)),X(roiIdx(ii))) = ridgeParam(ii);
         RF_mean2(Y(roiIdx(ii)),X(roiIdx(ii)),:,:) = RF_mean{ii};
         bestSF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSF(ii);
@@ -120,102 +137,44 @@ summary.RF_mean = RF_mean2;
 summary.bestSF = bestSF2;
 summary.bestOR = bestOR2;
 summary.expVar = expVal2;
+summary.correlation = correlation2;
 summary.thisROI = thisROI;
 summary.roiIdx = roiIdx;
 
-save([dataPaths.encodingSavePrefix '_summary'],'summary');
 
-%% summary figure
-subplot(241);
-imagesc(summary.thisROI);
-axis equal tight
-colormap(gca,'gray');
-
-subplot(242);
-imagesc(summary.RF_Cx);
-caxis(prctile(summary.RF_Cx(:),[10 90]));
-title('Cx [deg]');
-axis equal tight
-mcolorbar;
-
-subplot(243);
-imagesc(summary.RF_Cy)
-caxis(prctile(summary.RF_Cy(:),[10 90]));
-title('Cy [deg]');
-axis equal tight
-mcolorbar;
-
-subplot(244);
-imagesc(summary.RF_sigma)
-title('sigma [deg]');
-axis equal tight
-mcolorbar;
-
-subplot(245);
-imagesc(summary.expVar);
-title('explained variance [%]');
-axis equal tight
-colormap(gca,'gray');
-mcolorbar;
-
-subplot(246);
-imagesc(log(summary.ridgeParam));
-title('log(ridge param)');
-axis equal tight
-colormap(gca,'gray');
-mcolorbar;
-
-subplot(247);
-imagesc(log(summary.bestSF));
-%sfList = logspace(-1.1, 0.3, 5);
-%caxis(log(prctile(sfList,[0 100])));
-%caxis([-4 -1]);
-title('log(spatial frequency) [cpd]');
-axis equal tight
-mcolorbar;
-
-subplot(248);
-imagesc(summary.bestOR);
-colormap(gca, 'hsv');
-caxis([0 180]);
-title('orientation [deg]');
-axis equal tight
-mcolorbar;
-
-screen2png([dataPaths.encodingSavePrefix '_summary']);
-
-%% visual field sign
+%%vfs
 sfFac = 1;
 prefMaps_xy(:,:,1)=summary.RF_Cx;
 prefMaps_xy(:,:,2)=summary.RF_Cy;
+summary.vfs=getVFS(prefMaps_xy, sfFac);
 
-%test = interp2(i,j,prefMaps_xy(:,:,1), );
-vfs=getVFS(prefMaps_xy, sfFac);
+save([dataPaths.encodingSavePrefix '_summary'],'summary');
 
-ax(1)=subplot(131);
-imagesc(summary.RF_Cx);
-axis equal tight
-mcolorbar;
+%% adjust Cx and Cy
+switch ID
+    case {1,2}
+        fvY = 50;
+        fvX = 40;
+    case 3
+        fvY = 50;
+        fvX = 29;
+end
+summary_adj = summary;
+summary_adj.RF_Cx = summary.RF_Cx - summary.RF_Cx(fvY,fvX);
+summary_adj.RF_Cy = summary.RF_Cy - summary.RF_Cy(fvY,fvX);
 
-ax(2)=subplot(132);
-imagesc(summary.RF_Cy);
-axis equal tight
-mcolorbar;
 
-ax(3)=subplot(133);
-imagesc(vfs);
-axis equal tight;
-caxis([-1 1]);
-% colormap(gca,RedWhiteBlue);
-mcolorbar;
-linkaxes(ax);
-screen2png([dataPaths.encodingSavePrefix '_vfs']);
+%% summary figure
+[sumFig, sumAxes]=showSummaryFig(summary_adj);
+set(sumFig,'position',[0 0 1900 1000]);
+set(sumAxes(2),'clim', [-8 8]);
+set(sumAxes(3),'clim', [-5 5]);
+screen2png([dataPaths.encodingSavePrefix '_summary_adj']);
 
 
 %% show mRFs
-
-yy = 46+(1:5);
-xx = 33+(1:5);
+yy = 51+(1:5);
+xx = 13+(1:5:30);
 stimXaxis = RF_insilico.noiseRF.xaxis;
 stimYaxis = RF_insilico.noiseRF.yaxis;
 [f_panel, f_location] = showRFpanels(summary, xx, yy, stimXaxis, stimYaxis);

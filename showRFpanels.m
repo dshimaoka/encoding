@@ -4,7 +4,7 @@ function [f_panel, f_location] = showRFpanels(summary, xx, yy, stimXaxis, stimYa
 f_location = figure;
 subplot(1, 2, 1)
 imagesc(summary.RF_Cx);hold on;
-rectangle('position', [min(xx) min(yy) numel(xx) numel(yy)]);
+rectangle('position', [min(xx) min(yy) range(xx) range(yy)]);
 caxis(prctile(summary.RF_Cx(:),[1 100]));
 title('Cx [deg]');
 axis equal tight
@@ -12,7 +12,7 @@ mcolorbar;
 
 subplot(1, 2, 2)
 imagesc(summary.RF_Cy);hold on;
-rectangle('position', [min(xx) min(yy) numel(xx) numel(yy)]);
+rectangle('position', [min(xx) min(yy) range(xx) range(yy)]);
 caxis(prctile(summary.RF_Cy(:),[1 99]));
 title('Cy [deg]');
 axis equal tight
