@@ -3,7 +3,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-user=daisuke.shimaoka@monash.edu
-#SBATCH --job-name=Wrapper_42arrays
+#SBATCH --job-name=Wrapper_nxv_1000arrays
 #SBATCH --time=99:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
