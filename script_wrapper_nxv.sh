@@ -12,4 +12,4 @@
 #SBATCH --gres=gpu:1
 #SBATCH --partition=m3g
 module load matlab
-matlab -nodisplay -nodesktop -nosplash < wrapper_encoding.m
+matlab -nodisplay -nodesktop -nosplash < wrapper_encoding_nxv.m
