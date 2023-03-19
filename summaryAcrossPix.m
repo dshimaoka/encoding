@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 4;
+ID = 1;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -17,7 +17,7 @@ expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac);
 %TODO: save data locally
 %dataPaths.encodingSavePrefix = ['Z:\Shared\Daisuke\recording\processed\2022\11\30\resize10_obs\encoding_2022_11_30_16_resize10'];
-encodingSavePrefix = [dataPaths.encodingSavePrefix];
+encodingSavePrefix = [dataPaths.encodingSavePrefix '_nxv'];
 
 load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
 thisROI = imageData.meanImage; %153x120

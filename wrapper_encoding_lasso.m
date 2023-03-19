@@ -25,20 +25,21 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 1000;
-ngIdx = [1971];
+ngIdx = 1:2194;
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
+dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix '_lasso'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx');
 
 %% estimation of filter-bank coefficients
-trainParam.KFolds = 1;%5; %cross validation
-trainParam.ridgeParam = 1e5; %logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
+trainParam.KFolds = 5; %cross validation
+trainParam.ridgeParam = logspace(-2,-1,5);%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = 3:4;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+trainParam.lagFrames = 3; %3:4;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
 trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 
@@ -58,19 +59,20 @@ if ~isempty(ngIdx)
 else
     maxJID = numel(pen:narrays:nTotPix);
 end
-for JID = 1:maxJID
-    if ~isempty(ngIdx)
-        roiIdx = ngIdx(pen);
-    else
-        roiIdx = pen + (JID-1)*narrays;
-    end
+for pen = 1:numel(ngIdx) %JID = 1:maxJID
+    roiIdx = ngIdx(pen)
+%     if ~isempty(ngIdx)
+%         roiIdx = ngIdx(pen);
+%     else
+%         roiIdx = pen + (JID-1)*narrays;
+%     end
     
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
     
     %% in-silico RF estimation
     RF_insilico = struct;
-    RF_insilico.noiseRF.nRepeats = 80; %4
+    RF_insilico.noiseRF.nRepeats = 40;%80; %4
     RF_insilico.noiseRF.dwell = 15; %frames
     RF_insilico.noiseRF.screenPix = stimInfo.screenPix/8;%4 %[y x]
     RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
@@ -84,7 +86,7 @@ for JID = 1:maxJID
     RF_insilico.ORSF.oriList = oriList(1:end-1);
     SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
     RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 6); %[cycles/deg];
-    RF_insilico.ORSF.nRepeats = 15;
+    RF_insilico.ORSF.nRepeats = 10;%15;
     RF_insilico.ORSF.dwell = 45; %#stimulus frames
     
     
@@ -105,9 +107,9 @@ for JID = 1:maxJID
         %% fitting!
         tic;
         lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
-        trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
+        trained = trainAneuron_lasso(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
             trainParam.KFolds, lagRangeS, trainParam.tavg, trainParam.useGPU);
-        t1=toc %6s!
+        t1=toc
         screen2png([encodingSaveName(1:end-4) '_corr']);
         close;
         
@@ -132,17 +134,17 @@ for JID = 1:maxJID
     end
     
     %% in-silico simulation to obtain ORSF
-    if doORSF
-        RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimSz, 3);
-        showInSilicoORSF(RF_insilico);
-        
-        trange = [2 trainParam.lagFrames(end)/dsRate];
-
-        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, 3);
-        screen2png([encodingSaveName(1:end-4) '_ORSF']);
-        close;        
-        save(encodingSaveName,'RF_insilico','-append');
-    end
+%     if doORSF
+%         RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
+%             RF_insilico, stimSz, 3);
+%         showInSilicoORSF(RF_insilico);
+%         
+%         trange = [2 trainParam.lagFrames(end)/dsRate];
+% 
+%         RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, 3);
+%         screen2png([encodingSaveName(1:end-4) '_ORSF']);
+%         close;        
+%         save(encodingSaveName,'RF_insilico','-append');
+%     end
 
 end
