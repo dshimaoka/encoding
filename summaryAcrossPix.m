@@ -8,7 +8,7 @@ ID = 1;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
-reAnalyze = 1;
+reAnalyze = 0;
 ORSFfitOption = 1; %3:peakSF,fitOR
 
 
@@ -94,7 +94,7 @@ for ii = 1:numel(roiIdx)
         bestSF(ii) = RF_insilico.ORSF.bestSF;
         bestOR(ii) = RF_insilico.ORSF.bestOR;
     catch err
-        ngIdx = [ngIdx ii];
+        %ngIdx = [ngIdx ii];
     end
     %bestAmp(ii) = amp;   
 end
@@ -148,7 +148,7 @@ prefMaps_xy(:,:,1)=summary.RF_Cx;
 prefMaps_xy(:,:,2)=summary.RF_Cy;
 summary.vfs=getVFS(prefMaps_xy, sfFac);
 
-save([dataPaths.encodingSavePrefix '_summary'],'summary');
+save([encodingSavePrefix '_summary'],'summary');
 
 %% adjust Cx and Cy
 switch ID
@@ -169,7 +169,7 @@ summary_adj.RF_Cy = summary.RF_Cy - summary.RF_Cy(fvY,fvX);
 set(sumFig,'position',[0 0 1900 1000]);
 set(sumAxes(2),'clim', [-8 8]);
 set(sumAxes(3),'clim', [-5 5]);
-screen2png([dataPaths.encodingSavePrefix '_summary_adj']);
+screen2png([encodingSavePrefix '_summary_adj']);
 
 
 %% show mRFs

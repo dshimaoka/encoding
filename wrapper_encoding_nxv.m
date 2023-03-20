@@ -12,7 +12,7 @@ if ~ispc
 end
 
 
-ID = 2;
+ID = 1;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
@@ -25,7 +25,35 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 1000;
-ngIdx = [];
+ngIdx = [4
+          81
+          83
+         261
+         306
+         342
+         389
+         416
+         696
+         705
+         799
+         806
+         879
+         924
+        1004
+        1081
+        1083
+        1261
+        1306
+        1342
+        1389
+        1416
+        1696
+        1705
+        1799
+        1806
+        1879
+        1924
+        2004];
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
