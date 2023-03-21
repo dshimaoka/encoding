@@ -5,11 +5,10 @@
 
 if ~ispc
     addpath(genpath('~/git'));
-    %     if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
-    %         delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-    %         edit('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-    %         fclose('all');
-    %     end
+    if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
+        delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+        save('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    end
     
     %as of 21/3/23:
     %  touch /home/dshi0006/.matlab/R2019b/matlabprefs.mat
@@ -18,7 +17,16 @@ if ~ispc
     %  chmod 444 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
     %  ls -l /home/dshi0006/.matlab/R2019b/matlabprefs.mat
     % -r--r--r-- 1 dshi0006 monashuniversity 0 Mar 21 10:57 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
-   
+    % > this mat file is unreadable 
+    
+    %2nd attempt 21/3/23
+    % copied local one
+    % 'C:\Users\dshi0006\AppData\Roaming\MathWorks\MATLAB\R2021a\matlabprefs.mat'
+    % to MASSIVE, change it to read-only (chmod 444)
+    % >> >> >> >> >> >> {^HError using save
+    %     Unable to write file /home/dshi0006/.matlab/R2019b/matlabprefs.mat: permission
+    %     denied.
+    
     addDirPrefs;
 end
 
