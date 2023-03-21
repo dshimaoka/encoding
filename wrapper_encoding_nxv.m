@@ -5,16 +5,25 @@
 
 if ~ispc
     addpath(genpath('~/git'));
-    if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
-        delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-        edit('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-        fclose('all');
-    end
+    %     if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
+    %         delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    %         edit('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    %         fclose('all');
+    %     end
+    
+    %as of 21/3/23:
+    %  touch /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    %     ls -l /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    % -rw-r--r-- 1 dshi0006 monashuniversity 335 Mar 13 01:41 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    %  chmod 444 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    %  ls -l /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    % -r--r--r-- 1 dshi0006 monashuniversity 0 Mar 21 10:57 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+   
     addDirPrefs;
 end
 
 
-ID = 3;
+ID = 2;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
@@ -27,7 +36,138 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 1000;
-ngIdx = [];
+ngIdx = [  339
+         380
+         484
+         870
+         875
+         876
+         881
+         882
+         884
+         888
+         890
+         891
+         892
+         896
+         898
+         899
+         900
+         904
+         906
+         907
+         908
+         912
+         914
+         915
+         916
+         917
+         921
+         922
+         925
+         926
+         930
+         931
+         933
+         937
+         939
+         940
+         941
+         945
+         947
+         950
+         952
+         954
+         955
+         958
+         960
+         962
+         964
+         968
+         969
+         973
+         975
+         976
+         977
+         978
+         981
+         982
+         987
+         988
+         990
+         991
+         994
+         995
+         997
+        1005
+        1339
+        1380
+        1447
+        1484
+        1873
+        1876
+        1879
+        1883
+        1885
+        1887
+        1888
+        1891
+        1893
+        1894
+        1895
+        1897
+        1898
+        1899
+        1901
+        1905
+        1906
+        1907
+        1909
+        1912
+        1913
+        1917
+        1919
+        1923
+        1927
+        1929
+        1932
+        1933
+        1935
+        1937
+        1939
+        1940
+        1941
+        1942
+        1945
+        1947
+        1949
+        1951
+        1952
+        1955
+        1957
+        1959
+        1961
+        1962
+        1965
+        1967
+        1969
+        1971
+        1973
+        1975
+        1977
+        1979
+        1980
+        1981
+        1983
+        1985
+        1987
+        1989
+        1991
+        1993
+        1995
+        1997
+        1999
+        2005];
 
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
