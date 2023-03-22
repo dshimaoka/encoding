@@ -4,13 +4,14 @@ if ~ispc
 end
 
 
-ID = 2;
+ID = 3;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
-reAnalyze = 0;
+reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 
+pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
 
 %% path
 expInfo = getExpInfoNatMov(ID);
@@ -110,9 +111,11 @@ bestOR2 = nan(size(thisROI));
 expVal2 = nan(size(thisROI));
 correlation2 = nan(size(thisROI));
 ridgeParam2 = nan(size(thisROI));
+mask = nan(size(thisROI));
 RF_mean2 = nan(size(thisROI,1),size(thisROI,2),RF_insilico.noiseRF.screenPix(1),...
     RF_insilico.noiseRF.screenPix(2));
 for ii = 1:numel(roiIdx)
+    mask(Y(roiIdx(ii)),X(roiIdx(ii))) = 1;
     try
         RF_Cx2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cx(ii);
         RF_Cy2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cy(ii);
@@ -123,6 +126,7 @@ for ii = 1:numel(roiIdx)
         bestSF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSF(ii);
         bestOR2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestOR(ii);
         RF_sigma2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_sigma(ii);
+
     catch err
         continue
     end
@@ -140,28 +144,39 @@ summary.expVar = expVal2;
 summary.correlation = correlation2;
 summary.thisROI = thisROI;
 summary.roiIdx = roiIdx;
+summary.mask = mask;
 
 
 %%vfs
 sfFac = 1;
+prefMaps_xy = [];
 prefMaps_xy(:,:,1)=summary.RF_Cx;
 prefMaps_xy(:,:,2)=summary.RF_Cy;
 summary.vfs=getVFS(prefMaps_xy, sfFac);
 
 save([encodingSavePrefix '_summary'],'summary');
 
-%% adjust Cx and Cy
+%% adjust Cx and Cy, interpolate NANs
 switch ID
-    case {1,2}
+    case 1
         fvY = 50;
         fvX = 40;
+    case 2
+        fvY = 52;
+        fvX = 39;
     case 3
         fvY = 50;
         fvX = 29;
 end
 summary_adj = summary;
-summary_adj.RF_Cx = summary.RF_Cx - summary.RF_Cx(fvY,fvX);
-summary_adj.RF_Cy = summary.RF_Cy - summary.RF_Cy(fvY,fvX);
+summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
+summary_adj.RF_Cy = interpNanImages(summary.RF_Cy - summary.RF_Cy(fvY,fvX));
+summary_adj.RF_sigma = interpNanImages(summary_adj.RF_sigma);
+summary_adj.RF_mean = interpNanImages(summary_adj.RF_mean);
+summary_adj.bestSF = interpNanImages(summary_adj.bestSF);
+summary_adj.bestOR = interpNanImages(summary_adj.bestOR);
+summary_adj.correlation = interpNanImages(summary_adj.correlation);
+summary_adj.expVar = interpNanImages(summary_adj.expVar);
 
 
 %% summary figure
@@ -178,3 +193,9 @@ xx = 13+(1:5:30);
 stimXaxis = RF_insilico.noiseRF.xaxis;
 stimYaxis = RF_insilico.noiseRF.yaxis;
 [f_panel, f_location] = showRFpanels(summary, xx, yy, stimXaxis, stimYaxis);
+
+
+%% show composite map (under construction)
+fig = showCompositeMap(summary_adj);
+line([45 45],[55 55+pixPermm], 'linewidth',2);
+savePaperFigure(fig,[encodingSavePrefix '_compositeMap']);

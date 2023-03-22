@@ -5,10 +5,48 @@
 
 if ~ispc
     addpath(genpath('~/git'));
-    if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
-        delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-    end
-    addDirPrefs;
+    %     if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
+    %         delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    %         save('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    %     end
+    
+    % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!
+    
+    %as of 21/3/23:
+    %  touch /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    %     ls -l /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    % -rw-r--r-- 1 dshi0006 monashuniversity 335 Mar 13 01:41 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    %  chmod 444 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    %  ls -l /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    % -r--r--r-- 1 dshi0006 monashuniversity 0 Mar 21 10:57 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
+    % > this mat file is unreadable 
+    
+    %2nd attempt 21/3/23
+    % copied local one
+    % 'C:\Users\dshi0006\AppData\Roaming\MathWorks\MATLAB\R2021a\matlabprefs.mat'
+    % to MASSIVE, change it to read-only (chmod 444)
+    % >> >> >> >> >> >> {^HError using save
+    %     Unable to write file /home/dshi0006/.matlab/R2019b/matlabprefs.mat: permission
+    %     denied.
+    
+    %3rd attempt
+    %     delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    %     save('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
+    % nable to read MAT-file /home/dshi0006/.matlab/R2019b/matlabprefs.mat. Not a
+    %     binary MAT-file. Try load -ASCII to read as text.
+    %
+    %     Error in prefutils>loadPrefs (line 42)
+    %     fileContents = load(prefFile);
+    %
+    %     Error in prefutils (line 10)
+    %     [varargout{1:nargout}] = feval(varargin{:});
+    %
+    %     Error in getpref (line 62)
+    %     Preferences = prefutils('loadPrefs');
+    %
+    %     Error in getDataPaths (line 6)
+    %     dirPref = getpref('nsAnalysis','dirPref');
+    
 end
 
 
@@ -25,61 +63,22 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 1000;
-ngIdx = [2 
-    1
-           7
-          21
-          26
-         140
-         152
-         270
-         327
-         356
-         430
-         474
-         487
-         496
-         506
-         525
-         540
-         545
-         562
-         748
-         830
-         834
-         872
-         883
-        1001
-        1007
-        1021
-        1026
-        1140
-        1152
-        1270
-        1327
-        1356
-        1430
-        1474
-        1487
-        1496
-        1506
-        1525
-        1540
-        1545
-        1562];
+ngIdx = [];
 
+    
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac);
+dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix '_nxv'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx');
 
 %% estimation of filter-bank coefficients
 trainParam.KFolds = 5; %cross validation
-trainParam.ridgeParam = logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
+trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+trainParam.lagFrames = 2:3;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
 trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 
@@ -181,7 +180,7 @@ for JID = 1:maxJID
         
         trange = [2 trainParam.lagFrames(end)/dsRate];
 
-        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, 3);
+        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, 1);
         screen2png([encodingSaveName(1:end-4) '_ORSF']);
         close;        
         save(encodingSaveName,'RF_insilico','-append');

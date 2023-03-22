@@ -3,7 +3,12 @@ function dataPaths = getDataPaths(expInfo,rescaleFac)
 %returns full paths to the processed data used in encoding modeling of
 %imaging data
 
-dirPref = getpref('nsAnalysis','dirPref');
+%try
+    dirPref = getpref('nsAnalysis','dirPref');
+% catch err
+%         addDirPrefs;
+%         dirPref = getpref('nsAnalysis','dirPref');
+% end
 
 expDate = [expInfo.date(1:4) filesep expInfo.date(5:6) filesep expInfo.date(7:8)];
 expName = num2str(expInfo.expID);
