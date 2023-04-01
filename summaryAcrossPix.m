@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 3;
+ID = 4;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -69,10 +69,11 @@ for ii = 1:numel(roiIdx)
     trange = [2 trainParam.lagFrames(end)/dsRate];
 
     if reAnalyze
-        if ID==2
-            xlim = [-10 inf];
-        else
-            xlim = [-inf 5];
+        switch ID
+            case {2,4}
+                xlim = [-10 inf];
+            case {1,3}
+                xlim = [-inf 5];
         end
         ylim = [];
         RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim);
@@ -111,11 +112,9 @@ bestOR2 = nan(size(thisROI));
 expVal2 = nan(size(thisROI));
 correlation2 = nan(size(thisROI));
 ridgeParam2 = nan(size(thisROI));
-mask = nan(size(thisROI));
 RF_mean2 = nan(size(thisROI,1),size(thisROI,2),RF_insilico.noiseRF.screenPix(1),...
     RF_insilico.noiseRF.screenPix(2));
 for ii = 1:numel(roiIdx)
-    mask(Y(roiIdx(ii)),X(roiIdx(ii))) = 1;
     try
         RF_Cx2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cx(ii);
         RF_Cy2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_Cy(ii);
@@ -130,6 +129,11 @@ for ii = 1:numel(roiIdx)
     catch err
         continue
     end
+end
+
+mask = nan(size(thisROI));
+for ii = 1:numel(roiIdx)
+    mask(Y(roiIdx(ii)),X(roiIdx(ii))) = 1;
 end
 
 summary.RF_Cx = RF_Cx2;
@@ -161,41 +165,51 @@ switch ID
     case 1
         fvY = 50;
         fvX = 40;
+        corr_th = 0.2;
     case 2
         fvY = 52;
         fvX = 39;
+        corr_th = 0.2;
     case 3
         fvY = 50;
         fvX = 29;
+        corr_th = 0.2;
+    case 4
+        fvY = 33;
+        fvX = 37;
+        corr_th = 0.15;
 end
 summary_adj = summary;
 summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
-summary_adj.RF_Cy = interpNanImages(summary.RF_Cy - summary.RF_Cy(fvY,fvX));
+summary_adj.RF_Cy = interpNanImages(-(summary.RF_Cy - summary.RF_Cy(fvY,fvX)));
 summary_adj.RF_sigma = interpNanImages(summary_adj.RF_sigma);
-summary_adj.RF_mean = interpNanImages(summary_adj.RF_mean);
+summary_adj.RF_mean = (summary.RF_mean);
 summary_adj.bestSF = interpNanImages(summary_adj.bestSF);
 summary_adj.bestOR = interpNanImages(summary_adj.bestOR);
 summary_adj.correlation = interpNanImages(summary_adj.correlation);
 summary_adj.expVar = interpNanImages(summary_adj.expVar);
+save([encodingSavePrefix '_summary'],'summary_adj','-append');
 
 
 %% summary figure
+summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
 [sumFig, sumAxes]=showSummaryFig(summary_adj);
 set(sumFig,'position',[0 0 1900 1000]);
 set(sumAxes(2),'clim', [-8 8]);
 set(sumAxes(3),'clim', [-5 5]);
-screen2png([encodingSavePrefix '_summary_adj']);
+savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 
 %% show mRFs
-yy = 51+(1:5);
-xx = 13+(1:5:30);
-stimXaxis = RF_insilico.noiseRF.xaxis;
-stimYaxis = RF_insilico.noiseRF.yaxis;
-[f_panel, f_location] = showRFpanels(summary, xx, yy, stimXaxis, stimYaxis);
-
+brain_y = 20+(1:5:20);
+brain_x = 13+(1:6:20);
+stimXaxis = RF_insilico.noiseRF.xaxis - summary.RF_Cx(fvY,fvX);
+stimYaxis = -(RF_insilico.noiseRF.yaxis - summary.RF_Cy(fvY,fvX));
+[f_panel, f_location] = showRFpanels(summary_adj, brain_x, brain_y, stimXaxis, stimYaxis);
+savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
+savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs'], 'w');
 
 %% show composite map (under construction)
 fig = showCompositeMap(summary_adj);
-line([45 45],[55 55+pixPermm], 'linewidth',2);
+%line([45 45],[55 55+pixPermm], 'linewidth',2);
 savePaperFigure(fig,[encodingSavePrefix '_compositeMap']);

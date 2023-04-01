@@ -7,7 +7,7 @@ function fig = showCompositeMap(summary_adj)
 % mask = summary_adj.correlation/prctile(summary_adj.correlation(:),99);
 % mask(mask>1)=1;
 
-mask = summary_adj.correlation > 0.2;
+mask = (summary_adj.correlation > 0.2) .* summary_adj.mask;
 
 %imagesc(summary_adj.RF_Cy, 'alphadata',mask)
 % Cymax=prctile(abs(summary_adj.RF_Cy(:)),[99]);
@@ -38,11 +38,31 @@ closefac = 1;
 %subplot(211);imagesc(signMap);
 %subplot(212);imagesc(im_final);
 
-imagesc(im_final, 'alphadata', mask);
-bkrmap = customcolormap(linspace(0,1,3), ...
-   [0 0 1; 0 0 0; 1 0 0]);
-colormap(gca, bkrmap);
-hold on; %contour(im_final,[-0.1 0.1],'k','linewidth',2);
-contour(CyFilt, [0 0], '--w','linewidth',2);
-axis equal tight ij;
-whitebg(gcf,'w');
+for ii = 1:4
+    switch ii
+        case 1
+            image = summary_adj.RF_Cx;
+            cmap = parula;
+        case 2
+            image = summary_adj.RF_Cy;
+            cmap = customcolormap(linspace(0,1,3), ...
+                [1 0 0; 0 0 0; 0 1 0]);
+        case 3
+              image = summary_adj.vfs;
+            cmap = customcolormap(linspace(0,1,3), ...
+                [0 0 1; 0 0 0; 1 0 0]);
+        case 4
+            image = im_final;
+            cmap = customcolormap(linspace(0,1,3), ...
+                [0 0 1; 0 0 0; 1 0 0]);
+    end
+    subplot(2,2,ii);
+    imagesc(image, 'alphadata', mask);
+    
+    colormap(gca, cmap);
+    hold on; 
+    contour(im_final,[-0.1 0.1],'w','linewidth',2);
+    contour(CyFilt, [0 0], ':w','linewidth',2);
+    axis equal tight ij;
+    whitebg(gcf,'w');
+end

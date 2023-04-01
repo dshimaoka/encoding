@@ -7,14 +7,14 @@ fig_summary = figure;
 
 figAxes(1)=subplot(251);
 imagesc(summary.thisROI);
-axis equal tight
+axis equal tight off
 colormap(gca,'gray');
 
 figAxes(2)=subplot(252);
 imagesc(summary.RF_Cx, 'alphadata',summary.mask);
 caxis(prctile(summary.RF_Cx(:),[10 90]));
 title('Cx [deg]');
-axis equal tight
+axis equal tight off
 % gkrmap = customcolormap(linspace(0,1,3), ...
 %    [0 1 0; 0 0 0; 1 0 0]);
 % colormap(gca, gkrmap);
@@ -25,17 +25,17 @@ imagesc(summary.RF_Cy, 'alphadata',summary.mask)
 Cymax=prctile(abs(summary.RF_Cy(:)),[99]);
 caxis([-Cymax Cymax]);
 title('Cy [deg]');
-axis equal tight
-gkrmap = customcolormap(linspace(0,1,3), ...
-   [0 1 0; 0 0 0; 1 0 0]);
-colormap(gca, gkrmap);
+axis equal tight off
+rkgmap = customcolormap(linspace(0,1,3), ...
+   [1 0 0; 0 0 0; 0 1 0]);
+colormap(gca, rkgmap);
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(4)=subplot(254);
 imagesc(summary.vfs, 'alphadata',summary.mask)
 title('vfs');
 caxis([-1 1]);
-axis equal tight
+axis equal tight off
 bwrmap = customcolormap(linspace(0,1,11), ...
     {'#68011d','#b5172f','#d75f4e','#f7a580','#fedbc9','#f5f9f3','#d5e2f0','#93c5dc','#4295c1','#2265ad','#062e61'});
 colormap(gca, flipud(bwrmap));
@@ -44,37 +44,35 @@ mcolorbar(gca,.5,'southoutside');
 figAxes(5)=subplot(255);
 imagesc(summary.RF_sigma, 'alphadata',summary.mask)
 title('sigma [deg]');
-axis equal tight
+axis equal tight off
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(6)=subplot(256);
 imagesc(summary.expVar, 'alphadata',summary.mask);
 title('explained variance [%]');
-axis equal tight
+axis equal tight off
 colormap(gca,'gray');
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(7)=subplot(257);
 imagesc(summary.correlation, 'alphadata',summary.mask);
 title('correlation observed-mdl');
-axis equal tight
+axis equal tight off
 colormap(gca,'gray');
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(8)=subplot(258);
 imagesc(log(summary.ridgeParam), 'alphadata',summary.mask);
 title('log(ridge param)');
-axis equal tight
+axis equal tight off
 colormap(gca,'gray');
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(9)=subplot(259);
 imagesc(log(summary.bestSF), 'alphadata',summary.mask);
-%sfList = logspace(-1.1, 0.3, 5);
 caxis(prctile(log(summary.bestSF(:)),[1 99]));
-%caxis([-4 -1]);
 title('log(spatial frequency) [cpd]');
-axis equal tight
+axis equal tight off
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(10)=subplot(2,5,10);
@@ -82,7 +80,7 @@ imagesc(summary.bestOR, 'alphadata',summary.mask);
 colormap(gca, 'hsv');
 caxis([0 180]);
 title('orientation [deg]');
-axis equal tight
+axis equal tight off
 mcolorbar(gca,.5,'southoutside');
 
 linkaxes(figAxes);

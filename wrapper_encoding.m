@@ -50,7 +50,7 @@ if ~ispc
 end
 
 
-ID = 4;
+ID = 5;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
