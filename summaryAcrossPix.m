@@ -4,11 +4,11 @@ if ~ispc
 end
 
 
-ID = 4;
+ID = 5;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
-reAnalyze = 1;
+reAnalyze = 0;
 ORSFfitOption = 1; %3:peakSF,fitOR
 
 pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
@@ -178,6 +178,10 @@ switch ID
         fvY = 33;
         fvX = 37;
         corr_th = 0.15;
+    case 5 %TOBE FIXED
+        fvY = 33;
+        fvX = 37;
+        corr_th = 0.15;
 end
 summary_adj = summary;
 summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
@@ -196,7 +200,7 @@ summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
 [sumFig, sumAxes]=showSummaryFig(summary_adj);
 set(sumFig,'position',[0 0 1900 1000]);
 set(sumAxes(2),'clim', [-8 8]);
-set(sumAxes(3),'clim', [-5 5]);
+set(sumAxes(3),'clim', [-10 10]);
 savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 

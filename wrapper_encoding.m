@@ -12,45 +12,10 @@ if ~ispc
     
     % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!
     
-    %as of 21/3/23:
-    %  touch /home/dshi0006/.matlab/R2019b/matlabprefs.mat
-    %     ls -l /home/dshi0006/.matlab/R2019b/matlabprefs.mat
-    % -rw-r--r-- 1 dshi0006 monashuniversity 335 Mar 13 01:41 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
-    %  chmod 444 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
-    %  ls -l /home/dshi0006/.matlab/R2019b/matlabprefs.mat
-    % -r--r--r-- 1 dshi0006 monashuniversity 0 Mar 21 10:57 /home/dshi0006/.matlab/R2019b/matlabprefs.mat
-    % > this mat file is unreadable 
-    
-    %2nd attempt 21/3/23
-    % copied local one
-    % 'C:\Users\dshi0006\AppData\Roaming\MathWorks\MATLAB\R2021a\matlabprefs.mat'
-    % to MASSIVE, change it to read-only (chmod 444)
-    % >> >> >> >> >> >> {^HError using save
-    %     Unable to write file /home/dshi0006/.matlab/R2019b/matlabprefs.mat: permission
-    %     denied.
-    
-    %3rd attempt
-    %     delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-    %     save('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-    % nable to read MAT-file /home/dshi0006/.matlab/R2019b/matlabprefs.mat. Not a
-    %     binary MAT-file. Try load -ASCII to read as text.
-    %
-    %     Error in prefutils>loadPrefs (line 42)
-    %     fileContents = load(prefFile);
-    %
-    %     Error in prefutils (line 10)
-    %     [varargout{1:nargout}] = feval(varargin{:});
-    %
-    %     Error in getpref (line 62)
-    %     Preferences = prefutils('loadPrefs');
-    %
-    %     Error in getDataPaths (line 6)
-    %     dirPref = getpref('nsAnalysis','dirPref');
-    
 end
 
 
-ID = 5;
+ID = 6;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
