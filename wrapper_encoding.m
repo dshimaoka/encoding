@@ -19,6 +19,7 @@ ID = 7;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
+roiSuffix = '_v1v2_s_002hz';
 
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.10;%0.25;
@@ -27,13 +28,13 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-narrays = 1000;
+narrays = 100;%0;
 ngIdx = [];
 
     
 %% path
-dataPaths = getDataPaths(expInfo,rescaleFac);
-dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix '_nxv'];
+dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix);
+dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx');

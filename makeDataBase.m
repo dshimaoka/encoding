@@ -10,14 +10,17 @@ if ~ispc
 end
 
 
-expInfo = getExpInfoNatMov(6);
+expInfo = getExpInfoNatMov(7);
 
-procParam.rescaleFac = 0.10;%0.25;
+roiSuffix = '_v1v2_s_002hz';
+rescaleFac = 0.5;%0.25;
 procParam.cutoffFreq = 0.02;%0.1;
 procParam.lpFreq = []; %2
 
+rotateInfo = [];
+
 rebuildImageData = false;
-makeMask = true;
+makeMask = false;%true;
 uploadResult = true;
 
 %sampling rate of hemodynamic coupling function
@@ -32,15 +35,16 @@ gaborBankParamIdx.nrmparamIdx = 1;
 gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
 %< sampling rate of gabor bank filter
 
-dataPaths = getDataPaths(expInfo, procParam.rescaleFac);
+dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix);
 
 
 %% save image and processed data
 if exist(dataPaths.imageSaveName,'file') % && 
+    disp(['Loading ' dataPaths.imageSaveName];
     load(dataPaths.imageSaveName,'imageProc');
 else
-    imageProc = saveImageProcess(expInfo, procParam, rebuildImageData,...
-        makeMask, uploadResult);
+    
+    imageProc = saveImageProcess(expInfo, rescaleFac, rebuildImageData);
     
     [~,imDataName] = fileparts(dataPaths.imageSaveName);
     
@@ -56,34 +60,52 @@ else
     else
         disp([imDataName ' was NOT uploaded']);
     end
-
 end
 
+%% extract data within mask
+if makeMask
+    imagesc(imageData.meanImage);colormap(gray);
+    roiAhand = images.roi.AssistedFreehand;
+    draw(roiAhand);
+    roi = createMask(roiAhand);
+    nanMask = nan(size(roi));
+    nanMask(roi) = 1;
+    
+    imageData.imstack = imageData.imstack.*(nanMask==1);
+    imageData.imageMeans = squeeze(mean(mean(imageData.imstack)));
+else
+    %nanMask = nan(size(imageData.meanImage));
+    %nanMask(226:275,101:150) = 1;
+    nanMask = nan(318,300);
+    nanMask(246:255,121:130) = 1;
+end
+imageProc.nanMask = nanMask;
+
+theseIdx = find(~isnan(imageProc.nanMask));
+[Y,X,Z] = ind2sub(size(imageProc.nanMask), theseIdx);
+save(dataPaths.roiSaveName, 'X','Y','theseIdx');
+
+%% temporal filtering of pixels within mask
+Fs = 1/median(diff(imageProc.OETimes.camOnTimes));
+imageProc.V = filtV(imageProc.V(theseIdx,:), Fs, procParam.cutoffFreq, procParam.lpFreq);
 
 %% convert processed signal to a format compatible with fitting
 [observed, TimeVec_ds_c] = prepareObserved(imageProc, dsRate);
 %< TODO: BETTER WAY TO DO DOWNSAMPLING?
 %< observed is NOT saved
 
-
-%% extract data within mask
-theseIdx = find(~isnan(imageProc.nanMask));
-[Y,X,Z] = ind2sub(size(imageProc.nanMask), theseIdx);
-observed = observed(:,theseIdx);
-save(dataPaths.imageSaveName, 'X','Y','theseIdx','-append');
-
 %% save as timetable
 TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
 writetimetable(TT, dataPaths.timeTableSaveName);%slow
 clear TT
 
-
-%% prepare model output SLOW
-[S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
-     dsRate, gaborBankParamIdx, 0);
-
- 
-%% save gabor filter output as .mat
-save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
-    'gaborBankParamIdx', 'dsRate');
-
+if ~exist(dataPaths.stimSaveName,'file') 
+    %% prepare model output SLOW
+    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
+        dsRate, gaborBankParamIdx, 0);
+    
+    
+    %% save gabor filter output as .mat
+    save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
+        'gaborBankParamIdx', 'dsRate');
+end

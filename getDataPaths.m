@@ -1,7 +1,10 @@
-function dataPaths = getDataPaths(expInfo,rescaleFac)
+function dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix)
 %dataPaths = getDataPaths(expInfo)
 %returns full paths to the processed data used in encoding modeling of
 %imaging data
+if nargin<3
+    roiSuffix = '';
+end
 
 %try
     dirPref = getpref('nsAnalysis','dirPref');
@@ -18,7 +21,8 @@ saveDirBase = dirPref.saveDirBase;
 dataPaths.imageSaveName = fullfile(saveDirBase,expDate,resizeDir,...
     ['imageData_' regexprep(expDate, filesep,'_') '_' expName '_resize' ...
     num2str(rescaleFac*100) '.mat']);
-dataPaths.timeTableSaveName = [dataPaths.imageSaveName(1:end-4) '.csv'];
+dataPaths.roiSaveName = [dataPaths.imageSaveName(1:end-4) roiSuffix '.mat'];
+dataPaths.timeTableSaveName = [dataPaths.imageSaveName(1:end-4) roiSuffix '.csv'];
 dataPaths.stimSaveName = fullfile(saveDirBase,expDate,resizeDir,...
     ['stimData_' regexprep(expDate, filesep,'_') '_' expName '.mat']);
 dataPaths.encodingSavePrefix = fullfile(saveDirBase,expDate,resizeDir,...

@@ -4,11 +4,11 @@ if ~ispc
 end
 
 
-ID = 6;
+ID = 7;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
-reAnalyze = 0;
+reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 
 pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
@@ -74,6 +74,10 @@ for ii = 1:numel(roiIdx)
                 xlim = [-10 inf];
             case {1,3}
                 xlim = [-inf 5];
+            case {6}
+                xlim = [-10 15];
+            case {7}
+                xlim = [-10 15];
         end
         ylim = [];
         RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim);
@@ -182,6 +186,14 @@ switch ID
         fvY = 33;
         fvX = 37;
         corr_th = 0.15;
+    case 6 %TOBE FIXED
+        fvY = 45;
+        fvX = 40;
+        corr_th = 0.2;
+    case 7 %TOBE FIXED
+        fvY = 40;
+        fvX = 42;
+        corr_th = 0.2;
 end
 summary_adj = summary;
 summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
@@ -197,7 +209,7 @@ save([encodingSavePrefix '_summary'],'summary_adj','-append');
 
 %% summary figure
 summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
-[sumFig, sumAxes]=showSummaryFig(summary_adj);
+[sumFig, sumAxes]=showSummaryFig(summary);
 set(sumFig,'position',[0 0 1900 1000]);
 set(sumAxes(2),'clim', [-8 8]);
 set(sumAxes(3),'clim', [-10 10]);
