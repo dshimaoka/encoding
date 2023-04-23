@@ -22,14 +22,14 @@ doORSF = 1;
 roiSuffix = '_v1v2_s_002hz';
 
 omitSec = 5; %omit initial XX sec for training
-rescaleFac = 0.10;%0.25;
+rescaleFac = 0.50;%0.25;
 
 expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 100;%0;
-ngIdx = [];
+ngIdx = 1;
 
     
 %% path
