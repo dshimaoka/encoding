@@ -37,7 +37,7 @@ dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix);
 dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
-    'gaborBankParamIdx');
+    'gaborBankParamIdx','stimInfo');
 
 %% estimation of filter-bank coefficients
 trainParam.KFolds = 5; %cross validation
@@ -49,7 +49,7 @@ trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 
 %% stimuli
-load(dataPaths.imageSaveName,'stimInfo')
+%load(dataPaths.imageSaveName,'stimInfo')
 stimSz = [stimInfo.height stimInfo.width];
 
 

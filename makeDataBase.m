@@ -12,9 +12,9 @@ end
 
 expInfo = getExpInfoNatMov(7);
 
-roiSuffix = '_v1v2_s_002hz';
+roiSuffix = '_v1v2_s_01hz';
 rescaleFac = 0.5;%0.25;
-procParam.cutoffFreq = 0.02;%0.1;
+procParam.cutoffFreq = 0.1;
 procParam.lpFreq = []; %2
 
 rotateInfo = [];
@@ -40,11 +40,11 @@ dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix);
 
 %% save image and processed data
 if exist(dataPaths.imageSaveName,'file') % && 
-    disp(['Loading ' dataPaths.imageSaveName];
+    disp(['Loading ' dataPaths.imageSaveName]);
     load(dataPaths.imageSaveName,'imageProc');
 else
     
-    imageProc = saveImageProcess(expInfo, rescaleFac, rebuildImageData);
+    [imageProc, cic, stimInfo] = saveImageProcess(expInfo, rescaleFac, rebuildImageData);
     
     [~,imDataName] = fileparts(dataPaths.imageSaveName);
     
@@ -103,9 +103,8 @@ if ~exist(dataPaths.stimSaveName,'file')
     %% prepare model output SLOW
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
         dsRate, gaborBankParamIdx, 0);
-    
-    
+        
     %% save gabor filter output as .mat
     save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
-        'gaborBankParamIdx', 'dsRate');
+        'gaborBankParamIdx', 'dsRate','cic','stimInfo');
 end
