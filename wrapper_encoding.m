@@ -19,7 +19,7 @@ ID = 7;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
-roiSuffix = '_v1v2_s_002hz';
+roiSuffix = '_v1v2_s_01hz';
 
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.50;%0.25;
