@@ -12,9 +12,9 @@ end
 
 expInfo = getExpInfoNatMov(7);
 
-roiSuffix = '_v1v2_s_01hz';
+roiSuffix = '_v1v2_s_015hz';
 rescaleFac = 0.5;%0.25;
-procParam.cutoffFreq = 0.1;
+procParam.cutoffFreq = 0.15;
 procParam.lpFreq = []; %2
 
 rotateInfo = [];
