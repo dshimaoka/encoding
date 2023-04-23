@@ -29,7 +29,7 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 narrays = 100;%0;
-ngIdx = 1;
+ngIdx = [];
 
     
 %% path
@@ -76,7 +76,7 @@ for JID = 1:maxJID
     
     %% in-silico RF estimation
     RF_insilico = struct;
-    RF_insilico.noiseRF.nRepeats = 80; %4
+    RF_insilico.noiseRF.nRepeats = 80; 
     RF_insilico.noiseRF.dwell = 15; %frames
     RF_insilico.noiseRF.screenPix = stimInfo.screenPix/8;%4 %[y x]
     RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
