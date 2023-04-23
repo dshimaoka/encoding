@@ -28,7 +28,7 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-narrays = 100;%0;
+narrays = 20;%0;
 ngIdx = [];
 
     
