@@ -83,7 +83,8 @@ imageProc.nanMask = nanMask;
 
 theseIdx = find(~isnan(imageProc.nanMask));
 [Y,X,Z] = ind2sub(size(imageProc.nanMask), theseIdx);
-save(dataPaths.roiSaveName, 'X','Y','theseIdx');
+meanImage = imageData.meanImage;
+save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
 %% temporal filtering of pixels within mask
 Fs = 1/median(diff(imageProc.OETimes.camOnTimes));

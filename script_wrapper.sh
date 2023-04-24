@@ -3,12 +3,12 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-user=daisuke.shimaoka@monash.edu
-#SBATCH --job-name=Wrapper_100arrays
+#SBATCH --job-name=Wrapper_50arrays
 #SBATCH --time=19:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=33000
-#SBATCH --array=1-20
+#SBATCH --array=1-50
 #SBATCH --gres=gpu:1
 #SBATCH --partition=m3g
 module load matlab

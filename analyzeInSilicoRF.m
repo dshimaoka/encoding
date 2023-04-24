@@ -1,5 +1,9 @@
 function RF_insilico = analyzeInSilicoRF(RF_insilico, peakPolarity, trange, xlim, ylim)
 %RF_insilico = analyzeInSilicoRF(RF_insilico, trange)
+%RF_insilico.noiseRF.RF_Cx : preferred position in x
+%RF_insilico.noiseRF.RF_Cy : preferred position in y
+%RF_insilico.noiseRF.sigma : RF size
+
 if nargin < 2
     peakPolarity = -1;
 end
@@ -34,7 +38,7 @@ mRF = squeeze(mean(RF(:,:,tidx),3));
 % RF_Cy = cell2mat(Cy_tmp);
 % RF_ok = cell2mat(ok_tmp);
 
-RF_smooth = smooth2DGauss(mRF - mean(mRF(:)));
+RF_smooth = smooth2DGauss(mRF - median(mRF(:))); %mean
 
 RF_smooth = peakPolarity * RF_smooth;
 RF_smooth(RF_smooth<0) = 0;

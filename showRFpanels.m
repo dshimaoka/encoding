@@ -4,7 +4,7 @@ function [f_panel, f_location] = showRFpanels(summary, brain_x, brain_y, stimXax
 [brainX, brainY] = meshgrid(brain_x,brain_y);
 
 f_location = figure;
-subplot(1, 2, 1)
+a_location(1)=subplot(1, 2, 1)
 imagesc(summary.RF_Cx, 'alphadata',summary.mask);hold on;
 %rectangle('position', [min(brain_x) min(brain_y) range(brain_x) range(brain_y)]);
 plot(brainX, brainY, 'ko');
@@ -13,7 +13,7 @@ title('Cx [deg]');
 axis equal tight
 mcolorbar([],0.5,'northoutside');
 
-subplot(1, 2, 2)
+a_location(2)=subplot(1, 2, 2)
 imagesc(summary.RF_Cy, 'alphadata',summary.mask);hold on;
 %rectangle('position', [min(brain_x) min(brain_y) range(brain_x) range(brain_y)]);
 plot(brainX, brainY, 'ko');
@@ -22,6 +22,7 @@ title('Cy [deg]');
 axis equal tight
 mcolorbar([],0.5,'northoutside');
 
+linkaxes(a_location);
 
 f_panel = figure;
 %xaxis = RF_insilico.noiseRF.xaxis;
