@@ -9,12 +9,13 @@ if ~ispc
     addDirPrefs;
 end
 
+expID = 6;
 
-expInfo = getExpInfoNatMov(7);
+expInfo = getExpInfoNatMov(expID);
 
-roiSuffix = '_v1v2_s_015hz';
+roiSuffix = '_v1v2_s_01hz';
 rescaleFac = 0.5;%0.25;
-procParam.cutoffFreq = 0.15;
+procParam.cutoffFreq = 0.1;
 procParam.lpFreq = []; %2
 
 rotateInfo = [];
@@ -62,6 +63,21 @@ else
     end
 end
 
+%% align image data
+if expID==6
+    load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\image2Image_CJ235.mat',...
+        'baseImage','inputImage','base_points','input_points');
+    t_concord = cp2tform(rescaleFac * input_points, rescaleFac * base_points, 'nonreflective similarity');
+    imageDim = size(imresize(inputImage, rescaleFac));
+    tensor = reshape(imageProc.V, imageDim(1),imageDim(2),[]);
+    tensor_rotated = imtransform(tensor,...
+        t_concord,'XData',[1 imageDim(2)], 'YData',[1 imageDim(1)]);
+    meanImage = mean(tensor_rotated,3);%imageData.meanImage;
+    imageProc.V = reshape(tensor_rotated, size(tensor_rotated,1)*size(tensor_rotated,2),[]);
+    clear tensor
+end
+
+
 %% extract data within mask
 if makeMask
     imagesc(imageData.meanImage);colormap(gray);
@@ -83,7 +99,6 @@ imageProc.nanMask = nanMask;
 
 theseIdx = find(~isnan(imageProc.nanMask));
 [Y,X,Z] = ind2sub(size(imageProc.nanMask), theseIdx);
-meanImage = imageData.meanImage;
 save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
 %% temporal filtering of pixels within mask

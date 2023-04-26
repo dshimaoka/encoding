@@ -15,11 +15,11 @@ if ~ispc
 end
 
 
-ID = 7;
+ID = 6;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
-roiSuffix = '_v1v2_s_002hz';
+roiSuffix = '_v1v2_s_01hz';
 
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.50;%0.25;
@@ -34,7 +34,7 @@ ngIdx = [];
     
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix);
-dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv_0-5s'];
+dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
@@ -44,7 +44,7 @@ trainParam.KFolds = 5; %cross validation
 trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = round(0/dsRate):round(5/dsRate);%2:3;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+trainParam.lagFrames = 2:3;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
 trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
 
 
