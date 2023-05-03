@@ -4,13 +4,13 @@ if ~ispc
 end
 
 
-ID = 7;
+ID = 6;
 useGPU = 1;
 rescaleFac = 0.50;
 dsRate = 1;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
-roiSuffix = '_v1v2_s_002hz';
+roiSuffix = '_v1v2_s_01hz';
 
 pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
 
@@ -19,7 +19,7 @@ expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix);
 %TODO: save data locally
 %dataPaths.encodingSavePrefix = ['Z:\Shared\Daisuke\recording\processed\2022\11\30\resize10_obs\encoding_2022_11_30_16_resize10'];
-encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv_0-5s'];
+encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv'];
 
 %load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
 load(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');

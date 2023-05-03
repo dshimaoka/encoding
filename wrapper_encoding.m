@@ -19,6 +19,7 @@ ID = 6;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
+subtractImageMeans = 1;
 roiSuffix = '_v1v2_s_01hz';
 
 omitSec = 5; %omit initial XX sec for training
@@ -38,7 +39,11 @@ dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
-
+if subtractImageMeans
+    load(dataPaths.roiSaveName, 'imageMeans_proc');
+else
+    imageMeans_proc = [];
+end
 %% estimation of filter-bank coefficients
 trainParam.KFolds = 5; %cross validation
 trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
@@ -113,7 +118,7 @@ for JID = 1:maxJID
         lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
         trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
             trainParam.KFolds, lagRangeS, ...
-            trainParam.tavg, trainParam.useGPU);
+            trainParam.tavg, trainParam.useGPU, imageMeans_proc);
         t1=toc %6s!
         screen2png([encodingSaveName(1:end-4) '_corr']);
         close;

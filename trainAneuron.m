@@ -1,5 +1,5 @@
 function trained = trainAneuron(ds, S_fin, iNeuron, trainIdx,  ridgeParams, ...
-    KFolds, lagRange, tavg, useGPU)
+    KFolds, lagRange, tavg, useGPU, imageMean)
 %trained = trainAneuron(ds, S_fin, iNeuron, trainIdx,  ridgeParams, ...
 %     KFolds, lagRange, tavg, useGPU)
 
@@ -37,6 +37,12 @@ else
     neuroData = ds_tmp.readall;
     observed = neuroData.(['observed_' num2str(iNeuron)]);
 end
+
+if nargin==10
+    test = observed\imageMean; %regress out by imageMean
+    observed = observed - test*imageMean;
+end
+
 observed_train = single(observed(trainIdx));
 
 S_fin_train = single(S_fin(trainIdx,:));

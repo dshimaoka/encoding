@@ -75,6 +75,7 @@ if expID==6
     meanImage = mean(tensor_rotated,3);%imageData.meanImage;
     imageProc.V = reshape(tensor_rotated, size(tensor_rotated,1)*size(tensor_rotated,2),[]);
     clear tensor
+    save(dataPaths.imageSaveName,'imageProc', '-append');
 end
 
 
@@ -99,11 +100,24 @@ imageProc.nanMask = nanMask;
 
 theseIdx = find(~isnan(imageProc.nanMask));
 [Y,X,Z] = ind2sub(size(imageProc.nanMask), theseIdx);
+
 save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
+ 
 %% temporal filtering of pixels within mask
 Fs = 1/median(diff(imageProc.OETimes.camOnTimes));
 imageProc.V = filtV(imageProc.V(theseIdx,:), Fs, procParam.cutoffFreq, procParam.lpFreq);
+
+
+%% image means, resampled
+imageProc_tmp = imageProc;
+if length(imageProc.OETimes.camOnTimes) < numel(imageMeans_tmp)
+    imageMeans_tmp = imageMeans_tmp(1:numel(imageProc.OETimes.camOnTimes));
+end
+imageProc_tmp.V = filtV(imageMeans_tmp, Fs, procParam.cutoffFreq, procParam.lpFreq);
+[imageMeans_proc] = prepareObserved(imageProc_tmp, dsRate);
+save(dataPaths.roiSaveName, 'imageMeans_proc','-append');
+
 
 %% convert processed signal to a format compatible with fitting
 [observed, TimeVec_ds_c] = prepareObserved(imageProc, dsRate);
