@@ -38,7 +38,7 @@ else
     observed = neuroData.(['observed_' num2str(iNeuron)]);
 end
 
-if nargin==10
+if nargin==10 && ~isempty(imageMean)
     test = observed\imageMean; %regress out by imageMean
     observed = observed - test*imageMean;
 end

@@ -9,7 +9,7 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = 6;
+expID = 2;
 
 expInfo = getExpInfoNatMov(expID);
 
@@ -80,6 +80,8 @@ end
 
 
 %% extract data within mask
+load(dataPaths.imageSaveName,'imageData');
+meanImage = imageData.meanImage;
 if makeMask
     imagesc(imageData.meanImage);colormap(gray);
     roiAhand = images.roi.AssistedFreehand;
@@ -93,8 +95,10 @@ if makeMask
 else
     %nanMask = nan(size(imageData.meanImage));
     %nanMask(226:275,101:150) = 1;
-    nanMask = nan(318,300);
-    nanMask(246:255,121:130) = 1;
+    %     nanMask = nan(318,300);
+    %     nanMask(246:255,121:130) = 1;
+    nanMask = nan(300,246);
+    nanMask(226:250,61:75) = 1;
 end
 imageProc.nanMask = nanMask;
 
@@ -111,6 +115,7 @@ imageProc.V = filtV(imageProc.V(theseIdx,:), Fs, procParam.cutoffFreq, procParam
 
 %% image means, resampled
 imageProc_tmp = imageProc;
+imageMeans_tmp = imageData.imageMeans;
 if length(imageProc.OETimes.camOnTimes) < numel(imageMeans_tmp)
     imageMeans_tmp = imageMeans_tmp(1:numel(imageProc.OETimes.camOnTimes));
 end
@@ -137,4 +142,6 @@ if ~exist(dataPaths.stimSaveName,'file')
     %% save gabor filter output as .mat
     save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
         'gaborBankParamIdx', 'dsRate','cic','stimInfo');
+else
+    save( dataPaths.stimSaveName, 'cic','stimInfo','-append');
 end

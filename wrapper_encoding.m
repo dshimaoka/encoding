@@ -15,11 +15,11 @@ if ~ispc
 end
 
 
-ID = 6;
+ID = 2;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
-subtractImageMeans = 1;
+subtractImageMeans = 0;
 roiSuffix = '_v1v2_s_01hz';
 
 omitSec = 5; %omit initial XX sec for training
