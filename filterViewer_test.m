@@ -1,4 +1,4 @@
-gparamIdx = 2;
+gparamIdx = 11;%2;
 screenPix = [144 256];%/4; %Y-X %gaborparams is identical irrespective of the denominator
 screenDeg = [15 27]; %[deg]
 showFiltIdx = 1:30; %filter idx to visualize

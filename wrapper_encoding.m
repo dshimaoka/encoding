@@ -20,16 +20,16 @@ doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
-roiSuffix = '_v1v2_s_01hz';
+roiSuffix = '_v1v2_s_01hz_gparam11';
 
 omitSec = 5; %omit initial XX sec for training
-rescaleFac = 0.50;%0.25;
+rescaleFac = 0.5;%0.25;
 
 expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-narrays = 50;%0;
+narrays = 100;%0;
 ngIdx = [];
 
     

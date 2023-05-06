@@ -13,9 +13,9 @@ expID = 2;
 
 expInfo = getExpInfoNatMov(expID);
 
-roiSuffix = '_v1v2_s_01hz';
+roiSuffix = '_v1v2_s_01hz_gparam11';
 rescaleFac = 0.5;%0.25;
-procParam.cutoffFreq = 0.1;
+procParam.cutoffFreq = 0.1;%0.02;
 procParam.lpFreq = []; %2
 
 rotateInfo = [];
@@ -29,7 +29,7 @@ dsRate = 1;%[Hz]
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
-gaborBankParamIdx.gparamIdx = 2;
+gaborBankParamIdx.gparamIdx = 11;%2;
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
@@ -43,6 +43,12 @@ dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix);
 if exist(dataPaths.imageSaveName,'file') % && 
     disp(['Loading ' dataPaths.imageSaveName]);
     load(dataPaths.imageSaveName,'imageProc');
+    
+    try
+        cic = imageProc.cic;
+        stimInfo = imageProc.stimInfo;
+    catch err
+    end
 else
     
     [imageProc, cic, stimInfo] = saveImageProcess(expInfo, rescaleFac, rebuildImageData);

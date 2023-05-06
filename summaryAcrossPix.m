@@ -4,13 +4,13 @@ if ~ispc
 end
 
 
-ID = 6;
+ID = 2;
 useGPU = 1;
-rescaleFac = 0.50;
+rescaleFac = 0.10;
 dsRate = 1;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
-roiSuffix = '_v1v2_s_01hz';
+roiSuffix = '';%'_v1v2_s_01hz';
 
 pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
 
@@ -18,7 +18,10 @@ pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
 expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix);
 %TODO: save data locally
-%dataPaths.encodingSavePrefix = ['Z:\Shared\Daisuke\recording\processed\2022\11\30\resize10_obs\encoding_2022_11_30_16_resize10'];
+%TMP
+% dataPaths.encodingSavePrefix = '\\storage.erc.monash.edu.au\shares\MNHS-dshi0006\Massive\processed\2023\04\05\resize50_regressImageMeans\encoding_2023_04_05_22_resize50';
+% dataPaths.encodingSavePrefix = '\\storage.erc.monash.edu.au\shares\MNHS-dshi0006\Massive\processed\2023\04\05\resize50_regressImageMeans\encoding_2023_04_05_22_resize50';
+% dataPaths.encodingSavePrefix = '\\storage.erc.monash.edu.au\shares\MNHS-dshi0006\Massive\processed\2022\11\30\resize50_regressImageMeans\encoding_2022_11_30_16_resize50';
 encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv'];
 
 %load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
