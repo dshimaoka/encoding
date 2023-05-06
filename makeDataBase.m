@@ -13,8 +13,8 @@ expID = 2;
 
 expInfo = getExpInfoNatMov(expID);
 
-roiSuffix = '_v1v2_s_01hz_gparam11';
-rescaleFac = 0.5;%0.25;
+roiSuffix = '_01hz';%'_v1v2_s_01hz_gparam11';
+rescaleFac = 0.1;%0.25;
 procParam.cutoffFreq = 0.1;%0.02;
 procParam.lpFreq = []; %2
 
@@ -29,7 +29,7 @@ dsRate = 1;%[Hz]
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
-gaborBankParamIdx.gparamIdx = 11;%2;
+gaborBankParamIdx.gparamIdx = 2;
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
@@ -99,12 +99,12 @@ if makeMask
     imageData.imstack = imageData.imstack.*(nanMask==1);
     imageData.imageMeans = squeeze(mean(mean(imageData.imstack)));
 else
-    %nanMask = nan(size(imageData.meanImage));
+    nanMask = nan(size(imageData.meanImage));
     %nanMask(226:275,101:150) = 1;
     %     nanMask = nan(318,300);
     %     nanMask(246:255,121:130) = 1;
-    nanMask = nan(300,246);
-    nanMask(226:250,61:75) = 1;
+    %nanMask = nan(300,246);
+    %nanMask(226:250,61:75) = 1;
 end
 imageProc.nanMask = nanMask;
 
