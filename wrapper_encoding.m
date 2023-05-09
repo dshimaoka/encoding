@@ -6,6 +6,9 @@
 if ~ispc
     addpath(genpath('~/git'));
     % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!    
+    [~,narrays] = getArray('script_wrapper.sh');
+else
+    narrays = 1;
 end
 
 
@@ -25,7 +28,7 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-narrays = 1000;
+%narrays = 1000;
 ngIdx = [];
 
     
