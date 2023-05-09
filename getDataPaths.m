@@ -1,7 +1,10 @@
-function dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix)
+function dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, stimSuffix)
 %dataPaths = getDataPaths(expInfo)
 %returns full paths to the processed data used in encoding modeling of
 %imaging data
+if nargin<4
+    stimSuffix = '';
+end
 if nargin<3
     roiSuffix = '';
 end
@@ -24,10 +27,10 @@ dataPaths.imageSaveName = fullfile(saveDirBase,expDate,resizeDir,...
 dataPaths.roiSaveName = [dataPaths.imageSaveName(1:end-4) roiSuffix '.mat'];
 dataPaths.timeTableSaveName = [dataPaths.imageSaveName(1:end-4) roiSuffix '.csv'];
 dataPaths.stimSaveName = fullfile(saveDirBase,expDate,resizeDir,...
-    ['stimData_' regexprep(expDate, filesep,'_') '_' expName '.mat']);
+    ['stimData_' regexprep(expDate, filesep,'_') '_' expName stimSuffix '.mat']);
 dataPaths.encodingSavePrefix = fullfile(saveDirBase,expDate,resizeDir,...
     ['encoding_' regexprep(expDate, filesep,'_') '_' expName '_resize' ...
-    num2str(rescaleFac*100)]);% '_' num2str(roiIdx(pen)) '.mat']);
+    num2str(rescaleFac*100) roiSuffix stimSuffix]);% '_' num2str(roiIdx(pen)) '.mat']);
 
 switch getenv('COMPUTERNAME')
     case 'MU00175834'

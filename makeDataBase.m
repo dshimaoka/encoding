@@ -14,6 +14,7 @@ expID = 2;
 expInfo = getExpInfoNatMov(expID);
 
 roiSuffix = '_01hz';%'_v1v2_s_01hz_gparam11';
+stimSuffix = '_gparam12';
 rescaleFac = 0.1;%0.25;
 procParam.cutoffFreq = 0.1;%0.02;
 procParam.lpFreq = []; %2
@@ -36,7 +37,7 @@ gaborBankParamIdx.nrmparamIdx = 1;
 gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
 %< sampling rate of gabor bank filter
 
-dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix);
+dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix, stimSuffix);
 
 
 %% save image and processed data
