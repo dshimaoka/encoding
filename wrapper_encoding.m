@@ -5,47 +5,53 @@
 
 if ~ispc
     addpath(genpath('~/git'));
-    %     if exist('/home/dshi0006/.matlab/R2019b/matlabprefs.mat','file')
-    %         delete('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-    %         save('/home/dshi0006/.matlab/R2019b/matlabprefs.mat');
-    %     end
-    
-    % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!
-    
+    % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!    
+    [~,narrays] = getArray('script_wrapper.sh');
+else
+    narrays = 1;
 end
 
 
-ID = 6;
+ID = 2;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
-roiSuffix = '_v1v2_s_01hz';
+subtractImageMeans = 0;
+roiSuffix = '';%'_01hz';%'_v1v2_s_01hz_gparam11';
+stimSuffix = '';%'_gparam12';
+regressSuffix = '_nxv_delay2-9';
 
 omitSec = 5; %omit initial XX sec for training
-rescaleFac = 0.50;%0.25;
+rescaleFac = 0.1;%0.5;
 
 expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-narrays = 50;%0;
+%narrays = 1000;
 ngIdx = [];
 
     
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix);
-dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix roiSuffix '_nxv'];
+dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
-
+if subtractImageMeans
+    load(dataPaths.roiSaveName, 'imageMeans_proc');
+else
+    imageMeans_proc = [];
+end
 %% estimation of filter-bank coefficients
-trainParam.KFolds = 5; %cross validation
+trainParam.regressType = 'ridge';
 trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
+trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = 2:3;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
-trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
+trainParam.lagFrames = 2:9;%3;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+trainParam.useGPU = 0;%1; %for ridgeXs local GPU is not sufficient
+
 
 
 %% stimuli
@@ -76,7 +82,7 @@ for JID = 1:maxJID
     
     %% in-silico RF estimation
     RF_insilico = struct;
-    RF_insilico.noiseRF.nRepeats = 80; 
+    RF_insilico.noiseRF.nRepeats = 10;%80; 
     RF_insilico.noiseRF.dwell = 15; %frames
     RF_insilico.noiseRF.screenPix = stimInfo.screenPix/8;%4 %[y x]
     RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
@@ -113,7 +119,7 @@ for JID = 1:maxJID
         lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
         trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
             trainParam.KFolds, lagRangeS, ...
-            trainParam.tavg, trainParam.useGPU);
+            trainParam.tavg, trainParam.useGPU, imageMeans_proc, trainParam.regressType);
         t1=toc %6s!
         screen2png([encodingSaveName(1:end-4) '_corr']);
         close;
