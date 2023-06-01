@@ -13,20 +13,23 @@ expID = 2;
 
 expInfo = getExpInfoNatMov(expID);
 
-roiSuffix = '_01hz';%'_v1v2_s_01hz_gparam11';
-stimSuffix = '_gparam12';
+roiSuffix = '_01hzFovea';%'_v1v2_s_01hz_gparam11';
+stimSuffix = '_topRight';
+
+%% imaging parameters
 rescaleFac = 0.1;%0.25;
 procParam.cutoffFreq = 0.1;%0.02;
 procParam.lpFreq = []; %2
-
 rotateInfo = [];
-
 rebuildImageData = false;
 makeMask = false;%true;
 uploadResult = true;
+dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
-%sampling rate of hemodynamic coupling function
-dsRate = 1;%[Hz]
+
+%% stimulus parameters
+stimXrange = 201:256; %1:left
+stimYrange = 1:56;  %1:top
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -38,7 +41,6 @@ gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
 %< sampling rate of gabor bank filter
 
 dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix, stimSuffix);
-
 
 %% save image and processed data
 if exist(dataPaths.imageSaveName,'file') % && 
@@ -53,6 +55,8 @@ if exist(dataPaths.imageSaveName,'file') % &&
 else
     
     [imageProc, cic, stimInfo] = saveImageProcess(expInfo, rescaleFac, rebuildImageData);
+    
+       
     
     [~,imDataName] = fileparts(dataPaths.imageSaveName);
     
@@ -142,9 +146,17 @@ writetimetable(TT, dataPaths.timeTableSaveName);%slow
 clear TT
 
 if ~exist(dataPaths.stimSaveName,'file') 
+    
+     stimInfo.stimXrange = stimXrange;
+    stimInfo.stimYrange = stimYrange;
+    screenPixNew = [max(stimYrange)-min(stimYrange)+1 max(stimXrange)-min(stimXrange)+1];
+    stimInfo.width = stimInfo.width * screenPixNew(2)/stimInfo.screenPix(2);
+    stimInfo.height = stimInfo.height * screenPixNew(1)/stimInfo.screenPix(1);
+    stimInfo.screenPix = screenPixNew;
+
     %% prepare model output SLOW
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
-        dsRate, gaborBankParamIdx, 0);
+        dsRate, gaborBankParamIdx, 0, stimInfo.stimYrange, stimInfo.stimXrange);
         
     %% save gabor filter output as .mat
     save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...

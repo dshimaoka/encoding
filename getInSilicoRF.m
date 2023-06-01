@@ -87,8 +87,13 @@ end
 RF_insilico.noiseRF.RF = RF_is;
 RF_insilico.noiseRF.RFdelay = RF_delay;
 
-xpix = 1:screenPix(2);
-RF_insilico.noiseRF.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
-ypix = 1:screenPix(1);
-RF_insilico.noiseRF.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
+%xpix = 1:screenPix(2);
+%RF_insilico.noiseRF.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
+%ypix = 1:screenPix(1);
+%RF_insilico.noiseRF.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
+
+xpos = (1:screenPix(2))/screenPix(2);
+ypos = (1:screenPix(1))/screenPix(1);
+[RF_insilico.noiseRF.xaxis,RF_insilico.noiseRF.yaxis] = ...
+    pix2deg(xpos,ypos,oriStimSize(2),oriStimSize(1));
 

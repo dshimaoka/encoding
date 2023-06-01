@@ -1,6 +1,11 @@
-gparamIdx = 11;%2;
-screenPix = [144 256];%/4; %Y-X %gaborparams is identical irrespective of the denominator
-screenDeg = [15 27]; %[deg]
+%% testing parameters based on gparamIdx = 2;
+%sfmax = 5*32 > #filter = 78729 ... more tiling needed at finer sf or smaller rf sizes
+
+
+gparamIdx = 2;
+subSampleFac = 4;
+screenPix = [144 256]/subSampleFac; %Y-X %gaborparams is identical irrespective of the denominator
+screenDeg = [40 70]/subSampleFac;%[15 27]; %[deg] = [stimInfo.height stimInfo.width]
 showFiltIdx = 1:30; %filter idx to visualize
 S = zeros(screenPix(1), screenPix(2), 20); %X-Y-T???
 
@@ -12,6 +17,11 @@ gparams.show_or_preprocess = 0; %necessary to obtain gaborparams
 %filtContours = squeeze(mean(abs(S),3));
 filtContours = squeeze(S(:,:,round(size(S,3)/2),:));
 images(filtContours(:,:,showFiltIdx),[],[],[],showFiltIdx);
+
+% figure;
+% for ii=1:size(filtContours,3)%numel(showFiltIdx)
+%     contour(squeeze(filtContours(:,:,ii)));hold on
+% end
 
 
 %% temporal
@@ -26,8 +36,15 @@ gaborparams = gparams.gaborparams;
 %                       and D is the number of wavelet channels
 %                       Each field in gaborparams represents:
 %                       [pos_x pos_y direction s_freq t_freq s_size t_size phasevalue]
-%                       s_size: Spatial envelope size in standard deviation 1=entire screen
-%                         
+%                       pos_x,pos_y: The spatial center of the Gabor function. The axes are normalized
+%                                    to 0 (lower left corner) to 1(upper right corner).
+%                                    e.g., [0.5 0.5] put the Gabor at the center of the matrix.
+%                       direction: The direction of the Gabor function in degree (0-360)
+%                       s_size: Spatial envelope size in standard deviation 
+%                       s_freq,t_freq: Spatial frequency and temporal frequency
+%                                      They determine how many cycles in
+%                                      XYTSIZE pixels for each dimension.
+%                                      (NOT cycles per pixel)
 %                       t_size: Number of frames to calculate wavelets
 %                       phasevalue can be 0 to 6, where
 %                         0: spectra
@@ -59,8 +76,25 @@ xlabel('filter number')
 showFiltIdx = find(gaborparams(1,:)==0.5 & gaborparams(2,:)==0.5 & gaborparams(3,:)==0);
 
 %% convert to real space
-%pix2deg = mean(screenDeg./screenPix); %[deg/pix]
-gaborparams_real = gaborparams;
-gaborparams_real(4,:) = 1/max(screenDeg)* gaborparams(4,:);%s_freq [cpd]
-gaborparams_real(6,:) = 1/max(screenDeg) * gaborparams(6,:); %s_size [deg]
+pix2deg = mean(screenDeg./screenPix); %[deg/pix]
+gaborparams_r = gaborparams;
+[gaborparams_r(1,:),gaborparams_r(2,:)] = relpos2deg(gaborparams(1,:),gaborparams(2,:), screenDeg(2),screenDeg(1));
+gaborparams_r(4,:) = 1/mean(screenDeg)* gaborparams(4,:);%s_freq [cpd]
+gaborparams_r(5,:) = gaborparams(5,:); %TOBE FIXED
+gaborparams_r(6,:) = mean(screenDeg) * gaborparams(6,:); %s_size [deg]
+gaborparams_r(7,:) = gaborparams(7,:); %TOBE FIXED
+
+
+figure;
+paramNames_r = {'pos_x [deg]' 'pos_y [deg]' 'direction [deg]' 's_freq [cycles/deg]' ...
+    't_freq [cycles]' 's_size [deg]' 't_size [pix]' 'phasevalue [deg]'};
+for ii = 1:8
+    ax(ii)=subplot(8,1,ii);
+    plot(gaborparams_r(ii,:));
+    ylabel(paramNames_r{ii});
+    grid on;
+    axis tight padded
+end
+linkaxes(ax(:),'x');
+xlabel('filter number')
 

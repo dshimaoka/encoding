@@ -215,7 +215,7 @@ save([encodingSavePrefix '_summary'],'summary_adj','-append');
 
 %% summary figure
 %summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
-[sumFig, sumAxes]=showSummaryFig(summary);
+[sumFig, sumAxes]=showSummaryFig(summary_adj);
 set(sumFig,'position',[0 0 1900 1400]);
 set(sumAxes(2),'xlim',[min(X) max(X)]);
 set(sumAxes(2),'ylim',[min(Y) max(Y)]);
