@@ -17,9 +17,9 @@ doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
-roiSuffix = '';%'_01hz';%'_v1v2_s_01hz_gparam11';
-stimSuffix = '';%'_gparam12';
-regressSuffix = '_nxv_delay2-9';
+roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
+stimSuffix = '_right';
+regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.1;%0.5;
@@ -29,11 +29,11 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 %narrays = 1000;
-ngIdx = [];
+ngIdx = [1];
 
     
 %% path
-dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix);
+dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
 dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
@@ -49,9 +49,11 @@ trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best
 trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = 2:9;%3;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+trainParam.lagFrames = 2:3;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
 trainParam.useGPU = 0;%1; %for ridgeXs local GPU is not sufficient
 
+%% in-silico simulation
+analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
 
 
 %% stimuli
@@ -82,9 +84,9 @@ for JID = 1:maxJID
     
     %% in-silico RF estimation
     RF_insilico = struct;
-    RF_insilico.noiseRF.nRepeats = 10;%80; 
+    RF_insilico.noiseRF.nRepeats = 10;%80; FIX
     RF_insilico.noiseRF.dwell = 15; %frames
-    RF_insilico.noiseRF.screenPix = stimInfo.screenPix/8;%4 %[y x]
+    RF_insilico.noiseRF.screenPix = stimInfo.screenPix/8;%4 %[y x] %FIX %spatial resolution of noise stimuli
     RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
     %<screenPix(1)/screenPix(2) determines the #gabor filters
     
@@ -134,9 +136,8 @@ for JID = 1:maxJID
     %% in-silico simulation to obtain RF
     if doRF
         RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimSz);
+            RF_insilico, stimInfo.stimXdeg, stimInfo.stimYdeg);
         
-        analysisTwin = [0 trainParam.lagFrames(end)/dsRate];
         RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
         showInSilicoRF(RF_insilico, analysisTwin);
         screen2png([encodingSaveName(1:end-4) '_RF']);
@@ -150,9 +151,7 @@ for JID = 1:maxJID
             RF_insilico, stimSz, 3);
         showInSilicoORSF(RF_insilico);
         
-        trange = [2 trainParam.lagFrames(end)/dsRate];
-
-        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, 1);
+        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, analysisTwin, 1);
         screen2png([encodingSaveName(1:end-4) '_ORSF']);
         close;        
         save(encodingSaveName,'RF_insilico','-append');

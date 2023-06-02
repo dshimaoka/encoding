@@ -16,7 +16,7 @@ for itr = 1:c.nrTrials
     if nargin < 7 || isempty(xrange)
         xrange = 1:size(frames_reconstruct,2);
     end
-    frames_reconstruct = frames_reconstruct(yrange,xrange,:);
+    frames_reconstruct = frames_reconstruct(yrange,xrange,:,:);
     
     disp(['trialTimeby cic: ' num2str(numel(frameIdx_final)/c.screen.frameRate) '[s]']);
     %disp(['trialTime by OEphys: ' num2str(OETimes.stimOffTimes(itr)-OETimes.stimOnTimes(itr)) '[s]']);

@@ -1,4 +1,5 @@
-function RF_insilico = getInSilicoRF(paramIdx, trained, trainParam, RF_insilico, oriStimSize)
+function RF_insilico = getInSilicoRF(paramIdx, trained, trainParam, ...
+    RF_insilico, stimXdeg, stimYdeg)
 %RF_insilico = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
 % estimate RF contour of the motion-energy model through in-silico noise
 % stimulation
@@ -15,12 +16,19 @@ function RF_insilico = getInSilicoRF(paramIdx, trained, trainParam, RF_insilico,
 %RF_insilico
 %   .screenPix: screen # pixels [y - x] for in silico simulation (no need to match that for in vivo exp)
 %   .nRepeats: #presentation per screen pixel(default:20)
-%oriStimSize: original stimulus window [height] in degree
+%stimX(Y)deg: list of stimulus positions used for computing motion-energy model
 %
 %OUTPUT
 %append the following fields to RF_insilico:
 %   .RF: stim-trig avg [screenY x screenX x nDelays x nNeurons ]
 %   .RF_delay: axis of time delay after vis stim onset, corresponding to 3rd dim of RF_is in [s] 
+
+% if nargin < 6 || isempty(stimXdeg)
+%     stimXdeg = oristimSize(2)*(1:RF_insilico.noiseRF.screenPix(2) - 0.5*RF_insilico.noiseRF.screenPix(2))/RF_insilico.noiseRF.screenPix(2);
+% end
+% if nargin < 7 || isempty(stimYdeg)
+%     stimYdeg = oristimSize(1)*(1:RF_insilico.noiseRF.screenPix(1) - 0.5*RF_insilico.noiseRF.screenPix(1))/RF_insilico.noiseRF.screenPix(1);
+% end
 
 polarity = 'white';
 
@@ -87,13 +95,21 @@ end
 RF_insilico.noiseRF.RF = RF_is;
 RF_insilico.noiseRF.RFdelay = RF_delay;
 
-%xpix = 1:screenPix(2);
-%RF_insilico.noiseRF.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
-%ypix = 1:screenPix(1);
-%RF_insilico.noiseRF.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
+xpix = 1:screenPix(2);
+% RF_insilico.noiseRF.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
+ypix = 1:screenPix(1);
+% RF_insilico.noiseRF.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
 
-xpos = (1:screenPix(2))/screenPix(2);
-ypos = (1:screenPix(1))/screenPix(1);
-[RF_insilico.noiseRF.xaxis,RF_insilico.noiseRF.yaxis] = ...
-    pix2deg(xpos,ypos,oriStimSize(2),oriStimSize(1));
+% RF_insilico.noiseRF.xaxis = stimXdeg;
+% RF_insilico.noiseRF.yaxis = stimYdeg;
+
+RF_insilico.noiseRF.xaxis = (max(stimXdeg)-min(stimXdeg))/(max(xpix)-min(xpix))*(xpix-1)+min(stimXdeg);
+RF_insilico.noiseRF.yaxis = (max(stimYdeg)-min(stimYdeg))/(max(ypix)-min(ypix))*(ypix-1)+min(stimYdeg);
+
+% xpos = (1:screenPix(2))/screenPix(2);
+% ypos = (1:screenPix(1))/screenPix(1);
+% xrelpos = stimXrange/max(stimXrange);
+% yrelpos = stimYrange/max(stimYrange);
+% [RF_insilico.noiseRF.xaxis,RF_insilico.noiseRF.yaxis] = ...
+%     relpos2deg(xrelpos,yrelpos,oriStimSize(2),oriStimSize(1));
 

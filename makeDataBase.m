@@ -13,12 +13,12 @@ expID = 2;
 
 expInfo = getExpInfoNatMov(expID);
 
-roiSuffix = '_01hzFovea';%'_v1v2_s_01hz_gparam11';
-stimSuffix = '_topRight';
+roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
+stimSuffix = '_right';
 
 %% imaging parameters
 rescaleFac = 0.1;%0.25;
-procParam.cutoffFreq = 0.1;%0.02;
+procParam.cutoffFreq = 0.02; %0.1
 procParam.lpFreq = []; %2
 rotateInfo = [];
 rebuildImageData = false;
@@ -29,7 +29,7 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
 %% stimulus parameters
 stimXrange = 201:256; %1:left
-stimYrange = 1:56;  %1:top
+stimYrange = 72-28+1:72+28;  %1:top
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -42,7 +42,7 @@ gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
 
 dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix, stimSuffix);
 
-%% save image and processed data
+%% save imaging raw and processed data
 if exist(dataPaths.imageSaveName,'file') % && 
     disp(['Loading ' dataPaths.imageSaveName]);
     load(dataPaths.imageSaveName,'imageProc');
@@ -110,6 +110,7 @@ else
     %     nanMask(246:255,121:130) = 1;
     %nanMask = nan(300,246);
     %nanMask(226:250,61:75) = 1;
+    nanMask(31:50,43)=1;
 end
 imageProc.nanMask = nanMask;
 
@@ -145,15 +146,17 @@ TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
 writetimetable(TT, dataPaths.timeTableSaveName);%slow
 clear TT
 
+
+%% motion-energy model computation from visual stimuli
 if ~exist(dataPaths.stimSaveName,'file') 
     
-     stimInfo.stimXrange = stimXrange;
-    stimInfo.stimYrange = stimYrange;
+    stimInfo.stimXdeg = stimInfo.width * (stimXrange-0.5*stimInfo.screenPix(2))/stimInfo.screenPix(2);
+    stimInfo.stimYdeg = stimInfo.height * (stimYrange-0.5*stimInfo.screenPix(1))/stimInfo.screenPix(1);
     screenPixNew = [max(stimYrange)-min(stimYrange)+1 max(stimXrange)-min(stimXrange)+1];
     stimInfo.width = stimInfo.width * screenPixNew(2)/stimInfo.screenPix(2);
     stimInfo.height = stimInfo.height * screenPixNew(1)/stimInfo.screenPix(1);
     stimInfo.screenPix = screenPixNew;
-
+    
     %% prepare model output SLOW
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
         dsRate, gaborBankParamIdx, 0, stimInfo.stimYrange, stimInfo.stimXrange);
