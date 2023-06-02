@@ -4,12 +4,12 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=daisuke.shimaoka@monash.edu
 #SBATCH --job-name=Wrapper
-#SBATCH --time=69:00:00
+#SBATCH --time=02:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=33000
-#SBATCH --array=1-1000
+#SBATCH --array=1-10
 #SBATCH --gres=gpu:1
-#SBATCH --partition=m3g
+#SBATCH --partition=m3h
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < wrapper_encoding.m
