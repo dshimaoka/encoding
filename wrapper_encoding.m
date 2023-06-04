@@ -19,7 +19,7 @@ doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
 stimSuffix = '_right';
-regressSuffix = '_nxv_cpu';
+regressSuffix = '_nxv_gpu';
 
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.1;%0.5;
@@ -50,7 +50,7 @@ trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
 trainParam.lagFrames = 2:3;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
-trainParam.useGPU = 0;%1; %for ridgeXs local GPU is not sufficient
+trainParam.useGPU = 1;%1; %for ridgeXs local GPU is not sufficient
 
 %% in-silico simulation
 analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
