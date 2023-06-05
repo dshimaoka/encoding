@@ -18,11 +18,11 @@ doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
-stimSuffix = '_right';
-regressSuffix = '_nxv_gpu';
+stimSuffix = '_right_small';
+regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
-rescaleFac = 0.1;%0.5;
+rescaleFac = 0.5;
 
 expInfo = getExpInfoNatMov(ID);
 
