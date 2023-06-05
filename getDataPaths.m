@@ -35,6 +35,8 @@ dataPaths.encodingSavePrefix = fullfile(saveDirBase,expDate,resizeDir,...
 switch getenv('COMPUTERNAME')
     case 'MU00175834'
         dataPaths.moviePath = 'Z:\Shared\Daisuke\natural\nishimoto2011';
+    case 'MU00011697'
+        dataPaths.moviePath = '/mnt/syncitium/Daisuke/natural/nishimoto2011';
     case ''
         dataPaths.moviePath = 'TO BE FIXED';
 end

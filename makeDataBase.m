@@ -159,7 +159,7 @@ if ~exist(dataPaths.stimSaveName,'file')
     
     %% prepare model output SLOW
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
-        dsRate, gaborBankParamIdx, 0, stimInfo.stimYrange, stimInfo.stimXrange);
+        dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange);
         
     %% save gabor filter output as .mat
     save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
