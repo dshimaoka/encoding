@@ -3,4 +3,4 @@ x= 43;
 y=31:50; 
 roiIdx = 2032:2051;
 hold on
-plot(x,y,'o');
+plot(x,y,'ko');

@@ -19,7 +19,7 @@ doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
 stimSuffix = '_right';
-regressSuffix = '_nxv';
+regressSuffix = '_nxv_gpu';
 
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.1;%0.5;
@@ -29,7 +29,7 @@ expInfo = getExpInfoNatMov(ID);
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
 %narrays = 1000;
-ngIdx = [1];
+ngIdx = [];
 
     
 %% path
@@ -50,7 +50,7 @@ trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
 trainParam.lagFrames = 2:3;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
-trainParam.useGPU = 0;%1; %for ridgeXs local GPU is not sufficient
+trainParam.useGPU = 1;%1; %for ridgeXs local GPU is not sufficient
 
 %% in-silico simulation
 analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
@@ -73,6 +73,8 @@ else
     maxJID = numel(pen:narrays:nTotPix);
 end
 for JID = 1:maxJID
+    disp([num2str(JID) '/' num2str(maxJID)]);
+    
     if ~isempty(ngIdx)
         roiIdx = ngIdx(pen);
     else
@@ -84,7 +86,7 @@ for JID = 1:maxJID
     
     %% in-silico RF estimation
     RF_insilico = struct;
-    RF_insilico.noiseRF.nRepeats = 80; %10
+    RF_insilico.noiseRF.nRepeats = 80; %10 FIX
     RF_insilico.noiseRF.dwell = 15; %frames
     RF_insilico.noiseRF.screenPix = stimInfo.screenPix/2;%8 %[y x] %FIX %spatial resolution of noise stimuli
     RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
