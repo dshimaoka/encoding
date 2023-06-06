@@ -38,6 +38,7 @@ dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
 dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 
 inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim.mat'];
+inSilicoORSFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoORSFstim.mat'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
@@ -52,7 +53,7 @@ trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best
 trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = 2:3;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+trainParam.lagFrames = 2:4;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
 trainParam.useGPU = 1;%1; %for ridgeXs local GPU is not sufficient
 
 %% in-silico simulation
@@ -164,8 +165,18 @@ for JID = 1:maxJID
     
     %% in-silico simulation to obtain ORSF
     if doORSF
+        if exist(inSilicoORSFStimName,'file') && ~exist('inSilicoORSFStim','var')
+            load(inSilicoORSFStimName, 'inSilicoORSFStim');
+        elseif  ~exist(inSilicoORSFStimName,'file') 
+            disp('creating inSilicoORSFstim...');
+            [inSilicoORSFStim] = ...
+                getInSilicoORSFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs, stimSz);
+            save(inSilicoRFStimName, 'inSilicoORSFStim','gaborBankParamIdx',"RF_insilico",'trainParam','stimSz');
+            disp('done');
+        end
+
         RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimSz, 3);
+            RF_insilico, stimSz, inSilicoORSFStim);
         showInSilicoORSF(RF_insilico);
         
         RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, analysisTwin, 1);
