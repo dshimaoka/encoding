@@ -37,7 +37,7 @@ ngIdx = [];
 dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
 dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 
-inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim'];
+inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim.mat'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
@@ -143,7 +143,7 @@ for JID = 1:maxJID
         %load InSilicoRFstim data
         if exist(inSilicoRFStimName,'file') && ~exist('inSilicoRFStim','var')
             load(inSilicoRFStimName, 'inSilicoRFStim');
-        else 
+        elseif  ~exist(inSilicoRFStimName,'file') 
             disp('creating inSilicoRFstim...');
             [inSilicoRFStim] = ...
                 getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs);
