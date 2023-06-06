@@ -1,5 +1,5 @@
 function RF_insilico = getInSilicoRF(paramIdx, trained, trainParam, ...
-    RF_insilico, stimXdeg, stimYdeg)
+    RF_insilico, stimXdeg, stimYdeg, insilicoRFStim)
 %RF_insilico = getInSilicoRF(gparamIdx, r0, rr, screenPix, Fs, nRepeats)
 % estimate RF contour of the motion-energy model through in-silico noise
 % stimulation
@@ -38,41 +38,20 @@ lagFrames = trainParam.lagFrames;
 tavg = trainParam.tavg;
 Fs = trainParam.Fs;
 screenPix = RF_insilico.noiseRF.screenPix;
-nRepeats = RF_insilico.noiseRF.nRepeats;
 
 %nDelays = size(rr,1);
 nNeurons = size(rr,3);
 
-if ~isfield(RF_insilico.noiseRF,'Fs_visStim') || isempty(RF_insilico.noiseRF.Fs_visStim)
-   Fs_visStim = paramIdx.predsRate;
+%% compute response of the filter bank
+if nargin<7 || isempty(insilicoRFStim)
+    insilicoRFStim= getInSilicoRFstim(paramIdx, RF_insilico, trainParam.Fs);
 end
+S_nm = insilicoRFStim.S_nm;
+timeVec_mdlResp = insilicoRFStim.timeVec_mdlResp;
+stim_is = insilicoRFStim.stim_is;
+timeVec_stim = insilicoRFStim.timeVec_stim;
 
-%%1 make sparse white noise
-dotStream = repmat(1:screenPix(1)*screenPix(2), 1, nRepeats);
-dotStream = dotStream(randperm(screenPix(1)*screenPix(2)*nRepeats));
-dotStream = repmat(dotStream,RF_insilico.noiseRF.dwell,1);
-dotStream = dotStream(:)';
-
-nFrames = numel(dotStream);
-timeVec_stim = 1/Fs_visStim*(0:nFrames-1);%0:1/Fs:maxT;%[s]
-
-%[dotYidxStream, dotXidxStream] = ind2sub([screenPix screenPix], dotStream);
-stim_is_flat = single(zeros(screenPix(1)*screenPix(2), nFrames));
-for tt = 1:nFrames
-    stim_is_flat(dotStream(tt),tt)=1;
-end
-%stim_is_flat(dotStreamIdx) = 1; %<this is what I want to do wo for loop
-stim_is = reshape(stim_is_flat, screenPix(1), screenPix(2), nFrames);
-clear stim_is_flat
-
-%% 2 compute response of the filter bank, at Fs Hz
-paramIdx.cparamIdx = [];
-paramIdx.predsRate = [];
-[S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, Fs_visStim, Fs);
-S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
-
-
-%% 3 compute responese of the wavelet filter
+%% compute responese of the wavelet filter
 % lagRange = [min(lagFrames) max(lagFrames)];%/Fs? %lag range provided as rr
 gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
 filterWidth = gparams.tsize; %#frames
@@ -84,7 +63,7 @@ for iNeuron = 1:nNeurons
     [observed] = predictXs(timeVec_mdlResp, S_nm, ...
         squeeze(r0(iNeuron)), squeeze(rr(:,:,iNeuron)), [lagFrames(1) lagFrames(end)], tavg);
     
-    %% 4 estimate RF
+    %% estimate RF
     % stimulus-triggered avg (by AP)...fast
     [response_t] = getSparseResponse(observed, timeVec_mdlResp, stim_is, ...
         timeVec_stim, lagRangeS_mdl, polarity);% [delay x 1 x ]

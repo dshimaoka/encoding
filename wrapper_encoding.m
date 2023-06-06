@@ -3,6 +3,7 @@
 %fit one pixel with ridge regression
 %evaluate the fit result with in-silico simulation
 
+
 if isempty(getenv('COMPUTERNAME'))
     addpath(genpath('~/git'));
     % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!    
@@ -35,6 +36,8 @@ ngIdx = [];
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
 dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
+
+inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim'];
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
@@ -137,8 +140,20 @@ for JID = 1:maxJID
     
     %% in-silico simulation to obtain RF
     if doRF
+        %load InSilicoRFstim data
+        if exist(inSilicoRFStimName,'file') && ~exist('inSilicoRFStim','var')
+            load(inSilicoRFStimName, 'inSilicoRFStim');
+        else 
+            disp('creating inSilicoRFstim...');
+            [inSilicoRFStim] = ...
+                getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs);
+            save(inSilicoRFStimName, 'inSilicoRFStim','gaborBankParamIdx',"RF_insilico",'trainParam');
+            disp('done');
+        end
+
+        %compute RF_insilico
         RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimInfo.stimXdeg, stimInfo.stimYdeg);
+            RF_insilico, stimInfo.stimXdeg, stimInfo.stimYdeg,inSilicoRFStim);
         
         RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
         showInSilicoRF(RF_insilico, analysisTwin);
