@@ -6,12 +6,13 @@ end
 
 ID = 2;
 useGPU = 1;
-rescaleFac = 0.10;
+rescaleFac = 0.50;
 dsRate = 1;
-reAnalyze = 1;
+reAnalyze = 0;
 ORSFfitOption = 1; %3:peakSF,fitOR
-roiSuffix = '_01hz';%'_v1v2_s_01hz';
-stimSuffix = '';
+roiSuffix = '_periV1';
+stimSuffix = '_right';
+regressSuffix = '_nxv';
 
 pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
 
@@ -20,10 +21,7 @@ expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, stimSuffix);
 %TODO: save data locally5
 %TMP
-% dataPaths.encodingSavePrefix = '\\storage.erc.monash.edu.au\shares\MNHS-dshi0006\Massive\processed\2023\04\05\resize50_regressImageMeans\encoding_2023_04_05_22_resize50';
-% dataPaths.encodingSavePrefix = '\\storage.erc.monash.edu.au\shares\MNHS-dshi0006\Massive\processed\2023\04\05\resize50_regressImageMeans\encoding_2023_04_05_22_resize50';
-% dataPaths.encodingSavePrefix = '\\storage.erc.monash.edu.au\shares\MNHS-dshi0006\Massive\processed\2022\11\30\resize50_regressImageMeans\encoding_2022_11_30_16_resize50';
-encodingSavePrefix = [dataPaths.encodingSavePrefix '_nxv'];
+encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 
 %load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
 load(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
@@ -214,6 +212,15 @@ save([encodingSavePrefix '_summary'],'summary_adj','-append');
 
 
 %% summary figure
+[sumFig, sumAxes]=showSummaryFig(summary);
+set(sumFig,'position',[0 0 1900 1400]);
+set(sumAxes(2),'xlim',[min(X) max(X)]);
+set(sumAxes(2),'ylim',[min(Y) max(Y)]);
+% set(sumFig,'position',[0 0 1900 1000]);
+% set(sumAxes(2),'clim', [-8 8]);
+% set(sumAxes(3),'clim', [-10 10]);
+savePaperFigure(sumFig,[encodingSavePrefix '_summary']);
+
 %summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
 [sumFig, sumAxes]=showSummaryFig(summary_adj);
 set(sumFig,'position',[0 0 1900 1400]);
@@ -222,7 +229,7 @@ set(sumAxes(2),'ylim',[min(Y) max(Y)]);
 % set(sumFig,'position',[0 0 1900 1000]);
 % set(sumAxes(2),'clim', [-8 8]);
 % set(sumAxes(3),'clim', [-10 10]);
-savePaperFigure(sumFig,[encodingSavePrefix '_summary']);
+savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 
 %% show mRFs
