@@ -29,13 +29,14 @@ xlabel('delay [s]');
 ylabel('orientation [deg]');
 
 subplot(212);
-imagesc(sfList,oriList, mresp');
+imagesc(1:numel(sfList),oriList, mresp');
 % [SFLIST, ORLIST] = meshgrid(sfList, oriList);
 % s = surf(SFLIST, ORLIST, mresp');
 % s.EdgeColor = 'none';view(2);axis ij tight;
 % set(gca,'xtick',sfList,'xticklabel',sfList);
 ylabel('orientation [rad]');
 xlabel('SF (cycles/deg)');
+set(gca,'xtick',1:numel(sfList),'xticklabel',sfList);
 
 title('mean across delays');
 caxis([-crange crange]);

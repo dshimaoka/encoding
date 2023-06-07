@@ -6,13 +6,13 @@ end
 
 ID = 2;
 useGPU = 1;
-rescaleFac = 0.10;
+rescaleFac = 0.50;
 dsRate = 1;
 reAnalyze = 0;
 ORSFfitOption = 1; %3:peakSF,fitOR
 roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
 stimSuffix = '_right';
-regressSuffix = '_nxv_gpu';
+regressSuffix = '_nxv';
 
 pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
 

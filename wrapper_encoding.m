@@ -19,7 +19,7 @@ doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
-stimSuffix = '_right_small';
+stimSuffix = '_right';
 regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
@@ -64,7 +64,26 @@ analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
 %load(dataPaths.imageSaveName,'stimInfo')
 stimSz = [stimInfo.height stimInfo.width];
 
+%% in-silico RF estimation
+RF_insilico = struct;
+RF_insilico.noiseRF.nRepeats = 80; %10 FIX
+RF_insilico.noiseRF.dwell = 15; %frames
+RF_insilico.noiseRF.screenPix = stimInfo.screenPix/2;%8 %[y x] %FIX %spatial resolution of noise stimuli
+RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
+%<screenPix(1)/screenPix(2) determines the #gabor filters
 
+
+%% in-silico ORSF estimation
+RF_insilico.ORSF.screenPix = stimInfo.screenPix; %[y x]
+nORs = 10;
+oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
+RF_insilico.ORSF.oriList = oriList(1:end-1);
+SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
+SFrange_mdl = getSFrange_mdl(RF_insilico.ORSF.screenPix, stimSz, gaborBankParamIdx.gparamIdx);
+RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_mdl(2)), 6); %[cycles/deg];
+RF_insilico.ORSF.nRepeats = 15;
+RF_insilico.ORSF.dwell = 45; %#stimulus frames
+    
 %% load neural data
 %TODO: copy timetable data to local
 disp('Loading tabular text datastore');
@@ -88,24 +107,6 @@ for JID = 1:maxJID
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
     
-    %% in-silico RF estimation
-    RF_insilico = struct;
-    RF_insilico.noiseRF.nRepeats = 80; %10 FIX
-    RF_insilico.noiseRF.dwell = 15; %frames
-    RF_insilico.noiseRF.screenPix = stimInfo.screenPix/2;%8 %[y x] %FIX %spatial resolution of noise stimuli
-    RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
-    %<screenPix(1)/screenPix(2) determines the #gabor filters
-    
-    
-    %% in-silico ORSF estimation
-    RF_insilico.ORSF.screenPix = stimInfo.screenPix; %[y x]
-    nORs = 10;
-    oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
-    RF_insilico.ORSF.oriList = oriList(1:end-1);
-    SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
-    RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 6); %[cycles/deg];
-    RF_insilico.ORSF.nRepeats = 15;
-    RF_insilico.ORSF.dwell = 45; %#stimulus frames
     
     
     if doTrain
@@ -142,13 +143,13 @@ for JID = 1:maxJID
     %% in-silico simulation to obtain RF
     if doRF
         %load InSilicoRFstim data
-        if exist(inSilicoRFStimName,'file') && ~exist('inSilicoRFStim','var')
+        if exist(inSilicoRFStimName,'file')>0 && ~exist('inSilicoRFStim','var')
             load(inSilicoRFStimName, 'inSilicoRFStim');
         elseif  ~exist(inSilicoRFStimName,'file') 
             disp('creating inSilicoRFstim...');
             [inSilicoRFStim] = ...
                 getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs);
-            save(inSilicoRFStimName, 'inSilicoRFStim','gaborBankParamIdx',"RF_insilico",'trainParam');
+            save(inSilicoRFStimName, 'inSilicoRFStim','gaborBankParamIdx',"RF_insilico",'trainParam','-v7.3');
             disp('done');
         end
 
@@ -171,7 +172,7 @@ for JID = 1:maxJID
             disp('creating inSilicoORSFstim...');
             [inSilicoORSFStim] = ...
                 getInSilicoORSFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs, stimSz);
-            save(inSilicoRFStimName, 'inSilicoORSFStim','gaborBankParamIdx',"RF_insilico",'trainParam','stimSz');
+            save(inSilicoORSFStimName, 'inSilicoORSFStim','gaborBankParamIdx',"RF_insilico",'trainParam','stimSz','-v7.3');
             disp('done');
         end
 

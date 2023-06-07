@@ -1,6 +1,8 @@
 function sfrange = getSFrange_stim(screenPix, screenDeg)
 % sfrange = getSFrange_stim(screenPix, screenDeg)
 % returns minimum and maximum SF included in the visual stimulus in cycles per deg
+% Note: this is a limitation imposed by visual stimulus, not by encoding model
+% See also: getSFrange_mdl.m
 %
 % INPUT
 % screenPix: number of pixels used for visual stimulation [height width]

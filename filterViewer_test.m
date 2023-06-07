@@ -3,9 +3,9 @@
 
 
 gparamIdx = 2;
-subSampleFac = 4;
-screenPix = [144 256]/subSampleFac; %Y-X %gaborparams is identical irrespective of the denominator
-screenDeg = [40 70]/subSampleFac;%[15 27]; %[deg] = [stimInfo.height stimInfo.width]
+subSampleFac = 1;%4;
+screenPix = [56 56];%[144 256]/subSampleFac; %Y-X %gaborparams is identical irrespective of the denominator
+screenDeg = [15.5556   15.3125];%[40 70]/subSampleFac;%[15 27]; %[deg] = [stimInfo.height stimInfo.width]
 showFiltIdx = 1:30; %filter idx to visualize
 S = zeros(screenPix(1), screenPix(2), 20); %X-Y-T???
 
