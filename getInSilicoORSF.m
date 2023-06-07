@@ -23,87 +23,18 @@ lagFrames = trainParam.lagFrames;
 tavg = trainParam.tavg;
 Fs = trainParam.Fs;
 
-% % screenPix = RF_insilico.ORSF.screenPix;
-% % 
-% % if ~isfield(RF_insilico.ORSF,'oriList') || isempty(RF_insilico.ORSF.oriList)
-% %     nORs = 10;
-% %     oriList = pi/180*linspace(0,180,nORs+1)';
-% %     oriList = oriList(1:end-1);
-% %     RF_insilico.ORSF.oriList = oriList;
-% % end
-% % 
-% % if  ~isfield(RF_insilico.ORSF,'sfList') || isempty(RF_insilico.ORSF.sfList)
-% %     sfList = linspace(1/screenPix(1), 1/2, 5); %cycles per pixel
-% %     %sfList = [0.05 0.1 0.15 0.2]';
-% %     RF_insilico.ORSF.sfList = sfList;
-% % end
 
-
-
-% % Fs_visStim = RF_insilico.ORSF.Fs_visStim;
-% % dwell = RF_insilico.ORSF.dwell;
-% % 
 oriList = RF_insilico.ORSF.oriList;
 sfList = RF_insilico.ORSF.sfList;
 nORs = numel(oriList);
 nSF = length(sfList);
 nNeurons = size(rr,3);
 
-% % nRepeats = RF_insilico.ORSF.nRepeats;
-
-% % if size(sfList,1) < size(sfList,2)
-% %     sfList = sfList';
-% % end
-% % 
-% % 
-% % sfrange = getSFrange_stim(screenPix, oriStimSize);
-% % 
-% % if max(sfList) > sfrange(2)
-% %     warning(['specified SF deviates maximum SF of vis stim ' num2str(sfrange(2)) '[cpd]']);
-% % end
-% % if min(sfList) < sfrange(1)
-% %        warning(['specified SF deviates minimum SF of vis stim ' num2str(sfrange(1)) '[cpd]']);
-% % end 
-
-%random varibles: spatial phase and OR and SF
-% % oriSfStream = repmat(1:nORs*nSF, 1, nRepeats);
-% % oriSfStream = oriSfStream(randperm(nORs*nSF*nRepeats));
-% % [sfIdxStream, oriIdxStream] = ind2sub([nSF nORs], oriSfStream);
-% % oriStream = oriList(oriIdxStream);
-% %pixPerDeg = mean(screenPix./oriStimSize);
-% %sfStream = 1/pixPerDeg * sfList(sfIdxStream); %convert cycles/deg to cycles/pix
-
-%%nOns = length(oriStream);
 
 gparams = preprocWavelets_grid_GetMetaParams(paramIdx.gparamIdx);
 %checkGparam(gparams, screenPix, rr);
 
 filterWidth = gparams.tsize; %#frames of visual stimulus
-% % onFrames = dwell*(1:nOns);%filterWidth*(1:nOns);
-% % timeVec_stim = 1/Fs_visStim*(0:(onFrames(end) + dwell - 1));
-% % 
-% % 
-% % %1 make visual stimulus (2D stripes)
-% % phaseStream = 2*pi*rand(1,nOns);
-% % %pix2deg = 1;
-% % xdeg = (1:screenPix(2))-0.5*screenPix(2);
-% % ydeg = (1:screenPix(1))-0.5*screenPix(1);
-% % [X,Y]=meshgrid(xdeg,ydeg);
-% % stim_is = single(zeros(screenPix(1),screenPix(2),length(timeVec_stim)));
-% % for ff = 1:nOns
-% %     XY = X*cos(oriStream(ff))+Y*sin(oriStream(ff));
-% %     AngFreqs = 2*pi* sfStream(ff) * XY + phaseStream(ff);
-% %     stim_is(:,:,onFrames(ff):onFrames(ff)+dwell-1) = repmat(sin(AngFreqs),1,1,dwell);
-% % end
-% % stim_is = 0.5*(stim_is+1); %[0-1]
-% % 
-% % 
-% % %% 2 compute response of the filter bank
-% % paramIdx.cparamIdx = [];
-% % paramIdx.predsRate = [];
-% % [S_nm, timeVec_mdlResp] = preprocAll(stim_is, paramIdx, RF_insilico.ORSF.Fs_visStim, ...
-% %     Fs, useGPU);
-% % S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 %% compute response of the filter bank
 if nargin<6 || isempty(insilicoORSFStim)

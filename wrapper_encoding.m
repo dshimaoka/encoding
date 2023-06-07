@@ -18,7 +18,7 @@ doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
-roiSuffix = '_Fovea';%'_v1v2_s_01hz_gparam11';
+roiSuffix = '_periV1';
 stimSuffix = '_right';
 regressSuffix = '_nxv';
 
