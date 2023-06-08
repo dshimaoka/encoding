@@ -9,12 +9,12 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = 2;
+expID = 1;
 
 expInfo = getExpInfoNatMov(expID);
 
 roiSuffix = '_periV1V2';
-stimSuffix = '_right';
+stimSuffix = '_top';
 
 %% imaging parameters
 rescaleFac = 0.5;%0.25;
@@ -28,8 +28,8 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
 
 %% stimulus parameters
-stimXrange = 52:147; %201:256; %1:left
-stimYrange = 52:120; %72-28+1:72+28;  %1:top
+stimXrange = 52:144; %201:256; %1:left
+stimYrange = 52:144; %72-28+1:72+28;  %1:top
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
