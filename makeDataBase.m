@@ -111,7 +111,7 @@ else
     %nanMask = nan(300,246);
     %nanMask(226:250,61:75) = 1; %CJ231 periV1
     %nanMask(31*5:50*5,43*5)=1;%CJ231 fovea
-    nanMask(61:100, 221:280) = 1; %CJ224 periV1V2
+    nanMask(221:280,61:100) = 1; %CJ224 periV1V2
 end
 imageProc.nanMask = nanMask;
 
