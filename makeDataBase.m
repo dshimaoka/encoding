@@ -13,8 +13,8 @@ expID = 2;
 
 expInfo = getExpInfoNatMov(expID);
 
-roiSuffix = '_periV1';
-stimSuffix = '_right_16dir';
+roiSuffix = '_periV1V2';
+stimSuffix = '_right';
 
 %% imaging parameters
 rescaleFac = 0.5;%0.25;
@@ -28,12 +28,12 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
 
 %% stimulus parameters
-stimXrange = 201:256; %1:left
-stimYrange = 72-28+1:72+28;  %1:top
+stimXrange = 52:147; %201:256; %1:left
+stimYrange = 52:120; %72-28+1:72+28;  %1:top
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
-gaborBankParamIdx.gparamIdx = 12;%2;
+gaborBankParamIdx.gparamIdx = 2;
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
@@ -109,8 +109,9 @@ else
     %     nanMask = nan(318,300);
     %     nanMask(246:255,121:130) = 1;
     %nanMask = nan(300,246);
-    nanMask(226:250,61:75) = 1; %CJ231
+    %nanMask(226:250,61:75) = 1; %CJ231 periV1
     %nanMask(31*5:50*5,43*5)=1;%CJ231 fovea
+    nanMask(61:100, 221:280) = 1; %CJ224 periV1V2
 end
 imageProc.nanMask = nanMask;
 
@@ -150,8 +151,7 @@ clear TT
 %% motion-energy model computation from visual stimuli
 if ~exist(dataPaths.stimSaveName,'file') 
     
-    stimInfo.stimXdeg = stimInfo.width * (stimXrange-0.5*stimInfo.screenPix(2))/stimInfo.screenPix(2);
-    stimInfo.stimYdeg = stimInfo.height * (stimYrange-0.5*stimInfo.screenPix(1))/stimInfo.screenPix(1);
+    [stimInfo.stimXdeg, stimInfo.stimYdeg] = stimPix2Deg(stimInfo, stimXrange, stimYrange);
     screenPixNew = [max(stimYrange)-min(stimYrange)+1 max(stimXrange)-min(stimXrange)+1];
     stimInfo.width = stimInfo.width * screenPixNew(2)/stimInfo.screenPix(2);
     stimInfo.height = stimInfo.height * screenPixNew(1)/stimInfo.screenPix(1);
