@@ -14,7 +14,7 @@ expID = 2;
 expInfo = getExpInfoNatMov(expID);
 
 roiSuffix = '_periV1';
-stimSuffix = '_right';
+stimSuffix = '_right_16dir';
 
 %% imaging parameters
 rescaleFac = 0.5;%0.25;
@@ -33,7 +33,7 @@ stimYrange = 72-28+1:72+28;  %1:top
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
-gaborBankParamIdx.gparamIdx = 2;
+gaborBankParamIdx.gparamIdx = 12;%2;
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
