@@ -13,13 +13,13 @@ else
 end
 
 
-ID = 2;
+ID = 1;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
-roiSuffix = '_periV1';
-stimSuffix = '_right_16dir';
+roiSuffix = '_periV1V2';
+stimSuffix = '_top';
 regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
@@ -68,7 +68,7 @@ stimSz = [stimInfo.height stimInfo.width];
 RF_insilico = struct;
 RF_insilico.noiseRF.nRepeats = 80; %10 FIX
 RF_insilico.noiseRF.dwell = 15; %frames
-RF_insilico.noiseRF.screenPix = stimInfo.screenPix/2;%8 %[y x] %FIX %spatial resolution of noise stimuli
+RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/4);%8 %[y x] %FIX %spatial resolution of noise stimuli
 RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
 %<screenPix(1)/screenPix(2) determines the #gabor filters
 
