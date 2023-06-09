@@ -84,6 +84,7 @@ RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_mdl(2))
 RF_insilico.ORSF.nRepeats = 15;
 RF_insilico.ORSF.dwell = 45; %#stimulus frames
     
+
 %% load neural data
 %TODO: copy timetable data to local
 disp('Loading tabular text datastore');

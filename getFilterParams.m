@@ -9,7 +9,7 @@ gparams = preprocWavelets_grid_GetMetaParams(gparamIdx);
 gparams.show_or_preprocess = 0; %necessary to obtain gaborparams
 S = zeros(screenPix(1), screenPix(2), 20); %X-Y-T
 
-[S, gparams] = preprocWavelets_grid(S, gparams);%filter assumes no time delay
+[S, gparams] = preprocWavelets_grid(S, gparams, 0);%filter assumes no time delay
 gaborparams = gparams.gaborparams;
 %     .gaborparams = A set of parameters for each Gabor wavelet.
 %                       This is a p-by-D matrix where p is number of parameters (8)
