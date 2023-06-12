@@ -1,7 +1,7 @@
 function insilicoORSFStim = getInSilicoORSFstim(gaborParamIdx, RF_insilico, ...
     trainParam_Fs, oriStimSize)
 
-useGPU = 1;
+useGPU = 0;
 
 screenPix = RF_insilico.ORSF.screenPix;
 

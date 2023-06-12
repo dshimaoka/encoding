@@ -1,5 +1,5 @@
 function insilicoRFStim = getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam_Fs)
-
+useGPU = 0;
 screenPix = RF_insilico.noiseRF.screenPix;
 nRepeats = RF_insilico.noiseRF.nRepeats;
 
@@ -30,7 +30,8 @@ clear stim_is_flat
 %% 2 compute response of the filter bank, at Fs Hz
 gaborBankParamIdx.cparamIdx = [];
 gaborBankParamIdx.predsRate = [];
-[S_nm, timeVec_mdlResp] = preprocAll(stim_is, gaborBankParamIdx, Fs_visStim, trainParam_Fs);
+[S_nm, timeVec_mdlResp] = preprocAll(stim_is, gaborBankParamIdx, Fs_visStim, ...
+    trainParam_Fs,useGPU);
 S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 insilicoRFStim.S_nm = S_nm;
