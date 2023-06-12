@@ -18,12 +18,12 @@ doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
-roiSuffix = '_periV1V2';
-stimSuffix = '_top';
+roiSuffix = '';
+stimSuffix = '_part';
 regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
-rescaleFac = 0.5;
+rescaleFac = 0.1;
 
 expInfo = getExpInfoNatMov(ID);
 

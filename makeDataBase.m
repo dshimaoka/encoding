@@ -13,11 +13,11 @@ expID = 1;
 
 expInfo = getExpInfoNatMov(expID);
 
-roiSuffix = '_periV1V2';
-stimSuffix = '_top';
+roiSuffix = '';
+stimSuffix = '_part';
 
 %% imaging parameters
-rescaleFac = 0.5;%0.25;
+rescaleFac = 0.1;
 procParam.cutoffFreq = 0.02; %0.1
 procParam.lpFreq = []; %2
 rotateInfo = [];
@@ -28,8 +28,8 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
 
 %% stimulus parameters
-stimXrange = 52:144; %201:256; %1:left
-stimYrange = 52:144; %72-28+1:72+28;  %1:top
+stimXrange = 24:156; %201:256; %1:left
+stimYrange = 5:139; %72-28+1:72+28;  %1:top
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -111,7 +111,7 @@ else
     %nanMask = nan(300,246);
     %nanMask(226:250,61:75) = 1; %CJ231 periV1
     %nanMask(31*5:50*5,43*5)=1;%CJ231 fovea
-    nanMask(221:280,61:100) = 1; %CJ224 periV1V2
+    %nanMask(221:280,61:100) = 1; %CJ224 periV1V2
 end
 imageProc.nanMask = nanMask;
 
