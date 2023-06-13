@@ -1,7 +1,10 @@
 function insilicoORSFStim = getInSilicoORSFstim(gaborParamIdx, RF_insilico, ...
-    trainParam_Fs, oriStimSize)
-
-useGPU = 0;
+    trainParam_Fs, oriStimSize, useGPU)
+%insilicoORSFStim = getInSilicoORSFstim(gaborParamIdx, RF_insilico, ...
+    % trainParam_Fs, oriStimSize, useGPU)
+if nargin < 5
+    useGPU = 0;
+end
 
 screenPix = RF_insilico.ORSF.screenPix;
 

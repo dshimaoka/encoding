@@ -1,5 +1,7 @@
-function insilicoRFStim = getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam_Fs)
-useGPU = 0;
+function insilicoRFStim = getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam_Fs,useGPU)
+if nargin <4
+    useGPU = 0;
+end
 screenPix = RF_insilico.noiseRF.screenPix;
 nRepeats = RF_insilico.noiseRF.nRepeats;
 

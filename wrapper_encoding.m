@@ -29,7 +29,7 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-ngIdx = [500:2400];
+ngIdx = [];
 
     
 %% path
@@ -42,7 +42,7 @@ inSilicoORSFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoORSFstim.mat']
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
 if subtractImageMeans
-    load(dataPaths.roiSaveName, 'imageMeans_proc');
+    load(dataPaths.imageSaveName, 'imageMeans_proc');
 else
     imageMeans_proc = [];
 end
@@ -150,7 +150,7 @@ for JID = 1:maxJID
         elseif  ~exist(inSilicoRFStimName,'file') 
             disp('creating inSilicoRFstim...');
             [inSilicoRFStim] = ...
-                getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs);
+                getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs, 1);
             save(inSilicoRFStimName, 'inSilicoRFStim','gaborBankParamIdx',"RF_insilico",'trainParam','-v7.3');
             disp('done');
         end
@@ -173,7 +173,7 @@ for JID = 1:maxJID
         elseif  ~exist(inSilicoORSFStimName,'file') 
             disp('creating inSilicoORSFstim...');
             [inSilicoORSFStim] = ...
-                getInSilicoORSFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs, stimSz);
+                getInSilicoORSFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs, stimSz,1);
             save(inSilicoORSFStimName, 'inSilicoORSFStim','gaborBankParamIdx',"RF_insilico",'trainParam','stimSz','-v7.3');
             disp('done');
         end
@@ -189,6 +189,7 @@ for JID = 1:maxJID
     end
 
     catch err
+        disp(err);
         errorID = [roiIdx errorID];
         continue
     end

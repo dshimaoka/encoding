@@ -90,34 +90,44 @@ if expID==6
 end
 
 
-%% extract data within mask
-load(dataPaths.imageSaveName,'imageData');
-meanImage = imageData.meanImage;
-if makeMask
-    imagesc(imageData.meanImage);colormap(gray);
-    roiAhand = images.roi.AssistedFreehand;
-    draw(roiAhand);
-    roi = createMask(roiAhand);
-    nanMask = nan(size(roi));
-    nanMask(roi) = 1;
-    
-    imageData.imstack = imageData.imstack.*(nanMask==1);
-    imageData.imageMeans = squeeze(mean(mean(imageData.imstack)));
-else
-    nanMask = nan(size(imageData.meanImage));
-    %nanMask(226:275,101:150) = 1;
-    %     nanMask = nan(318,300);
-    %     nanMask(246:255,121:130) = 1;
-    %nanMask = nan(300,246);
-    %nanMask(226:250,61:75) = 1; %CJ231 periV1
-    %nanMask(31*5:50*5,43*5)=1;%CJ231 fovea
-    %nanMask(221:280,61:100) = 1; %CJ224 periV1V2
-end
-imageProc.nanMask = nanMask;
+% % %% extract data within mask
+% % load(dataPaths.imageSaveName,'imageData');
+% % meanImage = imageData.meanImage;
+% % if makeMask
+% %     imagesc(imageData.meanImage);colormap(gray);
+% %     roiAhand = images.roi.AssistedFreehand;
+% %     draw(roiAhand);
+% %     roi = createMask(roiAhand);
+% %     nanMask = nan(size(roi));
+% %     nanMask(roi) = 1;
+% % 
+% %     imageData.imstack = imageData.imstack.*(nanMask==1);
+% %     imageData.imageMeans = squeeze(mean(mean(imageData.imstack)));
+% % else
+% %     nanMask = nan(size(imageData.meanImage));
+% %     %nanMask(226:275,101:150) = 1;
+% %     %     nanMask = nan(318,300);
+% %     %     nanMask(246:255,121:130) = 1;
+% %     %nanMask = nan(300,246);
+% %     %nanMask(226:250,61:75) = 1; %CJ231 periV1
+% %     %nanMask(31*5:50*5,43*5)=1;%CJ231 fovea
+% %     %nanMask(221:280,61:100) = 1; %CJ224 periV1V2
+% % end
+% % imageProc.nanMask = nanMask;
 
-theseIdx = find(~isnan(imageProc.nanMask));
-[Y,X,Z] = ind2sub(size(imageProc.nanMask), theseIdx);
-
+%2023 June. recycle ROI from previous analysis in March 
+saveDirBase = '/mnt/dshi0006_market/Massive/processed/';
+expDate = [expInfo.date(1:4) filesep expInfo.date(5:6) filesep expInfo.date(7:8)];
+expName = num2str(expInfo.expID);
+resizeDir = ['resize' num2str(rescaleFac*100)];
+encodingSavePrefix = fullfile(saveDirBase,expDate,resizeDir,...
+    ['encoding_' regexprep(expDate, filesep,'_') '_' expName '_resize' ...
+    num2str(rescaleFac*100) roiSuffix stimSuffix]);
+encodingSavePrefix = [encodingSavePrefix '_nxv'];
+load([encodingSavePrefix '_summary'],'summary_adj');
+nanMask = summary_adj.mask;
+[theseIdx, X,Y] = getROIIdx(nanMask);
+meanImage = summary_adj.thisROI;
 save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
  
