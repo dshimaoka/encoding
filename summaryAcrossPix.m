@@ -10,8 +10,8 @@ rescaleFac = 0.50;
 dsRate = 1;
 reAnalyze = 0;
 ORSFfitOption = 1; %3:peakSF,fitOR
-roiSuffix = '_periV1';
-stimSuffix = '_right_16dir';
+roiSuffix = '_periV1V2';
+stimSuffix = '_top';
 regressSuffix = '_nxv';
 
 pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
