@@ -29,8 +29,7 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-%narrays = 1000;
-ngIdx = [];
+ngIdx = [500:2400];
 
     
 %% path
@@ -90,16 +89,18 @@ disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 nTotPix = numel(ds.VariableNames)-1;
-if ~isempty(ngIdx)
-    maxJID=1;
-else
+% if ~isempty(ngIdx)
+%     maxJID=1;
+% else
     maxJID = numel(pen:narrays:nTotPix);
-end
+% end
+errorID=[];
 for JID = 1:maxJID
+    try
     disp([num2str(JID) '/' num2str(maxJID)]);
     
     if ~isempty(ngIdx)
-        roiIdx = ngIdx(pen);
+        roiIdx = ngIdx(JID);
     else
         roiIdx = pen + (JID-1)*narrays;
     end
@@ -186,4 +187,8 @@ for JID = 1:maxJID
         save(encodingSaveName,'RF_insilico','-append');
     end
 
+    catch err
+        errorID = [roiIdx errorID];
+        continue
+    end
 end
