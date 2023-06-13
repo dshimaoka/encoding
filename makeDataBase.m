@@ -9,7 +9,7 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = 1;
+expID = 2;
 
 expInfo = getExpInfoNatMov(expID);
 
@@ -28,8 +28,12 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
 
 %% stimulus parameters
-stimXrange = 24:156; %201:256; %1:left
-stimYrange = 5:139; %72-28+1:72+28;  %1:top
+%ID1,3
+%stimXrange = 24:156; %201:256; %1:left
+%stimYrange = 5:139; %72-28+1:72+28;  %1:top
+%ID2
+stimXrange = 161:238;
+stimYrange = 29:108;
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -116,18 +120,22 @@ end
 % % imageProc.nanMask = nanMask;
 
 %2023 June. recycle ROI from previous analysis in March 
-saveDirBase = '/mnt/dshi0006_market/Massive/processed/';
-expDate = [expInfo.date(1:4) filesep expInfo.date(5:6) filesep expInfo.date(7:8)];
-expName = num2str(expInfo.expID);
-resizeDir = ['resize' num2str(rescaleFac*100)];
-encodingSavePrefix = fullfile(saveDirBase,expDate,resizeDir,...
-    ['encoding_' regexprep(expDate, filesep,'_') '_' expName '_resize' ...
-    num2str(rescaleFac*100) roiSuffix stimSuffix]);
-encodingSavePrefix = [encodingSavePrefix '_nxv'];
-load([encodingSavePrefix '_summary'],'summary_adj');
-nanMask = summary_adj.mask;
+% saveDirBase = '/mnt/dshi0006_market/Massive/processed/';
+% expDate = [expInfo.date(1:4) filesep expInfo.date(5:6) filesep expInfo.date(7:8)];
+% expName = num2str(expInfo.expID);
+% resizeDir = ['resize' num2str(rescaleFac*100)];
+% encodingSavePrefix = fullfile(saveDirBase,expDate,resizeDir,...
+%     ['encoding_' regexprep(expDate, filesep,'_') '_' expName '_resize' ...
+%     num2str(rescaleFac*100) roiSuffix]);
+% encodingSavePrefix = [encodingSavePrefix '_nxv'];
+encodingSavePrefix = dataPaths.encodingSavePrefix(1:end-5);
+load([encodingSavePrefix '_summary.mat'],'summary');
+%nanMask = summary.mask;
+nanMask = nan(size(summary.RF_Cx));
+%nanMask(summary.roiIdx) = 1;
+nanMask(~isnan(summary.RF_Cx))=1;
 [theseIdx, X,Y] = getROIIdx(nanMask);
-meanImage = summary_adj.thisROI;
+meanImage = summary.thisROI;
 save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
  
