@@ -38,4 +38,15 @@ switch ID
         expInfo.expID = 13;
         expInfo.subject = 'CJ235';
         expInfo.date = '20230404';
+    case 8
+         expInfo.nsName = 'CJ246.runPassivemovies.052834';
+        expInfo.expID = 20;
+        expInfo.subject = 'CJ246';
+        expInfo.date = '20230920';
+    case 9
+         expInfo.nsName = 'CJ246.runPassivemovies.035319';
+        expInfo.expID = 30;
+        expInfo.subject = 'CJ246';
+        expInfo.date = '20230920';
+
 end

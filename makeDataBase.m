@@ -9,12 +9,11 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = 2;
+expID = 8;
 
-expInfo = getExpInfoNatMov(expID);
 
 roiSuffix = '';
-stimSuffix = '_part';
+stimSuffix = '_square';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -32,8 +31,11 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %stimXrange = 24:156; %201:256; %1:left
 %stimYrange = 5:139; %72-28+1:72+28;  %1:top
 %ID2
-stimXrange = 161:238;
-stimYrange = 29:108;
+%stimXrange = 161:238;
+%stimYrange = 29:108;
+%ID8,9
+stimXrange = [];
+stimYrange = [];
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -44,6 +46,7 @@ gaborBankParamIdx.nrmparamIdx = 1;
 gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
 %< sampling rate of gabor bank filter
 
+expInfo = getExpInfoNatMov(expID);
 dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix, stimSuffix);
 
 %% save imaging raw and processed data
@@ -94,32 +97,32 @@ if expID==6
 end
 
 
-% % %% extract data within mask
-% % load(dataPaths.imageSaveName,'imageData');
-% % meanImage = imageData.meanImage;
-% % if makeMask
-% %     imagesc(imageData.meanImage);colormap(gray);
-% %     roiAhand = images.roi.AssistedFreehand;
-% %     draw(roiAhand);
-% %     roi = createMask(roiAhand);
-% %     nanMask = nan(size(roi));
-% %     nanMask(roi) = 1;
-% % 
-% %     imageData.imstack = imageData.imstack.*(nanMask==1);
-% %     imageData.imageMeans = squeeze(mean(mean(imageData.imstack)));
-% % else
-% %     nanMask = nan(size(imageData.meanImage));
-% %     %nanMask(226:275,101:150) = 1;
-% %     %     nanMask = nan(318,300);
-% %     %     nanMask(246:255,121:130) = 1;
-% %     %nanMask = nan(300,246);
-% %     %nanMask(226:250,61:75) = 1; %CJ231 periV1
-% %     %nanMask(31*5:50*5,43*5)=1;%CJ231 fovea
-% %     %nanMask(221:280,61:100) = 1; %CJ224 periV1V2
-% % end
-% % imageProc.nanMask = nanMask;
+%% extract data within mask
+load(dataPaths.imageSaveName,'imageData');
+meanImage = imageData.meanImage;
+if makeMask
+    imagesc(imageData.meanImage);colormap(gray);
+    roiAhand = images.roi.AssistedFreehand;
+    draw(roiAhand);
+    roi = createMask(roiAhand);
+    nanMask = nan(size(roi));
+    nanMask(roi) = 1;
 
-%2023 June. recycle ROI from previous analysis in March 
+    imageData.imstack = imageData.imstack.*(nanMask==1);
+    imageData.imageMeans = squeeze(mean(mean(imageData.imstack)));
+else
+    nanMask = nan(size(imageData.meanImage));
+    %nanMask(226:275,101:150) = 1;
+    %     nanMask = nan(318,300);
+    %     nanMask(246:255,121:130) = 1;
+    %nanMask = nan(300,246);
+    %nanMask(226:250,61:75) = 1; %CJ231 periV1
+    %nanMask(31*5:50*5,43*5)=1;%CJ231 fovea
+    %nanMask(221:280,61:100) = 1; %CJ224 periV1V2
+end
+imageProc.nanMask = nanMask;
+
+%analysis in 2023 June. recycle ROI from previous analysis in March 
 % saveDirBase = '/mnt/dshi0006_market/Massive/processed/';
 % expDate = [expInfo.date(1:4) filesep expInfo.date(5:6) filesep expInfo.date(7:8)];
 % expName = num2str(expInfo.expID);
@@ -128,12 +131,13 @@ end
 %     ['encoding_' regexprep(expDate, filesep,'_') '_' expName '_resize' ...
 %     num2str(rescaleFac*100) roiSuffix]);
 % encodingSavePrefix = [encodingSavePrefix '_nxv'];
-encodingSavePrefix = dataPaths.encodingSavePrefix(1:end-5);
-load([encodingSavePrefix '_summary.mat'],'summary');
-%nanMask = summary.mask;
-nanMask = nan(size(summary.RF_Cx));
-%nanMask(summary.roiIdx) = 1;
-nanMask(~isnan(summary.RF_Cx))=1;
+% encodingSavePrefix = dataPaths.encodingSavePrefix(1:end-5);
+% load([encodingSavePrefix '_summary.mat'],'summary');
+% %nanMask = summary.mask;
+% nanMask = nan(size(summary.RF_Cx));
+% %nanMask(summary.roiIdx) = 1;
+% nanMask(~isnan(summary.RF_Cx))=1;
+
 [theseIdx, X,Y] = getROIIdx(nanMask);
 meanImage = summary.thisROI;
 save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');

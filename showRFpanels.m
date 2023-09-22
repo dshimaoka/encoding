@@ -30,12 +30,13 @@ f_panel = figure;
 for ix = 1:numel(brain_x)
     for iy = 1:numel(brain_y)
         aa(ix,iy)=subplot_tight(numel(brain_y), numel(brain_x), ix + numel(brain_x)*(iy-1), 0.02);
-        imagesc(stimXaxis, stimYaxis, squeeze(summary.RF_mean(brain_y(iy), brain_x(ix),:,:)));
+        thisImage = squeeze(summary.RF_mean(brain_y(iy), brain_x(ix),:,:));
+        imagesc(stimXaxis, stimYaxis, thisImage);
         axis xy equal tight;
         hold on
         plot(summary.RF_Cx(brain_y(iy), brain_x(ix)),summary.RF_Cy(brain_y(iy), brain_x(ix)), 'ro');
         
-        vline;hline;
+        vline(0,gca,'-');hline;
         
         if ix>1 || iy > 1
             set(gca,'xtick',[],'ytick',[]);
@@ -48,6 +49,8 @@ for ix = 1:numel(brain_x)
         end
         %title(['x: ' num2str(xx(ix)) ', y: ' num2str(yy(iy))])
         %caxis(prctile(all(:),[1 99])); %better not to impose same color range
+        thisRange = [-max(abs(thisImage(:))) max(abs(thisImage(:)))];
+        caxis(thisRange)
     end
 end
 linkaxes(aa(:));

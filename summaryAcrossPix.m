@@ -4,17 +4,17 @@ if ~ispc
 end
 
 
-ID = 1;
+ID = 2;
 useGPU = 1;
-rescaleFac = 0.50;
+rescaleFac = 0.10;
 dsRate = 1;
-reAnalyze = 0;
+reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
-roiSuffix = '_periV1V2';
-stimSuffix = '_top';
+roiSuffix = '';
+stimSuffix = '_part';
 regressSuffix = '_nxv';
 
-pixPermm = 31.25*rescaleFac; %cf note_magnificationFactor.m
+pixPermm = 31.25*rescaleFac; 
 
 %% path
 expInfo = getExpInfoNatMov(ID);
@@ -31,6 +31,25 @@ roiIdx = 1:numel(X);
 
 load(dataPaths.stimSaveName,'stimInfo')
 stimSz = [stimInfo.height stimInfo.width];
+if ID==3
+    xlim = [-5 1]-3;
+    ylim = [-4 6];
+else
+    xlim = prctile(stimInfo.stimXdeg,[0 100]);
+    ylim = prctile(stimInfo.stimYdeg,[0 100]);
+end
+%         switch ID
+%             case {2,4}
+%                 xlim = [-10 inf];
+%             case {1,3}
+%                 xlim = [-inf 5];
+%             case {6}
+%                 xlim = [-10 15];
+%             case {7}
+%                 xlim = [-10 inf];
+%         end
+%         ylim = [];
+
 clear stimInfo;
 
 load( dataPaths.stimSaveName, 'gaborBankParamIdx');
@@ -73,18 +92,8 @@ for ii = 1:numel(roiIdx)
     trange = [2 trainParam.lagFrames(end)/dsRate];
 
     if reAnalyze
-        switch ID
-            case {2,4}
-                xlim = [-10 inf];
-            case {1,3}
-                xlim = [-inf 5];
-            case {6}
-                xlim = [-10 15];
-            case {7}
-                xlim = [-10 inf];
-        end
-        ylim = [];
         RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim);
+        %showInSilicoRF(RF_insilico, trange);
     end
     %showInSilicoRF(RF_insilico, trange);
             
@@ -169,36 +178,7 @@ summary.vfs=getVFS(prefMaps_xy, sfFac);
 save([encodingSavePrefix '_summary'],'summary');
 
 %% adjust Cx and Cy, interpolate NANs
-switch ID
-    case 1
-        fvY = 50;
-        fvX = 40;
-        corr_th = 0.2;
-    case 2
-        fvY = 52;
-        fvX = 39;
-        corr_th = 0.2;
-    case 3
-        fvY = 50;
-        fvX = 29;
-        corr_th = 0.2;
-    case 4
-        fvY = 33;
-        fvX = 37;
-        corr_th = 0.15;
-    case 5 %TOBE FIXED
-        fvY = 33;
-        fvX = 37;
-        corr_th = 0.15;
-    case 6 %TOBE FIXED
-        fvY = 45;
-        fvX = 40;
-        corr_th = 0.2;
-    case 7 %TOBE FIXED
-        fvY = 40;
-        fvX = 42;
-        corr_th = 0.2;
-end
+[fvY,fvX] = getFoveaPix(ID, rescaleFac);
 summary_adj = summary;
 summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
 summary_adj.RF_Cy = interpNanImages(-(summary.RF_Cy - summary.RF_Cy(fvY,fvX)));
@@ -208,7 +188,12 @@ summary_adj.bestSF = interpNanImages(summary_adj.bestSF);
 summary_adj.bestOR = interpNanImages(summary_adj.bestOR);
 summary_adj.correlation = interpNanImages(summary_adj.correlation);
 summary_adj.expVar = interpNanImages(summary_adj.expVar);
-save([encodingSavePrefix '_summary'],'summary_adj','-append');
+
+stimXaxis_ori = RF_insilico.noiseRF.xaxis;
+stimYaxis_ori = RF_insilico.noiseRF.yaxis;
+
+save([encodingSavePrefix '_summary'],'summary_adj','stimXaxis_ori','stimYaxis_ori',...
+    'fvX','fvY','-append');
 
 
 %% summary figure
@@ -227,23 +212,39 @@ set(sumFig,'position',[0 0 1900 1400]);
 set(sumAxes(2),'xlim',[min(X) max(X)]);
 set(sumAxes(2),'ylim',[min(Y) max(Y)]);
 % set(sumFig,'position',[0 0 1900 1000]);
-% set(sumAxes(2),'clim', [-8 8]);
-% set(sumAxes(3),'clim', [-10 10]);
+set(sumAxes(2),'clim', [-7 1]);
+set(sumAxes(3),'clim', [-5 5]);
 savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 
-%% show mRFs
-brain_y = 26;%20+(1:5:20);%unique(Y);%
-brain_x = 13:19;%13+(1:6:20);;%unique(X);%
-stimXaxis = RF_insilico.noiseRF.xaxis; %- summary.RF_Cx(fvY,fvX);
-stimYaxis = -(RF_insilico.noiseRF.yaxis);% - summary.RF_Cy(fvY,fvX));
-[f_panel, f_location] = showRFpanels(summary, brain_x, brain_y, stimXaxis, stimYaxis);
-set(f_panel,'position',[0 0 1900 1400]);
+%% show mRFs on maps of preferred position
+brain_y = [25 30 35];%20+(1:5:20);%unique(Y);%
+brain_x = [10 25 40];%13:19;%13+(1:6:20);;%unique(X);%
+stimXaxis = stimXaxis_ori - summary.RF_Cx(fvY,fvX);
+stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
+[f_panel, f_location] = showRFpanels(summary_adj, brain_x, brain_y, stimXaxis, stimYaxis);
+%set(f_panel,'position',[0 0 1900 1400]);
 set(f_location,'position',[0 0 1900 1400]);
+colormap(f_panel,'gray');
+rkgmap = customcolormap(linspace(0,1,3), ...
+   [1 0 0; 0 0 0; 0 1 0]);
+colormap(f_location, rkgmap);
+caxis([-5 5]);
 savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
-savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs'], 'w');
+savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_rkg'], 'w');
 
-%% show composite map (under construction)
-%fig = showCompositeMap(summary_adj);
-%line([45 45],[55 55+pixPermm], 'linewidth',2);
-%savePaperFigure(fig,[encodingSavePrefix '_compositeMap']);
+
+
+%% pixel position on Brain
+load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\ephys2Image_CJ231_pen1.mat');
+subplot(121);imagesc(baseImage)
+hold on
+plot(10*brain_x(2),10*brain_y(2),'rs');
+axis equal tight off
+colormap(gray);
+subplot(122);imagesc(inputImage_registered)
+axis equal tight off
+colormap(gray);
+savePaperFigure(gcf, ['brainImage_ephys2Image_CJ231_pen1']);
+
+ 
