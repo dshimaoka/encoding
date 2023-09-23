@@ -34,8 +34,8 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %stimXrange = 161:238;
 %stimYrange = 29:108;
 %ID8,9
-stimXrange = [];
-stimYrange = [];
+stimXrange = 293:293+247;
+stimYrange = 378:378+247;
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -139,7 +139,7 @@ imageProc.nanMask = nanMask;
 % nanMask(~isnan(summary.RF_Cx))=1;
 
 [theseIdx, X,Y] = getROIIdx(nanMask);
-meanImage = summary.thisROI;
+meanImage = imageData.meanImage;%summary.thisROI;
 save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
  

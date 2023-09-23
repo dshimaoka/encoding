@@ -42,7 +42,7 @@ switch ID
          expInfo.nsName = 'CJ246.runPassivemovies.052834';
         expInfo.expID = 20;
         expInfo.subject = 'CJ246';
-        expInfo.date = '20230920';
+        expInfo.date = '20230919';
     case 9
          expInfo.nsName = 'CJ246.runPassivemovies.035319';
         expInfo.expID = 30;

@@ -37,9 +37,17 @@ dataPaths.encodingSavePrefix = fullfile(saveDirBase,expDate,resizeDir,...
 
 switch getenv('COMPUTERNAME')
     case 'MU00175834'
-        dataPaths.moviePath = 'Z:\Shared\Daisuke\natural\nishimoto2011';
+        if sum(strcmp(expInfo.date, {'20230919','20230920'})) %high-res
+            dataPaths.moviePath = 'Z:\Shared\Daisuke\natural\nishimoto2023\15Hz_120_skip1';
+        else
+            dataPaths.moviePath = 'Z:\Shared\Daisuke\natural\nishimoto2011';
+        end
     case 'MU00011697'
-        dataPaths.moviePath = '/mnt/syncitium/Daisuke/natural/nishimoto2011';
+        if sum(strcmp(expInfo.date, {'20230919','20230920'})) %high-res
+            dataPaths.moviePath = '/mnt/syncitium/Daisuke/natural/nishimoto2023\15Hz_120_skip1';
+        else
+            dataPaths.moviePath = '/mnt/syncitium/Daisuke/natural/nishimoto2011';
+        end
     case ''
         dataPaths.moviePath = 'TO BE FIXED';
 end
