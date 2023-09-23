@@ -65,7 +65,7 @@ stimSz = [stimInfo.height stimInfo.width];
 
 %% in-silico RF estimation
 RF_insilico = struct;
-RF_insilico.noiseRF.nRepeats = 80; %10 FIX
+RF_insilico.noiseRF.nRepeats = 60;% 80; %10 FIX
 RF_insilico.noiseRF.dwell = 15; %frames
 RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/4);%8 %[y x] %FIX %spatial resolution of noise stimuli
 RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
