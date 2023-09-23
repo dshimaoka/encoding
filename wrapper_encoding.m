@@ -79,8 +79,8 @@ oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
 RF_insilico.ORSF.oriList = oriList(1:end-1);
 SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
 SFrange_mdl = getSFrange_mdl(RF_insilico.ORSF.screenPix, stimSz, gaborBankParamIdx.gparamIdx);
-RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_mdl(2)), 6); %[cycles/deg];
-RF_insilico.ORSF.nRepeats = 15;
+RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_mdl(2)), 5); %6 %[cycles/deg];
+RF_insilico.ORSF.nRepeats = 10;%15;
 RF_insilico.ORSF.dwell = 45; %#stimulus frames
     
 
