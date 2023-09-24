@@ -29,7 +29,7 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-ngIdx = [];
+%ngIdx = [];
 
     
 %% path
@@ -133,6 +133,7 @@ for JID = 1:maxJID
             trainParam.tavg, trainParam.useGPU, imageMeans_proc, trainParam.regressType);
         t1=toc %6s!
         screen2png([encodingSaveName(1:end-4) '_corr']);
+        saveas(gcf,[encodingSaveName(1:end-4) '_corr.fig']);
         close;
         
         %clear S_fin

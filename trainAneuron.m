@@ -113,6 +113,20 @@ if sanityCheck
     title(['corr ' num2str(corr_fitted(2,1)) ', expval ' num2str(expval)]);
     axis equal square;
     
+    % % correlation over time
+    %     idx =round(linspace(1,numel(timeVec_train),10));
+    % 
+    % tiledlayout('flow');
+    % corrval = [];
+    % for ii=1:numel(idx)-1
+    %     nexttile;
+    %     cache=corrcoef(observed_train(idx(ii):idx(ii+1)), fitted(idx(ii):idx(ii+1)));
+    % 
+    %     corrval(ii) = cache(2,1);
+    % 
+    %     yyaxis left; plot(timeVec_train(idx(ii):idx(ii+1)), observed_train(idx(ii):idx(ii+1)));
+    %     yyaxis right; plot(timeVec_train(idx(ii):idx(ii+1)), fitted(idx(ii):idx(ii+1)));
+    % end
     %% validating fitting
     %     testIdx = setxor(1:size(S_fin,1),trainIdx);
     %     timeVec_test = timeVec(testIdx);
