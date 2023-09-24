@@ -4,14 +4,14 @@ if ~ispc
 end
 
 
-ID = 2;
+ID = 8;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 roiSuffix = '';
-stimSuffix = '_part';
+stimSuffix = '_square';
 regressSuffix = '_nxv';
 
 pixPermm = 31.25*rescaleFac; 
@@ -73,10 +73,16 @@ for ii = 1:numel(roiIdx)
     disp(ii)
     encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
-        encodingResult = load(encodingSaveName, 'RF_insilico','trained','trainParam');
-        RF_insilico = encodingResult.RF_insilico;
-        trained = encodingResult.trained;
-        trainParam = encodingResult.trainParam;
+        try
+            encodingResult = load(encodingSaveName, 'RF_insilico','trained','trainParam');
+            RF_insilico = encodingResult.RF_insilico;
+            trained = encodingResult.trained;
+            trainParam = encodingResult.trainParam;
+        catch err
+            disp(['MISSING ' encodingSaveName]);
+            ngIdx = [ngIdx roiIdx(ii)];
+            continue;
+        end
     else
         disp(['MISSING ' encodingSaveName]);
         ngIdx = [ngIdx roiIdx(ii)];
@@ -113,7 +119,7 @@ for ii = 1:numel(roiIdx)
         bestSF(ii) = RF_insilico.ORSF.bestSF;
         bestOR(ii) = RF_insilico.ORSF.bestOR;
     catch err
-        %ngIdx = [ngIdx ii];
+        ngIdx = [ngIdx ii];
     end
     %bestAmp(ii) = amp;   
 end

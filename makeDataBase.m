@@ -9,7 +9,7 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = 9;
+expID = 8;
 
 
 roiSuffix = '';
@@ -34,7 +34,7 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %stimXrange = 161:238;
 %stimYrange = 29:108;
 %ID8,9
-stimXrange = 293:293+247;
+stimXrange =768:768+247;%293:293+247;
 stimYrange = 378:378+247;
 
 % gabor bank filter 
