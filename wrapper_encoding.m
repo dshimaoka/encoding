@@ -29,7 +29,6 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-ngIdx = [];
 
     
 %% path
@@ -38,6 +37,7 @@ dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 
 inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim.mat'];
 inSilicoORSFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoORSFstim.mat'];
+
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
@@ -76,6 +76,10 @@ nTotPix = numel(ds.VariableNames)-1;
 % else
     maxJID = numel(pen:narrays:nTotPix);
 % end
+
+%% retrieve unsuccessful analysis
+ngIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix);
+
 errorID=[];
 for JID = 1:maxJID
     try
