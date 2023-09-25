@@ -150,7 +150,7 @@ for JID = 1:maxJID
     if doORSF
         if exist(inSilicoORSFStimName,'file') && ~exist('inSilicoORSFStim','var')
             ORSFStim = load(inSilicoORSFStimName, 'inSilicoORSFStim','RF_insilico');
-            inSilicoRFStim = ORSFStim.inSilicoORSFStim;
+            inSilicoORSFStim = ORSFStim.inSilicoORSFStim;
             RF_insilico.ORSF = ORSFStim.RF_insilico.ORSF;
             clear ORSFStim
         elseif  ~exist(inSilicoORSFStimName,'file') 
