@@ -127,7 +127,10 @@ for JID = 1:maxJID
     if doRF
         %load InSilicoRFstim data
         if exist(inSilicoRFStimName,'file')>0 && ~exist('inSilicoRFStim','var')
-            load(inSilicoRFStimName, 'inSilicoRFStim');
+            noiseStim = load(inSilicoRFStimName, 'inSilicoRFStim','RF_insilico');
+            inSilicoRFStim = noiseStim.inSilicoRFStim;
+            RF_insilico.noiseRF = noiseStim.RF_insilico.noiseRF;
+            clear noiseStim
         elseif  ~exist(inSilicoRFStimName,'file') 
             disp(['Missing ' inSilicoRFStimName]);
         end
@@ -146,7 +149,10 @@ for JID = 1:maxJID
     %% in-silico simulation to obtain ORSF
     if doORSF
         if exist(inSilicoORSFStimName,'file') && ~exist('inSilicoORSFStim','var')
-            load(inSilicoORSFStimName, 'inSilicoORSFStim');
+            ORSFStim = load(inSilicoORSFStimName, 'inSilicoORSFStim');
+            inSilicoRFStim = ORSFStim.inSilicoRFStim;
+            RF_insilico.ORSF = ORSFStim.RF_insilico.ORSF;
+            clear ORSFStim
         elseif  ~exist(inSilicoORSFStimName,'file') 
             disp(['Missing ' inSilicoORSFStimName]);
         end
