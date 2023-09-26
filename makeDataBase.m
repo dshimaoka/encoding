@@ -34,8 +34,15 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %stimXrange = 161:238;
 %stimYrange = 29:108;
 %ID8,9
-stimXrange =768:768+247;%293:293+247;
-stimYrange = 378:378+247;
+%test1
+% stimXrange = 293:293+247;
+% stimYrange = 378:378+247;
+%test2
+% stimXrange =768:768+247;
+% stimYrange = 378:378+247;
+%test3
+stimXrange = 800-247:800+247;
+stimYrange = 540-247:540+247;
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -204,7 +211,7 @@ stimSz = [stimInfo.height stimInfo.width];
 RF_insilico = struct;
 RF_insilico.noiseRF.nRepeats = 80; %10 FIX
 RF_insilico.noiseRF.dwell = 15; %frames
-RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/8);%4 %[y x] %FIX %spatial resolution of noise stimuli
+RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/16);%4 %[y x] %FIX %spatial resolution of noise stimuli
 RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
 
 try
