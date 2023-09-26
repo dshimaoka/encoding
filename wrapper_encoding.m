@@ -39,6 +39,7 @@ dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim.mat'];
 inSilicoORSFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoORSFstim.mat'];
 
+
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
     'gaborBankParamIdx','stimInfo');
 if subtractImageMeans
@@ -63,26 +64,7 @@ analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
 %load(dataPaths.imageSaveName,'stimInfo')
 stimSz = [stimInfo.height stimInfo.width];
 
-%% in-silico RF estimation
-RF_insilico = struct;
-RF_insilico.noiseRF.nRepeats = 60;% 80; %10 FIX
-RF_insilico.noiseRF.dwell = 15; %frames
-RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/8);%4 %[y x] %FIX %spatial resolution of noise stimuli
-RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
-%<screenPix(1)/screenPix(2) determines the #gabor filters
-
-
-%% in-silico ORSF estimation
-RF_insilico.ORSF.screenPix = stimInfo.screenPix; %[y x]
-nORs = 10;
-oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
-RF_insilico.ORSF.oriList = oriList(1:end-1);
-SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
-SFrange_mdl = getSFrange_mdl(RF_insilico.ORSF.screenPix, stimSz, gaborBankParamIdx.gparamIdx);
-RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_mdl(2)), 5); %6 %[cycles/deg];
-RF_insilico.ORSF.nRepeats = 10;%15;
-RF_insilico.ORSF.dwell = 45; %#stimulus frames
-    
+ 
 
 %% load neural data
 %TODO: copy timetable data to local
@@ -95,6 +77,10 @@ nTotPix = numel(ds.VariableNames)-1;
 % else
     maxJID = numel(pen:narrays:nTotPix);
 % end
+
+%% retrieve unsuccessful analysis
+ngIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix);
+
 errorID=[];
 for JID = 1:maxJID
     try
@@ -147,13 +133,12 @@ for JID = 1:maxJID
     if doRF
         %load InSilicoRFstim data
         if exist(inSilicoRFStimName,'file')>0 && ~exist('inSilicoRFStim','var')
-            load(inSilicoRFStimName, 'inSilicoRFStim');
+            noiseStim = load(inSilicoRFStimName, 'inSilicoRFStim','RF_insilico');
+            inSilicoRFStim = noiseStim.inSilicoRFStim;
+            RF_insilico.noiseRF = noiseStim.RF_insilico.noiseRF;
+            clear noiseStim
         elseif  ~exist(inSilicoRFStimName,'file') 
-            disp('creating inSilicoRFstim...');
-            [inSilicoRFStim] = ...
-                getInSilicoRFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs, 1);
-            save(inSilicoRFStimName, 'inSilicoRFStim','gaborBankParamIdx',"RF_insilico",'trainParam','-v7.3');
-            disp('done');
+            disp(['Missing ' inSilicoRFStimName]);
         end
 
         %compute RF_insilico
@@ -170,13 +155,12 @@ for JID = 1:maxJID
     %% in-silico simulation to obtain ORSF
     if doORSF
         if exist(inSilicoORSFStimName,'file') && ~exist('inSilicoORSFStim','var')
-            load(inSilicoORSFStimName, 'inSilicoORSFStim');
+            ORSFStim = load(inSilicoORSFStimName, 'inSilicoORSFStim','RF_insilico');
+            inSilicoORSFStim = ORSFStim.inSilicoORSFStim;
+            RF_insilico.ORSF = ORSFStim.RF_insilico.ORSF;
+            clear ORSFStim
         elseif  ~exist(inSilicoORSFStimName,'file') 
-            disp('creating inSilicoORSFstim...');
-            [inSilicoORSFStim] = ...
-                getInSilicoORSFstim(gaborBankParamIdx, RF_insilico, trainParam.Fs, stimSz,1);
-            save(inSilicoORSFStimName, 'inSilicoORSFStim','gaborBankParamIdx',"RF_insilico",'trainParam','stimSz','-v7.3');
-            disp('done');
+            disp(['Missing ' inSilicoORSFStimName]);
         end
 
         RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
