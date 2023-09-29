@@ -13,7 +13,7 @@ expID = 8;
 
 
 roiSuffix = '';
-stimSuffix = '_square';
+stimSuffix = '_square18';
 
 %% imaging parameters
 rescaleFac = 0.1;
