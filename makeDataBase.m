@@ -175,7 +175,7 @@ save(dataPaths.roiSaveName, 'imageMeans_proc','-append');
 TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
 writetimetable(TT, dataPaths.timeTableSaveName);%slow
 clear TT
-
+m
 
 %% motion-energy model computation from visual stimuli
 if ~exist(dataPaths.stimSaveName,'file') 
@@ -187,7 +187,7 @@ if ~exist(dataPaths.stimSaveName,'file')
     stimInfo.screenPix = screenPixNew;
     
     %% prepare model output SLOW
-    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, imageProc.cic, ...
+    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
         dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange);
         
     %% save gabor filter output as .mat

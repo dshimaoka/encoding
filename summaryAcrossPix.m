@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 8;
+ID = 2;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -224,20 +224,16 @@ savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 
 %% show mRFs on maps of preferred position
-brain_y = [25 30 35];%20+(1:5:20);%unique(Y);%
-brain_x = [10 25 40];%13:19;%13+(1:6:20);;%unique(X);%
+brain_y = [25 30 35];
+brain_x = [10 25 40];
+showXrange = [-10 1];
+showYrange = [-7.5 7.5];
 stimXaxis = stimXaxis_ori - summary.RF_Cx(fvY,fvX);
 stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
-[f_panel, f_location] = showRFpanels(summary_adj, brain_x, brain_y, stimXaxis, stimYaxis);
-%set(f_panel,'position',[0 0 1900 1400]);
-set(f_location,'position',[0 0 1900 1400]);
-colormap(f_panel,'gray');
-rkgmap = customcolormap(linspace(0,1,3), ...
-   [1 0 0; 0 0 0; 0 1 0]);
-colormap(f_location, rkgmap);
-caxis([-5 5]);
+[f_panel, f_location] = showRFpanels(summary_adj, brain_x, brain_y, ...
+    stimXaxis, stimYaxis, showXrange, showYrange, rescaleFac);
 savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
-savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_rkg'], 'w');
+savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg'], 'w');
 
 
 

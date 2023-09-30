@@ -1,4 +1,5 @@
-function [fig, signMap, signBorder, CyBorder, mask] = showCompositeMap(summary_adj, corrth)
+function [fig, signMap, signBorder, CyBorder, mask] = ...
+    showCompositeMap(summary_adj, corrth, showXrange, showYrange, rescaleFac)
 % [fig, signMap, signBorder] = showCompositeMap(summary_adj)
 % under construction
 
@@ -53,12 +54,12 @@ for ii = 1:4
     switch ii
         case 1
             image = summary_adj.RF_Cx;
-            cmap = parula;
+            cmap = pwgmap;
         case 2
             image = summary_adj.RF_Cy;
             %cmap = customcolormap(linspace(0,1,3), ...
             %    [1 0 0; 0 0 0; 0 1 0]);
-            cmap = parula;
+            cmap = pwgmap;
         case 3
               image = summary_adj.vfs;
             cmap = customcolormap(linspace(0,1,3), ...
@@ -71,21 +72,31 @@ for ii = 1:4
     subplot(2,2,ii);
     imagesc(image, 'alphadata', mask);
     if ii==1
-        caxis([-7 0]);
-        
+        title('Cx [deg]');
+        caxis([-max(abs(showXrange)) max(abs(showXrange))]);
+        colormap(gca, cmap);
+        cb=colorbar(gca,'location','northoutside','xtick',sort(unique([showXrange, 0])));
+        cb.Limits = showXrange;
     elseif ii == 2
-        ll = .1*round(10*prctile(abs(image(:)),95));
-        caxis([-ll ll]);
-    elseif ii==3
+        title('Cy [deg]');
+        caxis([-max(abs(showYrange)) max(abs(showYrange))]);
+        colormap(gca, cmap);
+        cb=colorbar(gca,'location','northoutside','xtick',sort(unique([showYrange, 0])));
+        cb.Limits = showYrange;
+
+    elseif ii==3 || ii==4
+        title('VFS');
         caxis([-1 1]);
+        colormap(gca, cmap);
+        cb=colorbar(gca,'location','northoutside','xtick',[-1 0 1]);
     end
     
-    colormap(gca, cmap);
     hold on; 
     contour(signBorder,[-0.1 0.1],'w','linewidth',2);
     contour(CyFilt, [0 0], ':w','linewidth',2);
     CyBorder = (CyFilt>=0);
+    addScaleBar(rescaleFac);
     axis equal tight ij;
     whitebg(gcf,'w');
-    aaa=mcolorbar;
+    
 end
