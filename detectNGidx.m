@@ -24,7 +24,7 @@ function ngIdx = detectNGidx(encodingSavePrefix, numIdx)
 roiIdx = 1:numIdx;
 ngIdx = [];
 for ii = 1:numel(roiIdx)
-    disp(ii)
+    %disp(ii)
     encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
         try

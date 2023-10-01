@@ -29,7 +29,6 @@ expInfo = getExpInfoNatMov(ID);
 
 %% draw slurm ID for parallel computation specifying ROI position    
 pen = getPen; 
-%ngIdx = [];
 
     
 %% path
@@ -64,34 +63,24 @@ analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
 %load(dataPaths.imageSaveName,'stimInfo')
 stimSz = [stimInfo.height stimInfo.width];
 
- 
-
 %% load neural data
 %TODO: copy timetable data to local
 disp('Loading tabular text datastore');
 ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 
 nTotPix = numel(ds.VariableNames)-1;
-% if ~isempty(ngIdx)
-%     maxJID=1;
-% else
-    maxJID = numel(pen:narrays:nTotPix);
-% end
 
 %% retrieve unsuccessful analysis
-ngIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix);
+tgtIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix);
+maxJID = numel(pen:narrays:numel(tgtIdx));
 
 errorID=[];
 for JID = 1:maxJID
     try
     disp([num2str(JID) '/' num2str(maxJID)]);
     
-    if ~isempty(ngIdx)
-        roiIdx = ngIdx(JID);
-    else
-        roiIdx = pen + (JID-1)*narrays;
-    end
-    
+    roiIdx = tgtIdx(pen + (JID-1)*narrays);
+
     %TODO: save data locally
     encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
     
