@@ -13,7 +13,7 @@ expID = 8;
 
 
 roiSuffix = '';
-stimSuffix = '_square18';
+stimSuffix = '_rect18-40';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -40,9 +40,13 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %test2
 % stimXrange =768:768+247;
 % stimYrange = 378:378+247;
-%test3
+%test3 square18
+%stimXrange = 800-247:800+247;
+%stimYrange = 540-247:540+247;
+%test4: rect18-40
 stimXrange = 800-247:800+247;
-stimYrange = 540-247:540+247;
+stimYrange = 1:1080;
+
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -175,7 +179,7 @@ save(dataPaths.roiSaveName, 'imageMeans_proc','-append');
 TT = timetable(seconds(TimeVec_ds_c), observed);%instantaneous
 writetimetable(TT, dataPaths.timeTableSaveName);%slow
 clear TT
-m
+
 
 %% motion-energy model computation from visual stimuli
 if ~exist(dataPaths.stimSaveName,'file') 

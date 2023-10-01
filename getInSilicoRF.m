@@ -76,7 +76,7 @@ RF_insilico.noiseRF.RFdelay = RF_delay;
 
 xpix = 1:screenPix(2);
 % RF_insilico.noiseRF.xaxis = oriStimSize(2)*(xpix - mean(xpix))./numel(xpix);
-ypix = 1:screenPix(1);
+ypix = fliplr(1:screenPix(1));
 % RF_insilico.noiseRF.yaxis = oriStimSize(1)*(ypix - mean(ypix))./numel(ypix);
 
 % RF_insilico.noiseRF.xaxis = stimXdeg;
