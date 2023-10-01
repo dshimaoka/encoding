@@ -49,5 +49,5 @@ switch getenv('COMPUTERNAME')
             dataPaths.moviePath = '/mnt/syncitium/Daisuke/natural/nishimoto2011';
         end
     case ''
-        dataPaths.moviePath = 'TO BE FIXED';
+        dataPaths.moviePath = '/fs03/fs11/Daisuke/natural/nishimoto2023/15Hz_120_skip1';
 end
