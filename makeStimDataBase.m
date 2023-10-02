@@ -58,11 +58,8 @@ gaborBankParamIdx.predsRate = 15; %Hz %mod(dsRate, predsRate) must be 0
 expInfo = getExpInfoNatMov(expID);
 dataPaths = getDataPaths(expInfo, rescaleFac, roiSuffix, stimSuffix);
 
-%% save imaging raw and processed data
-load(dataPaths.imageSaveName,'imageProc');
-cic = imageProc.cic;
-stimInfo = imageProc.stimInfo;
-
+%% load cic and stimInfo
+load(dataPaths.imageSaveName,'cic','stimInfo');
 
 %% motion-energy model computation from visual stimuli
 if ~exist(dataPaths.stimSaveName,'file') 

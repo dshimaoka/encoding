@@ -61,6 +61,11 @@ else
     end
 end
 
+cic = imageProc.cic;
+stimInfo = imageProc.stimInfo;
+save(dataPaths.imageSaveName, 'cic','stimInfo','-append');
+
+
 %% align image data
 if expID==6
     load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\image2Image_CJ235.mat',...
