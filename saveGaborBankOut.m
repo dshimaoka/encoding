@@ -1,10 +1,14 @@
 function [S_fin, TimeVec_stim_cat] = saveGaborBankOut(moviePath, c, ...
-    dsRate, gaborBankParamIdx, uploadResult,yrange,xrange)
+    dsRate, gaborBankParamIdx, uploadResult,yrange,xrange, theseTrials)
 % S_fin = saveGaborBankOut(moviePath, c, dsRate)
 % returns output of gabor-wavelet bank
 
-cparams = preprocColorSpace_GetMetaParams(1);
-for itr = 1:c.nrTrials
+if nargin < 8
+    theseTrials = 1:c.nrTrials;
+end
+
+%cparams = preprocColorSpace_GetMetaParams(1);
+for itr = theseTrials
     
    disp([num2str(itr) '/' num2str(c.nrTrials)]);
    

@@ -71,8 +71,9 @@ if ~exist(dataPaths.stimSaveName,'file')
     stimInfo.screenPix = screenPixNew;
     
     %% prepare model output SLOW
+    theseTrials = 39:60;
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
-        dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange);
+        dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials);
         
     %% save gabor filter output as .mat
     save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
@@ -95,7 +96,8 @@ stimSz = [stimInfo.height stimInfo.width];
 RF_insilico = struct;
 RF_insilico.noiseRF.nRepeats = 80; %10 FIX
 RF_insilico.noiseRF.dwell = 15; %frames
-RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/16);%4 %[y x] %FIX %spatial resolution of noise stimuli
+fac = mean(stimInfo.screenPix)/20;
+RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/fac);%4 %[y x] %FIX %spatial resolution of noise stimuli
 RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
 
 try
@@ -114,8 +116,8 @@ nORs = 10;
 oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
 RF_insilico.ORSF.oriList = oriList(1:end-1);
 SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
-SFrange_mdl = getSFrange_mdl(RF_insilico.ORSF.screenPix, stimSz, gaborBankParamIdx.gparamIdx);
-RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_mdl(2)), 5); %6 %[cycles/deg];
+%SFrange_mdl = getSFrange_mdl(RF_insilico.ORSF.screenPix, stimSz, gaborBankParamIdx.gparamIdx);
+RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 5); %6 %[cycles/deg];
 RF_insilico.ORSF.nRepeats = 10;%15;
 RF_insilico.ORSF.dwell = 45; %#stimulus frames
 
