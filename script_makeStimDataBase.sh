@@ -10,6 +10,6 @@
 #SBATCH --mem-per-cpu=130000
 #SBATCH --array=1-1
 #SBATCH --gres=gpu:1
-#SBATCH --partition=m3g
+#SBATCH --partition=m3h
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < makeStimDataBase.m

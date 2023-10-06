@@ -11,7 +11,7 @@ expID = 8;
 
 
 roiSuffix = '';
-stimSuffix = '_rect18-40';
+stimSuffix = '_rect10-40';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -42,7 +42,10 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %stimXrange = 800-247:800+247;
 %stimYrange = 540-247:540+247;
 %test4: rect18-40
-stimXrange = 800-247:800+247;
+%stimXrange = 800-247:800+247;
+%stimYrange = 1:1080;
+%test5: rect10-40
+stimXrange = 1047-275:1047;
 stimYrange = 1:1080;
 
 
@@ -71,7 +74,7 @@ if ~exist(dataPaths.stimSaveName,'file')
     stimInfo.screenPix = screenPixNew;
     
     %% prepare model output SLOW
-    theseTrials = 39:60;
+    theseTrials = [];
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
         dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials);
         
