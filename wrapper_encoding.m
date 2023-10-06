@@ -53,7 +53,7 @@ trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
 trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
 trainParam.Fs = dsRate; %hz after downsampling
 trainParam.lagFrames = 2:4;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
-trainParam.useGPU = 1;%1; %for ridgeXs local GPU is not sufficient
+trainParam.useGPU = 0;%1; %for ridgeXs local GPU is not sufficient
 
 %% in-silico simulation
 analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
