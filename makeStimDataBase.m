@@ -2,10 +2,17 @@
 %this script process and save stimulus data(saveGaborBankOut), together with in-silico simulation 
 %that will be used for the model fitting (in MASSIVE) by wrapper_encoding.m
 
-if ~ispc
+if isempty(getenv('COMPUTERNAME'))
     addpath(genpath('~/git'));
-    addDirPrefs;
+    % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!    
+    [~,narrays] = getArray('script_wrapper.sh');
+else
+    narrays = 1;
 end
+
+%% draw slurm ID for parallel computation specifying stimulus ID    
+pen = getPen; 
+
 
 expID = 8;
 
@@ -46,7 +53,7 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %stimYrange = 1:1080;
 %test5: rect10-40
 stimXrange = 1047-275:1047;
-stimYrange = 1:1080;
+stimYrange = 540-247:1080;
 
 
 % gabor bank filter 
@@ -74,8 +81,8 @@ if ~exist(dataPaths.stimSaveName,'file')
     stimInfo.screenPix = screenPixNew;
     
     %% prepare model output SLOW
-    theseTrials = [];
-    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
+    theseTrials = pen:narrays:cic.nrTrials;
+    saveGaborBankOut(dataPaths.moviePath, cic, ...
         dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials);
         
     %% save gabor filter output as .mat
