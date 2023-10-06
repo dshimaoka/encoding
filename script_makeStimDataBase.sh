@@ -11,5 +11,5 @@
 #SBATCH --array=1-2
 #SBATCH --gres=gpu:1
 #SBATCH --partition=gpu
-module load matlab
+module load matlab/r2021a
 matlab -nodisplay -nodesktop -nosplash < makeStimDataBase.m
