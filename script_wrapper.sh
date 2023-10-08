@@ -11,6 +11,5 @@
 #SBATCH --array=1-5
 #SBATCH --gres=gpu:1
 #SBATCH --partition=m3g
-#SBATCH --constraint=V100-32G
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < wrapper_encoding.m
