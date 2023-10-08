@@ -19,7 +19,7 @@ doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '';
-stimSuffix = '_rect18-40';
+stimSuffix = '_rect10-40';
 regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
