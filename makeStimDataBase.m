@@ -14,11 +14,11 @@ end
 pen = getPen; 
 
 
-expID = 8;
+expID = 9;
 
 
 roiSuffix = '';
-stimSuffix = '_rect10-40';
+stimSuffix = '_square30';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -48,13 +48,15 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %test3 square18
 %stimXrange = 800-247:800+247;
 %stimYrange = 540-247:540+247;
-%test4: rect18-40
+%test4: rect18-40 ... Sfin = [7200 x 14375]
 %stimXrange = 800-247:800+247;
 %stimYrange = 1:1080;
-%test5: rect10-40
-stimXrange = 1047-275:1047;
-stimYrange = 540-247:1080;
-
+%test5: rect10-40 ... Sfin = [7200 x 6555]
+%stimXrange = 1047-275:1047;
+%stimYrange = 540-247:1080;
+%test6: square30
+stimXrange = 293:1080;
+stimYrange = 293:1080;
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -82,7 +84,7 @@ if ~exist(dataPaths.stimSaveName,'file')
     
     %% prepare model output SLOW
     theseTrials = pen:narrays:cic.nrTrials;
-    saveGaborBankOut(dataPaths.moviePath, cic, ...
+    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
         dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials);
         
     %% save gabor filter output as .mat

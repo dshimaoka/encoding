@@ -9,11 +9,11 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = 8;
+expID = 9;
 
 
 roiSuffix = '';
-stimSuffix = '_rect18-40';
+stimSuffix = '';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -21,7 +21,7 @@ procParam.cutoffFreq = 0.02; %0.1
 procParam.lpFreq = []; %2
 rotateInfo = [];
 rebuildImageData = false;
-makeMask = false;%true;
+makeMask = true;
 uploadResult = true;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
@@ -129,8 +129,10 @@ save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
  
 %% temporal filtering of pixels within mask
+filterEachPix = 1;
 Fs = 1/median(diff(imageProc.OETimes.camOnTimes));
-imageProc.V = filtV(imageProc.V(theseIdx,:), Fs, procParam.cutoffFreq, procParam.lpFreq);
+imageProc.V = filtV(imageProc.V(theseIdx,:), Fs, procParam.cutoffFreq, ...
+procParam.lpFreq, filterEachPix);
 
 
 %% image means, resampled
