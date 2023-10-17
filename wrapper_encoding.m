@@ -6,7 +6,7 @@
 
 if isempty(getenv('COMPUTERNAME'))
     addpath(genpath('~/git'));
-    % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!    
+    % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!
     [~,narrays] = getArray('script_wrapper.sh');
 else
     narrays = 1;
@@ -27,10 +27,10 @@ rescaleFac = 0.1;
 
 expInfo = getExpInfoNatMov(ID);
 
-%% draw slurm ID for parallel computation specifying ROI position    
-pen = getPen; 
+%% draw slurm ID for parallel computation specifying ROI position
+pen = getPen;
 
-    
+
 %% path
 dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
 dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
@@ -46,6 +46,16 @@ if subtractImageMeans
 else
     imageMeans_proc = [];
 end
+
+
+%% estimate the energy-model parameters w cross validation
+nMovies = numel(stimInfo.stimLabels);
+movDur = stimInfo.duration;%[s]
+trainIdx = [];
+for imov = 1:nMovies
+    trainIdx = [trainIdx (omitSec*dsRate+1:movDur*dsRate)+(imov-1)*movDur*dsRate];
+end
+
 %% estimation of filter-bank coefficients
 trainParam.regressType = 'ridge';
 trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
@@ -61,7 +71,6 @@ analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
 
 %% stimuli
 %load(dataPaths.imageSaveName,'stimInfo')
-stimSz = [stimInfo.height stimInfo.width];
 
 %% load neural data
 %TODO: copy timetable data to local
@@ -77,94 +86,110 @@ maxJID = numel(pen:narrays:numel(tgtIdx));
 errorID=[];
 for JID = 1:maxJID
     try
-    disp([num2str(JID) '/' num2str(maxJID)]);
-    
-    roiIdx = tgtIdx(pen + (JID-1)*narrays);
-
-    %TODO: save data locally
-    encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
-    
-    
-    
-    if doTrain
-        %% load gabor bank prediction data
-        %TODO load data tolocal
-        RF_insilico.Fs_visStim = gaborBankParamIdx.predsRate;
+        disp([num2str(JID) '/' num2str(maxJID)]);
         
-        %% estimate the energy-model parameters w cross validation
-        nMovies = numel(stimInfo.stimLabels);
-        movDur = stimInfo.duration;%[s]
-        trainIdx = [];
-        for imov = 1:nMovies
-            trainIdx = [trainIdx (omitSec*dsRate+1:movDur*dsRate)+(imov-1)*movDur*dsRate];
-        end
+        roiIdx = tgtIdx(pen + (JID-1)*narrays);
         
+        %TODO: save data locally
+        encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
         
-        %% fitting!
-        tic;
-        lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
-        trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
-            trainParam.KFolds, lagRangeS, ...
-            trainParam.tavg, trainParam.useGPU, imageMeans_proc, trainParam.regressType);
-        t1=toc %6s!
-        screen2png([encodingSaveName(1:end-4) '_corr']);
-        saveas(gcf,[encodingSaveName(1:end-4) '_corr.fig']);
-        close;
+        doEverything(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
+            gaborBankParamIdx, encodingSaveName, inSilicoRFStimName, ...
+            inSilicoORSFStimName, analysisTwin,doTrain, doRF, doORSF);
         
-        %clear S_fin
-        save(encodingSaveName,'trained','trainParam');
-    else
-        load(encodingSaveName,'trained','trainParam');
-    end
-    
-    
-    %% in-silico simulation to obtain RF
-    if doRF
-        %load InSilicoRFstim data
-        if exist(inSilicoRFStimName,'file')>0 && ~exist('inSilicoRFStim','var')
-            noiseStim = load(inSilicoRFStimName, 'inSilicoRFStim','RF_insilico');
-            inSilicoRFStim = noiseStim.inSilicoRFStim;
-            RF_insilico.noiseRF = noiseStim.RF_insilico.noiseRF;
-            clear noiseStim
-        elseif  ~exist(inSilicoRFStimName,'file') 
-            disp(['Missing ' inSilicoRFStimName]);
-        end
-
-        %compute RF_insilico
-        RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimInfo.stimXdeg, stimInfo.stimYdeg,inSilicoRFStim);
-        
-        RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
-        showInSilicoRF(RF_insilico, analysisTwin);
-        screen2png([encodingSaveName(1:end-4) '_RF']);
-        close;        
-        save(encodingSaveName,'RF_insilico','-append');
-    end
-    
-    %% in-silico simulation to obtain ORSF
-    if doORSF
-        if exist(inSilicoORSFStimName,'file') && ~exist('inSilicoORSFStim','var')
-            ORSFStim = load(inSilicoORSFStimName, 'inSilicoORSFStim','RF_insilico');
-            inSilicoORSFStim = ORSFStim.inSilicoORSFStim;
-            RF_insilico.ORSF = ORSFStim.RF_insilico.ORSF;
-            clear ORSFStim
-        elseif  ~exist(inSilicoORSFStimName,'file') 
-            disp(['Missing ' inSilicoORSFStimName]);
-        end
-
-        RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
-            RF_insilico, stimSz, inSilicoORSFStim);
-        showInSilicoORSF(RF_insilico);
-        
-        RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, analysisTwin, 1);
-        screen2png([encodingSaveName(1:end-4) '_ORSF']);
-        close;        
-        save(encodingSaveName,'RF_insilico','-append');
-    end
-
     catch err
         disp(err);
         errorID = [roiIdx errorID];
         continue
     end
+end
+
+%% re-run pixels with error
+while ~isempty(errorID)
+    try
+        roiIdx = errorID(1);
+        encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
+        
+        doEverything(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
+            gaborBankParamIdx, encodingSaveName, inSilicoRFStimName,...
+            inSilicoORSFStimName, analysisTwin,doTrain, doRF, doORSF);
+        if numel(errorID)>1
+            errorID = errorID(2:end);
+        end
+    catch err
+    end
+end
+
+
+function doEverything(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, ...
+    imageMeans_proc, gaborBankParamIdx, encodingSaveName, inSilicoRFStimName,...
+    inSilicoORSFStimName,analysisTwin,...
+    doTrain, doRF, doORSF)
+if doTrain
+    %% fitting!
+    tic;
+    lagRangeS = [trainParam.lagFrames(1) trainParam.lagFrames(end)]/trainParam.Fs;
+    trained = trainAneuron(ds, S_fin, roiIdx, trainIdx, trainParam.ridgeParam,  ...
+        trainParam.KFolds, lagRangeS, ...
+        trainParam.tavg, trainParam.useGPU, imageMeans_proc, trainParam.regressType);
+    t1=toc %6s!
+    screen2png([encodingSaveName(1:end-4) '_corr']);
+    saveas(gcf,[encodingSaveName(1:end-4) '_corr.fig']);
+    close;
+    
+    %clear S_fin
+    save(encodingSaveName,'trained','trainParam');
+else
+    load(encodingSaveName,'trained','trainParam');
+end
+
+
+%% in-silico simulation to obtain RF
+if doRF
+    %TODO load data tolocal
+    RF_insilico.Fs_visStim = gaborBankParamIdx.predsRate;
+    
+    %load InSilicoRFstim data
+    if exist(inSilicoRFStimName,'file')>0 && ~exist('inSilicoRFStim','var')
+        noiseStim = load(inSilicoRFStimName, 'inSilicoRFStim','RF_insilico');
+        inSilicoRFStim = noiseStim.inSilicoRFStim;
+        RF_insilico.noiseRF = noiseStim.RF_insilico.noiseRF;
+        clear noiseStim
+    elseif  ~exist(inSilicoRFStimName,'file')
+        disp(['Missing ' inSilicoRFStimName]);
+    end
+    
+    %compute RF_insilico
+    RF_insilico = getInSilicoRF(gaborBankParamIdx, trained, trainParam, ...
+        RF_insilico, stimInfo.stimXdeg, stimInfo.stimYdeg,inSilicoRFStim);
+    
+    RF_insilico = analyzeInSilicoRF(RF_insilico, -1, analysisTwin);
+    showInSilicoRF(RF_insilico, analysisTwin);
+    screen2png([encodingSaveName(1:end-4) '_RF']);
+    close;
+    save(encodingSaveName,'RF_insilico','-append');
+end
+
+%% in-silico simulation to obtain ORSF
+if doORSF
+    if exist(inSilicoORSFStimName,'file') && ~exist('inSilicoORSFStim','var')
+        ORSFStim = load(inSilicoORSFStimName, 'inSilicoORSFStim','RF_insilico');
+        inSilicoORSFStim = ORSFStim.inSilicoORSFStim;
+        RF_insilico.ORSF = ORSFStim.RF_insilico.ORSF;
+        clear ORSFStim
+    elseif  ~exist(inSilicoORSFStimName,'file')
+        disp(['Missing ' inSilicoORSFStimName]);
+    end
+    
+    stimSz = [stimInfo.height stimInfo.width];
+
+    RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
+        RF_insilico, stimSz, inSilicoORSFStim);
+    showInSilicoORSF(RF_insilico);
+    
+    RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, analysisTwin, 1);
+    screen2png([encodingSaveName(1:end-4) '_ORSF']);
+    close;
+    save(encodingSaveName,'RF_insilico','-append');
+end
 end

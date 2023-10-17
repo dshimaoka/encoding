@@ -1,25 +1,7 @@
-% if ~ispc
-%     addpath(genpath('~/git'));
-%     addDirPrefs;
-% end
-% 
-% 
-% ID = 8;
-% rescaleFac = 0.10;
-% roiSuffix = '';
-% stimSuffix = '_square';
-% regressSuffix = '_nxv';
-% 
-% 
-% %% path
-% expInfo = getExpInfoNatMov(ID);
-% dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, stimSuffix);
-% encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
-% 
-% load(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
-
 function ngIdx = detectNGidx(encodingSavePrefix, numIdx)
 % ngIdx = detectNGidx(encodingSavePrefix, numIdx)
+
+verbose = 0; 
 
 roiIdx = 1:numIdx;
 ngIdx = [];
@@ -30,12 +12,16 @@ for ii = 1:numel(roiIdx)
         try
             encodingResult = load(encodingSaveName, 'RF_insilico','trained','trainParam');
            catch err
-            disp(['MISSING ' encodingSaveName]);
+            if verbose
+               disp(['MISSING ' encodingSaveName]);
+            end
             ngIdx = [ngIdx roiIdx(ii)];
             continue;
         end
     else
-        disp(['MISSING ' encodingSaveName]);
+        if verbose
+            disp(['MISSING ' encodingSaveName]);
+        end
         ngIdx = [ngIdx roiIdx(ii)];
         continue;
     end
