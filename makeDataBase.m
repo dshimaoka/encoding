@@ -17,11 +17,12 @@ stimSuffix = '';
 
 %% imaging parameters
 rescaleFac = 0.1;
+doRegistration = 0; %17/10/23
 procParam.cutoffFreq = 0.02; %0.1
 procParam.lpFreq = []; %2
 rotateInfo = [];
 rebuildImageData = false;
-makeMask = true;
+makeMask = false;
 uploadResult = true;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
@@ -41,7 +42,8 @@ if exist(dataPaths.imageSaveName,'file') % &&
     end
 else
     
-    [imageProc, cic, stimInfo] = saveImageProcess(expInfo, rescaleFac, rebuildImageData);
+    [imageProc, cic, stimInfo] = saveImageProcess(expInfo, rescaleFac, ...
+        rebuildImageData,doRegistration);
     
        
     
@@ -95,8 +97,15 @@ if makeMask
 
     imageData.imstack = imageData.imstack.*(nanMask==1);
     imageData.imageMeans = squeeze(mean(mean(imageData.imstack)));
+    
+    [theseIdx, X,Y] = getROIIdx(nanMask);
+    meanImage = imageData.meanImage;%summary.thisROI;
+    save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
+
 else
+    load(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
     nanMask = nan(size(imageData.meanImage));
+    nanMask(theseIdx) = 1;
     %nanMask(226:275,101:150) = 1;
     %     nanMask = nan(318,300);
     %     nanMask(246:255,121:130) = 1;
@@ -123,9 +132,6 @@ imageProc.nanMask = nanMask;
 % %nanMask(summary.roiIdx) = 1;
 % nanMask(~isnan(summary.RF_Cx))=1;
 
-[theseIdx, X,Y] = getROIIdx(nanMask);
-meanImage = imageData.meanImage;%summary.thisROI;
-save(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 
  
 %% temporal filtering of pixels within mask

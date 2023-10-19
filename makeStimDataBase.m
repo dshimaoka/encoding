@@ -14,11 +14,11 @@ end
 pen = getPen; 
 
 
-expID = 9;
+expID = 8;
 
 
 roiSuffix = '';
-stimSuffix = '_square30';
+stimSuffix = '_square20';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -55,8 +55,18 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %stimXrange = 1047-275:1047;
 %stimYrange = 540-247:1080;
 %test6: square30
-stimXrange = 293:1080;
-stimYrange = 293:1080;
+%stimXrange = 293:1080;
+%stimYrange = 293:1080;
+%test7: square20
+% y: [-13 +7]
+% x: [12 +8]
+%stimXrange = 631:1171;
+%stimYrange = 351:891;
+%test8: square24
+% y: [-17 ~ +7]
+% x: [-16 ~ +8]
+stimXrange = 493:1141;
+stimYrange = 324:972;
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
