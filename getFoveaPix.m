@@ -33,5 +33,9 @@ switch ID
         fvY = round(46*rescaleFac/0.1);
         fvX = round(36*rescaleFac/0.1);
         corr_th = 0.2;
+    case 9
+        fvY = round(50*rescaleFac/0.1);
+        fvX = round(7*rescaleFac/0.1);
+        corr_th = 0.2;
         
 end

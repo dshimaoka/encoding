@@ -18,7 +18,7 @@ expID = 8;
 
 
 roiSuffix = '';
-stimSuffix = '_square20';
+stimSuffix = '_square24_gparam4';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -70,7 +70,7 @@ stimYrange = 324:972;
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
-gaborBankParamIdx.gparamIdx = 2;
+gaborBankParamIdx.gparamIdx = 4;%2;
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;

@@ -4,14 +4,14 @@ if ~ispc
 end
 
 
-ID = 8;
+ID = 9;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 roiSuffix = '';
-stimSuffix = '_square20';
+stimSuffix = '_square30';
 regressSuffix = '_nxv';
 
 %pixPermm = 31.25*rescaleFac; 

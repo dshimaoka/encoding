@@ -65,9 +65,11 @@ for ii = 1:4
             cmap = customcolormap(linspace(0,1,3), ...
                 [0 0 1; 0 0 0; 1 0 0]);
         case 4
-            image = signBorder;
-            cmap = customcolormap(linspace(0,1,3), ...
-                [0 0 1; 0 0 0; 1 0 0]);
+            %image = signBorder;
+            %cmap = customcolormap(linspace(0,1,3), ...
+            %    [0 0 1; 0 0 0; 1 0 0]);
+            image = 
+            cmap = gray;
     end
     subplot(2,2,ii);
     imagesc(image, 'alphadata', mask);
@@ -84,11 +86,13 @@ for ii = 1:4
         cb=colorbar(gca,'location','northoutside','xtick',sort(unique([showYrange, 0])));
         cb.Limits = showYrange;
 
-    elseif ii==3 || ii==4
+    elseif ii==3
         title('VFS');
         caxis([-1 1]);
         colormap(gca, cmap);
         cb=colorbar(gca,'location','northoutside','xtick',[-1 0 1]);
+    elseif ii==4
+        colormap(gca,cmap);
     end
     
     hold on; 
