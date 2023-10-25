@@ -13,13 +13,13 @@ else
 end
 
 
-ID = 9;
+ID = 8;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '';
-stimSuffix = '_square30';%'_square24_gparam4';
+stimSuffix ='_square24_gparam4';% '_square30';%
 regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
