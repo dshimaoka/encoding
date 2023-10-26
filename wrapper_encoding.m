@@ -117,6 +117,8 @@ while ~isempty(errorID)
             inSilicoORSFStimName, analysisTwin,doTrain, doRF, doORSF);
         if numel(errorID)>1
             errorID = errorID(2:end);
+        elseif numel(errorID)==1
+            errorID=[];
         end
     catch err
         errorID = [errorID(2:end) errorID(1)];
