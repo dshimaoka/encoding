@@ -1,5 +1,4 @@
 
-mechaOpa023!
 %makeStimDataBase.m:
 %this script process and save stimulus data(saveGaborBankOut), together with in-silico simulation 
 %that will be used for the model fitting (in MASSIVE) by wrapper_encoding.m
@@ -16,11 +15,11 @@ end
 pen = getPen; 
 
 
-expID = 8;
+expID = 9;
 
 
 roiSuffix = '';
-stimSuffix = '_square24_gparam4';
+stimSuffix = '_square28';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -67,12 +66,17 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 %test8: square24
 % y: [-17 ~ +7]
 % x: [-16 ~ +8]
-stimXrange = 493:1141;
-stimYrange = 324:972;
+%stimXrange = 493:1141;
+%stimYrange = 324:972;
+%test9 for left hem
+%y = [-19~+9]
+%x = [-4~+24]
+stimXrange = [850:(850+756)];
+stimYrange = [297:1053];
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
-gaborBankParamIdx.gparamIdx = 4;%2;
+gaborBankParamIdx.gparamIdx = 2; %4 for only small RFs
 gaborBankParamIdx.nlparamIdx = 1;
 gaborBankParamIdx.dsparamIdx = 1;
 gaborBankParamIdx.nrmparamIdx = 1;
@@ -95,7 +99,7 @@ if ~exist(dataPaths.stimSaveName,'file')
     stimInfo.screenPix = screenPixNew;
     
     %% prepare model output SLOW
-    theseTrials = pen:narrays:cic.nrTrials;
+    theseTrials = 38:60;%pen:narrays:cic.nrTrials;
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
         dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials);
         
