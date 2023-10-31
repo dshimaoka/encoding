@@ -68,7 +68,7 @@ for ii = 1:4
             %image = signBorder;
             %cmap = customcolormap(linspace(0,1,3), ...
             %    [0 0 1; 0 0 0; 1 0 0]);
-            image = 
+            image = summary_adj.thisROI;
             cmap = gray;
     end
     subplot(2,2,ii);
@@ -93,6 +93,7 @@ for ii = 1:4
         cb=colorbar(gca,'location','northoutside','xtick',[-1 0 1]);
     elseif ii==4
         colormap(gca,cmap);
+        cb=colorbar(gca,'location','northoutside');
     end
     
     hold on; 
