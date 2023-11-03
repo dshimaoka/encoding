@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 8;
+ID = 2;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -12,7 +12,7 @@ remakeSummary = 0;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 roiSuffix = '';
-stimSuffix = '_square30';%'_square24_gparam4';
+stimSuffix = '_part';%'_square20';
 regressSuffix = '_nxv';
 
 %pixPermm = 31.25*rescaleFac;
@@ -252,14 +252,14 @@ savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg'], 'w');
 
 
 %% pixel position on Brain
-load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\ephys2Image_CJ231_pen1.mat');
-subplot(121);imagesc(baseImage)
-hold on
-plot(10*brain_x(2),10*brain_y(2),'rs');
-axis equal tight off
-colormap(gray);
-subplot(122);imagesc(inputImage_registered)
-axis equal tight off
-colormap(gray);
-savePaperFigure(gcf, ['brainImage_ephys2Image_CJ231_pen1']);
+% load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\ephys2Image_CJ231_pen1.mat');
+% subplot(121);imagesc(baseImage)
+% hold on
+% plot(10*brain_x(2),10*brain_y(2),'rs');
+% axis equal tight off
+% colormap(gray);
+% subplot(122);imagesc(inputImage_registered)
+% axis equal tight off
+% colormap(gray);
+% savePaperFigure(gcf, ['brainImage_ephys2Image_CJ231_pen1']);
 

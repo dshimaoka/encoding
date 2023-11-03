@@ -48,6 +48,6 @@ switch getenv('COMPUTERNAME')
         else
             dataPaths.moviePath = '/mnt/syncitium/Daisuke/natural/nishimoto2011';
         end
-    case ''
+    case '' %for MASSIVE
         dataPaths.moviePath = '/fs03/fs11/Daisuke/natural/nishimoto2023/15Hz_120_skip1';
 end
