@@ -45,6 +45,31 @@ title('mask')
 colormap(gca,'gray');
 linkaxes(a_location);
 
+subplot(2,2,4); % RF position in visual field
+for iy = 1:numel(brain_y)
+    plot(summary.RF_Cx(brain_y(iy), brain_x(:)),summary.RF_Cy(brain_y(iy), brain_x(:)), 'k-');
+    hold on;
+end
+for ix = 1:numel(brain_x)
+    plot(summary.RF_Cx(brain_y(:), brain_x(ix)),summary.RF_Cy(brain_y(:), brain_x(ix)), 'b-');
+    hold on;
+end
+
+for ix = 1:numel(brain_x)
+    for iy = 1:numel(brain_y)
+        plot(summary.RF_Cx(brain_y(iy), brain_x(ix)),summary.RF_Cy(brain_y(iy), brain_x(ix)), 'ro');
+        hold on;
+    end
+end
+set(gca, 'xlim',showXrange,'ylim',showYrange);
+axis equal;
+vline(0,gca,'-','k');hline(0,gca,[],'k'); 
+
+set(gca,'tickdir','out');
+xlabel('azimuth [deg]'); ylabel('altitude [deg]');
+
+
+%% RF in visual field
 f_panel = figure;
 %xaxis = RF_insilico.noiseRF.xaxis;
 %yaxis = RF_insilico.noiseRF.yaxis;
@@ -72,4 +97,5 @@ for ix = 1:numel(brain_x)
 end
 linkaxes(aa(:));
 mcolorbar([], 0.5);
-colormap(gray);
+colormap(f_panel, gray);
+

@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 8;
+ID = 2;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -12,7 +12,7 @@ remakeSummary = 0;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 roiSuffix = '';
-stimSuffix = '_square30';%'_square24_gparam4';
+stimSuffix = '_part';%'_square20';
 regressSuffix = '_nxv';
 
 %pixPermm = 31.25*rescaleFac;
@@ -42,18 +42,6 @@ else
     xlim = prctile(stimInfo.stimXdeg,[0 100]);
     ylim = prctile(stimInfo.stimYdeg,[0 100]);
 end
-%         switch ID
-%             case {2,4}
-%                 xlim = [-10 inf];
-%             case {1,3}
-%                 xlim = [-inf 5];
-%             case {6}
-%                 xlim = [-10 15];
-%             case {7}
-%                 xlim = [-10 inf];
-%         end
-%         ylim = [];
-
 clear stimInfo;
 
 load( dataPaths.stimSaveName, 'gaborBankParamIdx');
@@ -238,28 +226,30 @@ savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 
 %% show mRFs on maps of preferred position
-brain_y = [25 30 35];
-brain_x = [10 25 40];
+% brain_y = 22:40;%[25 30 35];
+% brain_x = 23;%[10 25 40];
+brain_y = 25;%[25 30 35];
+brain_x = [7:23];%[10 25 40];
 showXrange = [-10 1];
 showYrange = [-7.5 7.5];
 stimXaxis = stimXaxis_ori - summary.RF_Cx(fvY,fvX);
 stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
 [f_panel, f_location] = showRFpanels(summary_adj, brain_x, brain_y, ...
     stimXaxis, stimYaxis, showXrange, showYrange, rescaleFac);
-savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
+savePaperFigure(f_panel,[encodingSavePrefix '_mRFs_s']);
 savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg'], 'w');
 
 
 
 %% pixel position on Brain
-load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\ephys2Image_CJ231_pen1.mat');
-subplot(121);imagesc(baseImage)
-hold on
-plot(10*brain_x(2),10*brain_y(2),'rs');
-axis equal tight off
-colormap(gray);
-subplot(122);imagesc(inputImage_registered)
-axis equal tight off
-colormap(gray);
-savePaperFigure(gcf, ['brainImage_ephys2Image_CJ231_pen1']);
+% load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\ephys2Image_CJ231_pen1.mat');
+% subplot(121);imagesc(baseImage)
+% hold on
+% plot(10*brain_x(2),10*brain_y(2),'rs');
+% axis equal tight off
+% colormap(gray);
+% subplot(122);imagesc(inputImage_registered)
+% axis equal tight off
+% colormap(gray);
+% savePaperFigure(gcf, ['brainImage_ephys2Image_CJ231_pen1']);
 

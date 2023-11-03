@@ -30,7 +30,7 @@ rebuildImageData = false;
 makeMask = false;%true;
 uploadResult = true;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
-
+useGPU = 1;
 
 %% stimulus parameters
 %ID1,3
@@ -101,7 +101,7 @@ if ~exist(dataPaths.stimSaveName,'file')
     %% prepare model output SLOW
     theseTrials = 38:60;%pen:narrays:cic.nrTrials;
     [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
-        dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials);
+        dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials, useGPU);
         
     %% save gabor filter output as .mat
     save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...

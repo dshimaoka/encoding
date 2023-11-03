@@ -1,8 +1,10 @@
 function [S_fin, TimeVec_stim_cat] = saveGaborBankOut(moviePath, c, ...
-    dsRate, gaborBankParamIdx, uploadResult,yrange,xrange, theseTrials)
+    dsRate, gaborBankParamIdx, uploadResult,yrange,xrange, theseTrials, useGPU)
 % S_fin = saveGaborBankOut(moviePath, c, dsRate)
 % returns output of gabor-wavelet bank
-
+if nargin < 9
+    useGPU = 0;
+end
 if nargin < 8
     theseTrials = 1:c.nrTrials;
 end
@@ -32,7 +34,7 @@ for itr = theseTrials
     %% preprocess movies ... SUPER SLOW!!!
     %frames_reconstruct  = single(frames_reconstruct)/255;%is this necessary?
     
-    useGPU = 0; %necessary for High-res movies
+    %useGPU = 0; %necessary for High-res movies
     
     [frames_fin, TimeVec_stim] = preprocAll(frames_reconstruct, gaborBankParamIdx, ...
         c.screen.frameRate, dsRate, useGPU);
