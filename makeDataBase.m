@@ -9,20 +9,20 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = 9;
+expID = 8;
 
 
 roiSuffix = '';
 stimSuffix = '';
 
 %% imaging parameters
-rescaleFac = 0.1;
+rescaleFac = 0.5;
 doRegistration = 0; %17/10/23
 procParam.cutoffFreq = 0.02; %0.1
 procParam.lpFreq = []; %2
 rotateInfo = [];
 rebuildImageData = false;
-makeMask = false;
+makeMask = true;
 uploadResult = true;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 
