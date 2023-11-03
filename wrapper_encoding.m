@@ -13,17 +13,17 @@ else
 end
 
 
-ID = 9;
+ID = 8;
 doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
 doORSF = 1;
 subtractImageMeans = 0;
-roiSuffix = '';
-stimSuffix = '_square28';%
+roiSuffix = '_v1';
+stimSuffix = '_square24_gparam4';%
 regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training
-rescaleFac = 0.1;
+rescaleFac = 0.5;
 
 expInfo = getExpInfoNatMov(ID);
 
