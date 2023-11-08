@@ -1,17 +1,28 @@
-function [fig_summary, figAxes] = showSummaryFig(summary)
+function [fig_summary, figAxes] = showSummaryFig(summary, flipLR)
 %[fig_summary, figAxes] = showSummaryFig(summary)
 %shows figure of a result of all the pixels analyzed in summaryAcrossPix.m
 
+if nargin < 2
+    flipLR = false;
+end
 
 fig_summary = figure;
 
 figAxes(1)=subplot(251);
-imagesc(summary.thisROI);
+if flipLR
+    imagesc(fliplr(summary.thisROI));
+else
+    imagesc(summary.thisROI);
+end
 axis equal tight off
 colormap(gca,'gray');
 
 figAxes(2)=subplot(252);
-imagesc(summary.RF_Cx, 'alphadata',summary.mask);
+if flipLR
+    imagesc(fliplr(summary.RF_Cx), 'alphadata', fliplr(summary.mask));
+else
+    imagesc(summary.RF_Cx, 'alphadata',summary.mask);
+end
 caxis(prctile(summary.RF_Cx(:),[10 90]));
 title('Cx [deg]');
 axis equal tight off
@@ -21,7 +32,11 @@ axis equal tight off
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(3)=subplot(253);
-imagesc(summary.RF_Cy, 'alphadata',summary.mask)
+if flipLR
+    imagesc(fliplr(summary.RF_Cy), 'alphadata', fliplr(summary.mask))
+else
+    imagesc(summary.RF_Cy, 'alphadata',summary.mask)
+end
 Cymax=prctile(abs(summary.RF_Cy(:)),[99]);
 caxis([-Cymax Cymax]);
 title('Cy [deg]');
@@ -32,7 +47,11 @@ colormap(gca, rkgmap);
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(4)=subplot(254);
-imagesc(summary.vfs, 'alphadata',summary.mask)
+if flipLR
+    imagesc(fliplr(summary.vfs), 'alphadata', fliplr(summary.mask));
+else
+    imagesc(summary.vfs, 'alphadata',summary.mask)
+end
 title('vfs');
 caxis([-1 1]);
 axis equal tight off
@@ -42,41 +61,65 @@ colormap(gca, flipud(bwrmap));
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(5)=subplot(255);
-imagesc(summary.RF_sigma, 'alphadata',summary.mask)
+if flipLR
+    imagesc(fliplr(summary.RF_sigma), 'alphadata',fliplr(summary.mask))
+else
+    imagesc(summary.RF_sigma, 'alphadata',summary.mask)
+end
 title('sigma [deg]');
 axis equal tight off
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(6)=subplot(256);
-imagesc(summary.expVar, 'alphadata',summary.mask);
+if flipLR
+    imagesc(fliplr(summary.expVar), 'alphadata', fliplr(summary.mask));
+else
+    imagesc(summary.expVar, 'alphadata',summary.mask);
+end
 title('explained variance [%]');
 axis equal tight off
 colormap(gca,'gray');
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(7)=subplot(257);
-imagesc(summary.correlation, 'alphadata',summary.mask);
+if flipLR
+    imagesc(fliplr(summary.correlation), 'alphadata', fliplr(summary.mask));
+else
+    imagesc(summary.correlation, 'alphadata',summary.mask);
+end
 title('correlation observed-mdl');
 axis equal tight off
 colormap(gca,'gray');
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(8)=subplot(258);
-imagesc(log(summary.ridgeParam), 'alphadata',summary.mask);
+if flipLR
+    imagesc(fliplr(log(summary.ridgeParam)), 'alphadata', fliplr(summary.mask));
+else
+    imagesc(log(summary.ridgeParam), 'alphadata',summary.mask);
+end
 title('log(ridge param)');
 axis equal tight off
 colormap(gca,'gray');
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(9)=subplot(259);
-imagesc(log(summary.bestSF), 'alphadata',summary.mask);
+if flipLR
+    imagesc(fliplr(log(summary.bestSF)), 'alphadata', fliplr(summary.mask));
+else
+    imagesc(log(summary.bestSF), 'alphadata',summary.mask);
+end
 caxis(prctile(log(summary.bestSF(:)),[1 99]));
 title('log(spatial frequency) [cpd]');
 axis equal tight off
 mcolorbar(gca,.5,'southoutside');
 
 figAxes(10)=subplot(2,5,10);
-imagesc(summary.bestOR, 'alphadata',summary.mask);
+if flipLR
+    imagesc(fliplr(summary.bestOR), 'alphadata', fliplr(summary.mask));
+else
+    imagesc(summary.bestOR, 'alphadata',summary.mask);
+end
 colormap(gca, 'hsv');
 caxis([0 180]);
 title('orientation [deg]');

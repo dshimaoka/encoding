@@ -20,7 +20,7 @@ title('Cx [deg]');
 axis equal tight
 caxis([-max(abs(showXrange)) max(abs(showXrange))]);
 colormap(gca, pwgmap);
-cb=colorbar(gca,'location','northoutside','xtick',sort([showXrange, 0]));
+cb=colorbar(gca,'location','northoutside','xtick',sort(unique([showXrange, 0])));
 cb.Limits = showXrange;
 addScaleBar(rescaleFac);
 
@@ -33,7 +33,7 @@ caxis([-absYrange absYrange]);
 colormap(gca, pwgmap);
 title('Cy [deg]');
 axis equal tight
-cb=colorbar(gca,'location','northoutside','xtick',sort([showYrange, 0]));
+cb=colorbar(gca,'location','northoutside','xtick',sort(unique([showYrange, 0])));
 cb.Limits = showYrange;
 addScaleBar(rescaleFac);
 
@@ -62,8 +62,9 @@ for ix = 1:numel(brain_x)
     end
 end
 set(gca, 'xlim',showXrange,'ylim',showYrange);
-axis equal;
-vline(0,gca,'-','k');hline(0,gca,[],'k'); 
+xlim(showXrange);
+ylim(showYrange);
+vline(0,gca,'-','k');hline(0,gca,[],'k');
 
 set(gca,'tickdir','out');
 xlabel('azimuth [deg]'); ylabel('altitude [deg]');

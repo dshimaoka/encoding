@@ -4,16 +4,17 @@ if ~ispc
 end
 
 
-ID = 2;
+ID = 1;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
 remakeSummary = 0;
-reAnalyze = 1;
+reAnalyze = 0;
 ORSFfitOption = 1; %3:peakSF,fitOR
 roiSuffix = '';
-stimSuffix = '_part';%'_square20';
+stimSuffix = '_part';%'_square28';%;%'_square20';
 regressSuffix = '_nxv';
+aparam = getAnalysisParam(ID);
 
 %pixPermm = 31.25*rescaleFac;
 
@@ -46,7 +47,6 @@ clear stimInfo;
 
 load( dataPaths.stimSaveName, 'gaborBankParamIdx');
 
-%[Y,X,Z] = ind2sub(size(thisROI), roiIdx);
 
 if remakeSummary
     scrSz = size(thisROI);
@@ -154,6 +154,9 @@ if remakeSummary
     for ii = 1:numel(roiIdx)
         mask(Y(roiIdx(ii)),X(roiIdx(ii))) = 1;
     end
+    if ID==9
+        mask(49:end,:)=0;
+    end
     
     summary.RF_Cx = RF_Cx2;
     summary.RF_Cy = RF_Cy2;
@@ -175,6 +178,9 @@ if remakeSummary
     prefMaps_xy = [];
     prefMaps_xy(:,:,1)=summary.RF_Cx;
     prefMaps_xy(:,:,2)=summary.RF_Cy;
+    if ID==9
+        prefMaps_xy(:,:,2)=-prefMaps_xy(:,:,2);
+    end
     summary.vfs=getVFS(prefMaps_xy, sfFac);
     
     save([encodingSavePrefix '_summary'],'summary');
@@ -189,6 +195,9 @@ end
 [fvY,fvX] = getFoveaPix(ID, rescaleFac);
 summary_adj = summary;
 summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
+if ID==9
+    summary_adj.RF_Cx = -summary_adj.RF_Cx;
+end
 summary_adj.RF_Cy = interpNanImages((summary.RF_Cy - summary.RF_Cy(fvY,fvX)));
 summary_adj.RF_sigma = interpNanImages(summary_adj.RF_sigma);
 summary_adj.RF_mean = (summary.RF_mean);
@@ -205,7 +214,7 @@ save([encodingSavePrefix '_summary'],'summary_adj','stimXaxis_ori','stimYaxis_or
 
 
 %% summary figure
-[sumFig, sumAxes]=showSummaryFig(summary);
+[sumFig, sumAxes]=showSummaryFig(summary, flipLR);
 set(sumFig,'position',[0 0 1900 1400]);
 set(sumAxes(2),'xlim',[min(X) max(X)]);
 set(sumAxes(2),'ylim',[min(Y) max(Y)]);
@@ -215,7 +224,7 @@ set(sumAxes(2),'ylim',[min(Y) max(Y)]);
 savePaperFigure(sumFig,[encodingSavePrefix '_summary']);
 
 %summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
-[sumFig, sumAxes]=showSummaryFig(summary_adj);
+[sumFig, sumAxes]=showSummaryFig(summary_adj, flipLR);
 set(sumFig,'position',[0 0 1900 1400]);
 set(sumAxes(2),'xlim',[min(X) max(X)]);
 set(sumAxes(2),'ylim',[min(Y) max(Y)]);
@@ -226,19 +235,15 @@ savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 
 %% show mRFs on maps of preferred position
-% brain_y = 22:40;%[25 30 35];
-% brain_x = 23;%[10 25 40];
-brain_y = 25;%[25 30 35];
-brain_x = [7:23];%[10 25 40];
-showXrange = [-10 1];
-showYrange = [-7.5 7.5];
 stimXaxis = stimXaxis_ori - summary.RF_Cx(fvY,fvX);
 stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
-[f_panel, f_location] = showRFpanels(summary_adj, brain_x, brain_y, ...
-    stimXaxis, stimYaxis, showXrange, showYrange, rescaleFac);
-savePaperFigure(f_panel,[encodingSavePrefix '_mRFs_s']);
-savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg'], 'w');
-
+for ib = 1:numel(aparam.brainPix)
+    [f_panel, f_location] = showRFpanels(summary_adj, aparam.brainPix(ib).brain_x, ...
+        aparam.brainPix(ib).brain_y, ...
+        stimXaxis, stimYaxis, aparam.showXrange, aparam.showYrange, rescaleFac);
+    %savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
+    savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg' num2str(ib)], 'w');
+end
 
 
 %% pixel position on Brain
