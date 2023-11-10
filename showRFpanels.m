@@ -1,9 +1,17 @@
 function [f_panel, f_location] = showRFpanels(summary, brain_x, brain_y, ...
-    stimXaxis, stimYaxis, showXrange, showYrange, rescaleFac)
+    stimXaxis, stimYaxis, showXrange, showYrange, rescaleFac, flipLR)
 %[f_panel, f_location] = showRFpanels(summary, xx, yy)
 
+if nargin<9
+    flipLR=false;
+end
 
-
+if flipLR
+    summary.RF_Cx = fliplr(summary.RF_Cx);
+    summary.RF_Cy = fliplr(summary.RF_Cy);
+    summary.mask = fliplr(summary.mask);
+    brain_x = size(summary.mask,2) - brain_x + 1;
+end
 
 [brainX, brainY] = meshgrid(brain_x,brain_y);
 
@@ -62,10 +70,10 @@ for ix = 1:numel(brain_x)
     end
 end
 set(gca, 'xlim',showXrange,'ylim',showYrange);
+axis equal;
 xlim(showXrange);
 ylim(showYrange);
 vline(0,gca,'-','k');hline(0,gca,[],'k');
-
 set(gca,'tickdir','out');
 xlabel('azimuth [deg]'); ylabel('altitude [deg]');
 

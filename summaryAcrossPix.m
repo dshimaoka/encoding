@@ -4,26 +4,26 @@ if ~ispc
 end
 
 
-ID = 1;
+ID = 8;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
-remakeSummary = 0;
-reAnalyze = 0;
-ORSFfitOption = 1; %3:peakSF,fitOR
+remakeSummary = 1;
+reAnalyze = 1;
+ORSFfitOption = 2;%1; %3:peakSF,fitOR
+RFfitOption = 0; %count #significant pixels
 roiSuffix = '';
-stimSuffix = '_part';%'_square28';%;%'_square20';
-regressSuffix = '_nxv';
 aparam = getAnalysisParam(ID);
+aparam.stimSuffix = '_square20'; %TEMP
 
 %pixPermm = 31.25*rescaleFac;
 
 %% path
 expInfo = getExpInfoNatMov(ID);
-dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, stimSuffix);
+dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, aparam.stimSuffix);
 %TODO: save data locally5
 %TMP
-encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
+encodingSavePrefix = [dataPaths.encodingSavePrefix aparam.regressSuffix];
 
 %load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
 load(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
@@ -37,7 +37,7 @@ if ID==3
     xlim = [-5 1]-3;
     ylim = [-4 6];
 elseif ID==8 || ID==9
-    xlim = [-7 2];%[-8 2];
+    xlim = [-10 2];%[-7 2];%[-8 2];
     ylim = [-15 9.14];
 else
     xlim = prctile(stimInfo.stimXdeg,[0 100]);
@@ -92,12 +92,11 @@ if remakeSummary
         
         if reAnalyze
             if ID==8
-                RF_insilico.noiseRF.maxRFsize=7;%5;%3.5;
+                RF_insilico.noiseRF.maxRFsize=15;%20;%30;%10;%7;%5;%3.5;
             end
-            RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim);
+            RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim, RFfitOption);
             %showInSilicoRF(RF_insilico, trange);
         end
-        %showInSilicoRF(RF_insilico, trange);
         
         RF_Cx(ii) = RF_insilico.noiseRF.RF_Cx;
         RF_Cy(ii) = RF_insilico.noiseRF.RF_Cy;
@@ -214,7 +213,7 @@ save([encodingSavePrefix '_summary'],'summary_adj','stimXaxis_ori','stimYaxis_or
 
 
 %% summary figure
-[sumFig, sumAxes]=showSummaryFig(summary, flipLR);
+[sumFig, sumAxes]=showSummaryFig(summary, aparam.flipLR);
 set(sumFig,'position',[0 0 1900 1400]);
 set(sumAxes(2),'xlim',[min(X) max(X)]);
 set(sumAxes(2),'ylim',[min(Y) max(Y)]);
@@ -224,13 +223,13 @@ set(sumAxes(2),'ylim',[min(Y) max(Y)]);
 savePaperFigure(sumFig,[encodingSavePrefix '_summary']);
 
 %summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
-[sumFig, sumAxes]=showSummaryFig(summary_adj, flipLR);
+[sumFig, sumAxes]=showSummaryFig(summary_adj, aparam.flipLR);
 set(sumFig,'position',[0 0 1900 1400]);
 set(sumAxes(2),'xlim',[min(X) max(X)]);
 set(sumAxes(2),'ylim',[min(Y) max(Y)]);
 % set(sumFig,'position',[0 0 1900 1000]);
-set(sumAxes(2),'clim', [-7 1]);
-set(sumAxes(3),'clim', [-7 7]);
+set(sumAxes(2),'clim', aparam.showXrange);%[-7 1]);
+set(sumAxes(3),'clim', aparam.showYrange);%[-7 7]);
 savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
 
 
@@ -240,7 +239,8 @@ stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
 for ib = 1:numel(aparam.brainPix)
     [f_panel, f_location] = showRFpanels(summary_adj, aparam.brainPix(ib).brain_x, ...
         aparam.brainPix(ib).brain_y, ...
-        stimXaxis, stimYaxis, aparam.showXrange, aparam.showYrange, rescaleFac);
+        stimXaxis, stimYaxis, aparam.showXrange, aparam.showYrange, rescaleFac,...
+        aparam.flipLR);
     %savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
     savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg' num2str(ib)], 'w');
 end

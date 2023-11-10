@@ -1,4 +1,4 @@
-function RF_insilico = analyzeInSilicoRF(RF_insilico, peakPolarity, trange, xlim, ylim)
+function RF_insilico = analyzeInSilicoRF(RF_insilico, peakPolarity, trange, xlim, ylim, method)
 %RF_insilico = analyzeInSilicoRF(RF_insilico, trange)
 %RF_insilico.noiseRF.RF_Cx : preferred position in x
 %RF_insilico.noiseRF.RF_Cy : preferred position in y
@@ -18,6 +18,10 @@ end
 
 if nargin < 5
     ylim = [];
+end
+
+if nargin < 6 
+    method = 0;
 end
 
 RF = RF_insilico.noiseRF.RF;
@@ -70,7 +74,17 @@ end
 
 RF_insilico.noiseRF.RF_Cx = p(1);
 RF_insilico.noiseRF.RF_Cy = p(2);
-RF_insilico.noiseRF.sigma = (p(3)+p(4))/2;
+if method == 0
+    RF_insilico.noiseRF.sigma = (p(3)+p(4))/2;
+elseif method == 1
+    [~,peakYpix] = min(abs(yaxis - RF_insilico.noiseRF.RF_Cy));
+    [~,peakXpix] = min(abs(xaxis - RF_insilico.noiseRF.RF_Cx));
+    th = 0.5*RF_smooth(peakYpix, peakXpix);
+    [~, connectedMatrix] = findConnectedPixels(RF_smooth>th, [], [peakXpix peakYpix]);
+    RF_insilico.noiseRF.sigma = sqrt(sum(sum(connectedMatrix)))/2;
+end
+RF_insilico.noiseRF.method = method;
+
 if (min(xaxis) < p(1)) && (max(xaxis) > p(1)) && (min(yaxis) < p(2)) && (max(yaxis) > p(2))
     RF_insilico.noiseRF.RF_ok = 1;
 else

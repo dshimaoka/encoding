@@ -1,4 +1,5 @@
 function RF_insilico = analyzeInSilicoORSF(RF_insilico, peakPolarity,trange,method)
+%RF_insilico = analyzeInSilicoORSF(RF_insilico, peakPolarity,trange,method)
 if nargin < 2
     peakPolarity = -1;
 end
@@ -59,3 +60,5 @@ switch method
         p2 = fitOritune180(180/pi*RF_insilico.ORSF.oriList, resp(sfidx,:));
         RF_insilico.ORSF.bestOR = p2(1);
 end
+
+RF_insilico.ORSF.method = method; %11/9/2023
