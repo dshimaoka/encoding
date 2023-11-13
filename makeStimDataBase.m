@@ -7,7 +7,8 @@ if isempty(getenv('COMPUTERNAME'))
     addpath(genpath('~/git'));
     % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!    
     [~,narrays] = getArray('script_wrapper.sh');
-    setenv('LD_LIBRARY_PATH', '/usr/local/matlab/r2021a/sys/opengl/lib/glnxa64:/usr/local/matlab/r2021a/bin/glnxa64:/usr/local/matlab/r2021a/extern/lib/glnxa64:/usr/local/matlab/r2021a/cefclient/sys/os/glnxa64:/usr/local/matlab/r2021a/runtime/glnxa64:/usr/local/matlab/r2021a/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/usr/local/matlab/r2021a/sys/java/jre/glnxa64/jre/lib/amd64/server:/usr/local/libjpeg-turbo/1.4.2/lib64:/opt/munge-0.5.14/lib:/opt/slurm-22.05.9/lib:/opt/slurm-22.05.9/lib/slurm:');
+    setenv('LD_LIBRARY_PATH', '/usr/local/matlab/r2021a/sys/opengl/lib/glnxa64:/usr/local/matlab/r2021a/bin/glnxa64:/usr/local/matlab/r2021a/extern/lib/glnxa64:/usr/local/matlab/r2021a/cefclient/sys/os/glnxa64:/usr/local/matlab/r2021a/runtime/glnxa64:/usr/local/matlab/r2021a/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/usr/local/matlab/r2021a/sys/java/jre/glnxa64/jre/lib/amd64/server:/usr/local/libjpeg-turbo/1.4.2/lib64:/opt/munge-0.5.14/lib:/opt/slurm-22.05.9/lib:/opt/slurm-22.05.9/lib/slurm:/usr/lib64:');
+    addpath('/usr/bin/');
 
 else
     narrays = 1;
