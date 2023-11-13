@@ -33,7 +33,7 @@ rebuildImageData = false;
 makeMask = false;%true;
 uploadResult = true;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
-useGPU = 1;
+useGPU = 0;
 
 %% stimulus parameters
 %ID1,3
