@@ -4,17 +4,16 @@ if ~ispc
 end
 
 
-ID = 8;
+ID = 9;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
-remakeSummary = 1;
+remakeSummary = 0;
 reAnalyze = 1;
-ORSFfitOption = 2;%1; %3:peakSF,fitOR
-RFfitOption = 0; %count #significant pixels
+ORSFfitOption = 1; %3:peakSF,fitOR
+RFfitOption = 0; %1:count #significant pixels
 roiSuffix = '';
 aparam = getAnalysisParam(ID);
-aparam.stimSuffix = '_square20'; %TEMP
 
 %pixPermm = 31.25*rescaleFac;
 

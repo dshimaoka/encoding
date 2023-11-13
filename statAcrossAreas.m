@@ -1,7 +1,7 @@
 
 %% parmaeters
-ID = 8;
-ebins = 0:8;
+ID = 9;
+ebins = 0:6;%8;
 rescaleFac = 0.1;
 remakeParcellation = 1;
 selectPixelTh = 3;
@@ -15,7 +15,6 @@ end
 roiSuffix = '';
 expInfo = getExpInfoNatMov(ID);
 aparam = getAnalysisParam(ID);
-aparam.stimSuffix = '_square20'; %TEMP
 
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, aparam.stimSuffix);
 
