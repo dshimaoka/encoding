@@ -18,11 +18,11 @@ end
 pen = getPen; 
 
 
-expID = 9;
+expID = 1;
 
 
 roiSuffix = '';
-stimSuffix = '_square30_2';
+stimSuffix = '_square20';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -76,8 +76,11 @@ useGPU = 0;
 %x = [-4~+24]
 % stimXrange = [850:(850+756)];
 % stimYrange = [297:1053];
-stimXrange = [816:1616];
-stimYrange = [280:1080];
+%stimXrange = [816:1616];
+%stimYrange = [280:1080];
+%ID1 2nd trial
+stimXrange = 1:156; 
+stimYrange = 1:156; 
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;

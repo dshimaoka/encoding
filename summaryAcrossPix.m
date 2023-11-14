@@ -4,17 +4,17 @@ if ~ispc
 end
 
 
-ID = 8;
+ID = 1;
 useGPU = 1;
-rescaleFac = 0.50;
+rescaleFac = 0.10;
 dsRate = 1;
 remakeSummary = 1;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 RFfitOption = 0; %1:count #significant pixels
-roiSuffix = '_v1';
+roiSuffix = '';
 aparam = getAnalysisParam(ID);
-aparam.stimSuffix = '_square24_gparam4';
+aparam.stimSuffix = '_part';%'_square24_gparam4';
 
 %% path
 expInfo = getExpInfoNatMov(ID);
@@ -86,7 +86,7 @@ if remakeSummary
         trange = [2 trainParam.lagFrames(end)/dsRate];
         
         if reAnalyze
-            if ID==8
+            if ID==8 || ID == 1
                 RF_insilico.noiseRF.maxRFsize=15;%20;%30;%10;%7;%5;%3.5;
             end
             RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim, RFfitOption);
