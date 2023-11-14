@@ -4,27 +4,23 @@ if ~ispc
 end
 
 
-ID = 9;
+ID = 8;
 useGPU = 1;
-rescaleFac = 0.10;
+rescaleFac = 0.50;
 dsRate = 1;
-remakeSummary = 0;
+remakeSummary = 1;
 reAnalyze = 1;
 ORSFfitOption = 1; %3:peakSF,fitOR
 RFfitOption = 0; %1:count #significant pixels
-roiSuffix = '';
+roiSuffix = '_v1';
 aparam = getAnalysisParam(ID);
-
-%pixPermm = 31.25*rescaleFac;
+aparam.stimSuffix = '_square24_gparam4';
 
 %% path
 expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, aparam.stimSuffix);
-%TODO: save data locally5
-%TMP
 encodingSavePrefix = [dataPaths.encodingSavePrefix aparam.regressSuffix];
 
-%load(dataPaths.imageSaveName, 'imageData','X','Y');%SLOOOOW!!!
 load(dataPaths.roiSaveName, 'X','Y','theseIdx','meanImage');
 thisROI = meanImage; %153x120
 roiIdx = 1:numel(X);

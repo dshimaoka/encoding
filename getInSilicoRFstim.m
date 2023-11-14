@@ -38,5 +38,5 @@ S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 insilicoRFStim.S_nm = S_nm;
 insilicoRFStim.timeVec_mdlResp = timeVec_mdlResp;
-insilicoRFStim.stim_is = stim_is;
+%insilicoRFStim.stim_is = stim_is;
 insilicoRFStim.timeVec_stim = timeVec_stim;

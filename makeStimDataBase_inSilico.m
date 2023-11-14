@@ -15,6 +15,8 @@ end
 
 expID = 9;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
+rescaleFac = 0.1;
+roiSuffix = '';
 
 stimSuffix = '_square30_2';
 
@@ -51,7 +53,7 @@ stimSz = [stimInfo.height stimInfo.width];
 RF_insilico = struct;
 RF_insilico.noiseRF.nRepeats = 80; %10 FIX
 RF_insilico.noiseRF.dwell = 15; %frames
-fac = mean(stimInfo.screenPix)/20;
+fac = mean(stimInfo.screenPix)/20; %NG18
 RF_insilico.noiseRF.screenPix = round(stimInfo.screenPix/fac);%4 %[y x] %FIX %spatial resolution of noise stimuli
 RF_insilico.noiseRF.maxRFsize = 10; %deg in radius
 
@@ -66,15 +68,15 @@ save(inSilicoRFStimName, 'inSilicoRFStim','gaborBankParamIdx',"RF_insilico",'-v7
 
 
 RF_insilico = struct;
-RF_insilico.ORSF.screenPix = stimInfo.screenPix; %[y x]
+RF_insilico.ORSF.screenPix = round(stimInfo.screenPix/2); %[y x]
 nORs = 10;
 oriList = pi/180*linspace(0,180,nORs+1)'; %[rad]
 RF_insilico.ORSF.oriList = oriList(1:end-1);
-SFrange_stim = [0.05 2.5];
+SFrange_stim = [0.035 2.5];
 %SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
 %SFrange_mdl = getSFrange_mdl(RF_insilico.ORSF.screenPix, stimSz, gaborBankParamIdx.gparamIdx);
-RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 5); %6 %[cycles/deg];
-RF_insilico.ORSF.nRepeats = 10;%15;
+RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 6); %5 %[cycles/deg];
+RF_insilico.ORSF.nRepeats = 10;% 15;
 RF_insilico.ORSF.dwell = 45; %#stimulus frames
 
 try

@@ -1,5 +1,5 @@
-function [S_fin, TimeVec_stim_cat] = saveGaborBankOut(moviePath, c, ...
-    dsRate, gaborBankParamIdx, uploadResult,yrange,xrange, theseTrials, useGPU)
+function  saveGaborBankOut(dataPaths, c, ...
+    dsRate, gaborBankParamIdx, yrange,xrange, theseTrials, useGPU)
 % S_fin = saveGaborBankOut(moviePath, c, dsRate)
 % returns output of gabor-wavelet bank
 if nargin < 9
@@ -12,12 +12,20 @@ end
 %cparams = preprocColorSpace_GetMetaParams(1);
 for itr = theseTrials
     
+    %     tempData = ['preprocAll_temp_' num2str(itr)];
+    [~,prefix] = fileparts(dataPaths.stimSaveName);
+    tempData = [prefix '_temp_' num2str(itr) '.mat'];
+    
+    if exist(tempData, 'file')
+        continue;
+    end
+    
    disp([num2str(itr) '/' num2str(c.nrTrials)]);
    
     %% correct dropped frames
     [~, frameIdx_final, timeVec_stim_NG, frames_reconstruct] = ...
         c.movie.reconstructStimulus(...
-        'moviePath',moviePath,'trial',itr);
+        'moviePath',dataPaths.moviePath,'trial',itr);
     
     if nargin < 6 || isempty(yrange)
         yrange = 1:size(frames_reconstruct,1);
@@ -46,32 +54,6 @@ for itr = theseTrials
     
     
     %% save data per trial
-    tempData = ['preprocAll_temp_' num2str(itr)];
     save(tempData,'frames_fin','TimeVec_stim');
     clear frames_fin TimeVec_stim
-end
-
-%% append across trials
-S_fin = [];TimeVec_stim_cat=[];
-for itr = 1:c.nrTrials    
-    tempData = ['preprocAll_temp_' num2str(itr)];
-    load(tempData,'frames_fin','TimeVec_stim');
-    
-    S_fin = cat(1,S_fin, frames_fin);    
-    if itr==1
-        TimeVec_stim_cat = TimeVec_stim;
-    else
-        TimeVec_stim_cat = cat(1, TimeVec_stim_cat, TimeVec_stim_cat(end) + 1/dsRate + TimeVec_stim);
-    end
-end
-
-if uploadResult
-    dirPref = getpref('nsAnalysis','dirPref');
-    oeOriServer = dirPref.oeOriServer; %direct ethernet connection
-    saveDir = fullfile(oeOriDir, fullOEName);
-
-    % save gabor filter output as .mat
-    % stimSaveName = fullfile(saveDirBase,expDate,...
-    %     ['stimData_' regexprep(expDate, '\','_') '_' expName '.mat']);
-    % save( stimSaveName, 'TimeVec_stim_cat', 'S_fin', 'energyModelParams');
 end
