@@ -22,7 +22,7 @@ expID = 1;
 
 
 roiSuffix = '';
-stimSuffix = '_square20';
+stimSuffix = '_square15';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -33,7 +33,7 @@ rebuildImageData = false;
 makeMask = false;%true;
 uploadResult = true;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
-useGPU = 0;
+useGPU = 1;
 
 %% stimulus parameters
 %ID1,3
@@ -79,8 +79,8 @@ useGPU = 0;
 %stimXrange = [816:1616];
 %stimYrange = [280:1080];
 %ID1 2nd trial
-stimXrange = 1:156; 
-stimYrange = 1:156; 
+stimXrange = 13:156; 
+stimYrange = 1:144; 
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;

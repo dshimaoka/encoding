@@ -18,11 +18,11 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 rescaleFac = 0.1;
 roiSuffix = '';
 
-stimSuffix = '_square20';
+stimSuffix = '_square15';
 
 %stimulus parameters - must be identical to ones in makeStimDataBase.m
-stimXrange = 1:156;
-stimYrange = 1:156;
+stimXrange = 13:156; 
+stimYrange = 1:144; 
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;

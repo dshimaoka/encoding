@@ -14,7 +14,7 @@ ORSFfitOption = 1; %3:peakSF,fitOR
 RFfitOption = 0; %1:count #significant pixels
 roiSuffix = '';
 aparam = getAnalysisParam(ID);
-aparam.stimSuffix = '_part';%'_square24_gparam4';
+aparam.stimSuffix = '_square';%'_square24_gparam4';
 
 %% path
 expInfo = getExpInfoNatMov(ID);
