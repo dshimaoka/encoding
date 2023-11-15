@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 1;
+ID = 9;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -14,7 +14,7 @@ ORSFfitOption = 1; %3:peakSF,fitOR
 RFfitOption = 0; %1:count #significant pixels
 roiSuffix = '';
 aparam = getAnalysisParam(ID);
-aparam.stimSuffix = '_square';%'_square24_gparam4';
+aparam.stimSuffix = '_square30_2';%'_square24_gparam4';
 
 %% path
 expInfo = getExpInfoNatMov(ID);
