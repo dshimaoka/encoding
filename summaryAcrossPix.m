@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 9;
+ID = 1;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;
@@ -14,7 +14,7 @@ ORSFfitOption = 1; %3:peakSF,fitOR
 RFfitOption = 0; %1:count #significant pixels
 roiSuffix = '';
 aparam = getAnalysisParam(ID);
-aparam.stimSuffix = '_square30_2';%'_square24_gparam4';
+aparam.stimSuffix = '_square15';%'_square24_gparam4';
 
 %% path
 expInfo = getExpInfoNatMov(ID);
@@ -31,7 +31,10 @@ stimSz = [stimInfo.height stimInfo.width];
 if ID==3
     xlim = [-5 1]-3;
     ylim = [-4 6];
-elseif ID==8 || ID==9
+elseif ID==8
+    xlim = [-6 2];%[-7 2];%[-8 2];
+    ylim = [-13 9.14];
+elseif ID==9 || ID==8
     xlim = [-10 2];%[-7 2];%[-8 2];
     ylim = [-15 9.14];
 else
@@ -49,11 +52,11 @@ if remakeSummary
     RF_Cy = nan(numel(thisROI),1);
     RF_sigma = nan(numel(thisROI),1);
     RF_mean =cell(numel(thisROI),1);% nan(scrSz(1), scrSz(2),18,32);
+    RF_peakAmp = nan(numel(thisROI),1);
     expVal = nan(numel(thisROI),1);
     correlation = nan(numel(thisROI),1);
     bestSF = nan(numel(thisROI),1);
     bestOR = nan(numel(thisROI),1);
-    bestAmp = nan(numel(thisROI),1);
     ridgeParam = nan(numel(thisROI),1);
     ngIdx = [];
     tic; %18h for CJ224 @officePC
@@ -86,8 +89,10 @@ if remakeSummary
         trange = [2 trainParam.lagFrames(end)/dsRate];
         
         if reAnalyze
-            if ID==8 || ID == 1
+            if ID == 1 || ID == 2
                 RF_insilico.noiseRF.maxRFsize=15;%20;%30;%10;%7;%5;%3.5;
+            elseif ID == 8
+                RF_insilico.noiseRF.maxRFsize=10;
             end
             RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim, RFfitOption);
             %showInSilicoRF(RF_insilico, trange);
@@ -96,6 +101,7 @@ if remakeSummary
         RF_Cx(ii) = RF_insilico.noiseRF.RF_Cx;
         RF_Cy(ii) = RF_insilico.noiseRF.RF_Cy;
         RF_sigma(ii) = RF_insilico.noiseRF.sigma;
+        RF_peakAmp(ii) = RF_insilico.noiseRF.peakAmp;
         
         tidx = find(RF_insilico.noiseRF.RFdelay>=trange(1) & RF_insilico.noiseRF.RFdelay<=trange(2));
         RF_mean{ii} = mean(RF_insilico.noiseRF.RF(:,:,tidx),3);
@@ -120,6 +126,7 @@ if remakeSummary
     RF_Cx2 = nan(size(thisROI));
     RF_Cy2 = nan(size(thisROI));
     RF_sigma2 = nan(size(thisROI));
+    RF_peakAmp2 = nan(size(thisROI));
     bestSF2 = nan(size(thisROI));
     bestOR2 = nan(size(thisROI));
     expVal2 = nan(size(thisROI));
@@ -138,7 +145,7 @@ if remakeSummary
             bestSF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSF(ii);
             bestOR2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestOR(ii);
             RF_sigma2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_sigma(ii);
-            
+            RF_peakAmp2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_peakAmp(ii);
         catch err
             continue
         end
@@ -176,6 +183,20 @@ if remakeSummary
         prefMaps_xy(:,:,2)=-prefMaps_xy(:,:,2);
     end
     summary.vfs=getVFS(prefMaps_xy, sfFac);
+    
+    %% test
+%     corrth=aparam.corrth;
+%     prefMaps_xy_i=[];
+%     for ii = 1:2
+%         prefMaps_xy_c = prefMaps_xy(:,:,ii);
+%         prefMaps_xy_c(summary.correlation<corrth)=NaN;
+%         prefMaps_xy_i(:,:,ii)=prefMaps_xy_c;
+%     end
+%     prefMaps_xy_i = interpNanImages(prefMaps_xy_i);
+%     vfs_c=getVFS(prefMaps_xy_i, sfFac);    
+%     subplot(121);imagesc(summary.vfs);
+%     subplot(122); imagesc(vfs_c); hold on; contour(summary.correlation<corrth, [.5 .5],'color','k');
+    
     
     save([encodingSavePrefix '_summary'],'summary');
     

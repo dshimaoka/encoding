@@ -67,6 +67,10 @@ end
 save(inSilicoRFStimName, 'inSilicoRFStim','gaborBankParamIdx',"RF_insilico",'-v7.3');
 
 
+
+
+%% ORSF
+
 RF_insilico = struct;
 RF_insilico.ORSF.screenPix = round(stimInfo.screenPix/2); %[y x]
 nORs = 10;
