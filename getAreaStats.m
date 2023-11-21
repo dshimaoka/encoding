@@ -13,12 +13,14 @@ for iarea = 1:numel(areaMatrix)
     theseIdx = find(theseSub);
         
     thisStat_tmp = summary_adj.(statName)(theseSub);
-
+    ngIdx = (isinf(thisStat_tmp(:)));
+    theseIdx(ngIdx) = [];
+    
     if ~isempty(selectPixelTh)
-        thismedian = median(thisStat_tmp(:));
-        thismad = mad(thisStat_tmp(:));
-        theseIdx = theseIdx(find((thisStat_tmp(:) > thismedian - selectPixelTh*thismad)...
-            .* (thisStat_tmp(:) < thismedian + selectPixelTh*thismad)));
+        thismedian = nanmedian(thisStat_tmp(~ngIdx));
+        thismad = mad(thisStat_tmp(~ngIdx));
+        theseIdx = theseIdx(find((thisStat_tmp(~ngIdx) > thismedian - selectPixelTh*thismad)...
+            .* (thisStat_tmp(~ngIdx) < thismedian + selectPixelTh*thismad)));
     end
     areaStats.(statName){iarea} = summary_adj.(statName)(theseIdx);
     areaStats.RF_Cx{iarea} = summary_adj.RF_Cx(theseIdx);

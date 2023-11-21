@@ -28,7 +28,10 @@ switch method
         
     case 1 %2D fitting
         if sflog
-            p = fitGaussOri180(log(double(RF_insilico.ORSF.sfList)), 180/pi*RF_insilico.ORSF.oriList, resp');
+            bounds = [prctile(log(double(RF_insilico.ORSF.sfList)),[0 100])' inf*ones(2,7)];
+            bounds(1,2:8) = -bounds(1,2:8);
+            p = fitGaussOri180(log(double(RF_insilico.ORSF.sfList)), 180/pi*RF_insilico.ORSF.oriList, resp',...
+                bounds);
             RF_insilico.ORSF.bestSF = exp(p(1));
             RF_insilico.ORSF.sigmaSF = exp(p(4));
         else

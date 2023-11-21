@@ -19,7 +19,7 @@ aparam = getAnalysisParam(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, aparam.stimSuffix);
 
 encodingSavePrefix = [dataPaths.encodingSavePrefix aparam.regressSuffix];
-
+saveName = [num2str(ID) '_eccentricity-sigma-sf' suffix];
 
 load([encodingSavePrefix '_summary'],'summary_adj');
 
@@ -86,7 +86,6 @@ if remakeParcellation
     areaMatrix{6} = imfill((((connectedMatrix{4}==1)+(DI==1))==2).*mask==1, 'holes');
     
     
-    
     %% show results of labeling
     for iarea = 1:numel(label)
         contourf(areaMatrix{iarea},[.5 .5], 'facecolor',lcolor(iarea,:));
@@ -126,6 +125,8 @@ for iarea = 1:numel(label)
 end
 screen2png([num2str(ID) '_eccentricity-sigma-sf_pix' suffix]);
 
+
+
 areaStats_bestSF = getAreaStats(summary_adj, areaMatrix, 'bestSF', selectPixelTh);
 areaStats_RF_sigma = getAreaStats(summary_adj, areaMatrix, 'RF_sigma', selectPixelTh);
  
@@ -164,14 +165,17 @@ for iarea = 1:numel(label)
     ax(4)=subplot(224);
     iq(iarea)=plot(mebins, bestSF_bin(:,iarea),'o','color',lcolor(iarea,:));
     hold on
-    plot(mebins, coef_bestSF_bin(1,iarea)+coef_bestSF_bin(2,iarea)*mebins, 'linewidth',2,'color',lcolor(iarea,:));
-    
+    plot(mebins, coef_bestSF_bin(1,iarea)+coef_bestSF_bin(2,iarea)*mebins, 'linewidth',2,'color',lcolor(iarea,:)); 
 end
 subplot(223); set(gca,'ColorOrderIndex',1, 'tickdir','out');
 subplot(224); set(gca,'ColorOrderIndex',1, 'tickdir','out','ylim',[0 2.5]);
 legend(iq, label);
 linkaxes(ax,'x');linkaxes([ax(1) ax(3)],'y');
 % screen2png([encodingSavePrefix '_eccentricity-sigma-sf']);
-screen2png([num2str(ID) '_eccentricity-sigma-sf' suffix]);
+screen2png(saveName);
+
+save(saveName, 'areaStats_bestSF','areaStats_RF_sigma','coef_bestSF','coef_bestSF_bin',...
+    'coef_RF_sigma','coef_RF_sigma_bin','mebins','bestSF_bin','RF_sigma_bin');
+
 
 

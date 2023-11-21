@@ -3,7 +3,7 @@ function [aparam] = getAnalysisParam(ID)
 
 switch ID
     case 1
-        aparam.stimSuffix = '_part';
+        aparam.stimSuffix = '_square15';
         aparam.regressSuffix = '_nxv';
         aparam.corrth = 0.26;
         aparam.showXrange = [-7 0]; aparam.showYrange = [-3.8 3.8];
@@ -43,7 +43,7 @@ switch ID
         aparam.brainPix(2).brain_y = 25;
         aparam.brainPix(2).brain_x = 7:19;%21;
     case 9
-        aparam.stimSuffix = '_square30_2';%'_square28';
+        aparam.stimSuffix = '_square30_2';
         aparam.regressSuffix = '_nxv';
         aparam.corrth=0.33;
         aparam.showXrange = [-10 1]; aparam.showYrange = [-7.5 7.5];

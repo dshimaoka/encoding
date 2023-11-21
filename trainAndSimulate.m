@@ -20,7 +20,7 @@ if doTrain
     %clear S_fin
     save(encodingSaveName,'trained','trainParam');
 else
-    load(encodingSaveName,'trained','trainParam');
+    load(encodingSaveName,'trained','trainParam','RF_insilico');
 end
 
 
