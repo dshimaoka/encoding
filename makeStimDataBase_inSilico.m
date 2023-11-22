@@ -24,8 +24,15 @@ doRF = 0;
 doORSF = 1;
 
 %stimulus parameters - must be identical to ones in makeStimDataBase.m
+% ID3
 stimXrange = 24:156; %201:256; %1:left
 stimYrange = 5:139; %72-28+1:72+28;  %1:top
+% ID2
+% stimXrange = 161:238;
+% stimYrange = 29:108;
+% ID8
+% stimXrange = 293:1080;
+% stimYrange = 293:1080;
 
 % gabor bank filter
 gaborBankParamIdx.cparamIdx = 1;
@@ -83,7 +90,8 @@ if doORSF
     SFrange_stim = [0.035 2.5];
     %SFrange_stim = getSFrange_stim(RF_insilico.ORSF.screenPix, stimSz);
     %SFrange_mdl = getSFrange_mdl(RF_insilico.ORSF.screenPix, stimSz, gaborBankParamIdx.gparamIdx);
-    RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 6); %5 %[cycles/deg];
+    %RF_insilico.ORSF.sfList = logspace(log10(SFrange_stim(1)), log10(SFrange_stim(2)), 6); %5 %[cycles/deg];
+    RF_insilico.ORSF.sfList = linspace(SFrange_stim(1), SFrange_stim(2), 12); %5 %[cycles/deg];
     RF_insilico.ORSF.nRepeats = 10;% 15;
     RF_insilico.ORSF.dwell = 45; %#stimulus frames
     
