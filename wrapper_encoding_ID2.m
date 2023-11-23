@@ -16,7 +16,8 @@ end
 ID = 2;
 doTrain = 0; %train a gabor bank filter or use it for insilico simulation
 doRF = 0;
-doORSF = 1;
+doORSF = 0;
+doDIRSFTF = 1;
 subtractImageMeans = 0;
 roiSuffix = '';
 % stimSuffix = '_square30';%
@@ -40,6 +41,7 @@ dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
 
 inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim.mat'];
 inSilicoORSFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoORSFstim.mat'];
+inSilicoDIRSFTFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoDIRSFTFstim.mat'];
 
 
 load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
@@ -85,7 +87,7 @@ nTotPix = numel(ds.VariableNames)-1;
 %% retrieve unsuccessful analysis
 % varNames = {'trained','trainParam'}; %'RF_insilico',
 % tgtIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix, varNames);
-tgtIdx = 1:nTotPix;
+tgtIdx = 1372;%:nTotPix;
 maxJID = numel(pen:narrays:numel(tgtIdx));
 
 errorID=[];
@@ -100,7 +102,7 @@ for JID = 1:maxJID
         
         trainAndSimulate(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
             gaborBankParamIdx, encodingSaveName, inSilicoRFStimName, ...
-            inSilicoORSFStimName, analysisTwin,doTrain, doRF, doORSF);
+            inSilicoORSFStimName, inSilicoDIRSFTFStimName, analysisTwin,doTrain, doRF, doORSF, doDIRSFTF);
         
     catch err
         disp(err);
@@ -119,7 +121,7 @@ while ~isempty(errorID)
         
         trainAndSimulate(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
             gaborBankParamIdx, encodingSaveName, inSilicoRFStimName,...
-            inSilicoORSFStimName, analysisTwin,doTrain, doRF, doORSF);
+            inSilicoORSFStimName, inSilicoDIRSFTFStimName, analysisTwin,doTrain, doRF, doORSF, doDIRSFTF);
         if numel(errorID)>1
             errorID = errorID(2:end);
         elseif numel(errorID)==1

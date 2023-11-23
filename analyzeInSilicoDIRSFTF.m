@@ -22,7 +22,7 @@ end
 tflog = 1;
 
 tidx = find(RF_insilico.DIRSFTF.respDelay>=trange(1) & RF_insilico.DIRSFTF.respDelay<=trange(2));
-resp = mean(mean(RF_insilico.DIRSFTF.resp(:,:,:,tidx),4),2); %sum over directions as in Nishimoto 2011
+resp = squeeze(mean(mean(RF_insilico.DIRSFTF.resp(:,:,:,tidx),4),2)); %sum over directions as in Nishimoto 2011
 resp = peakPolarity*resp;
 resp(resp<0) = 0;
 %resp = resp - min(resp(:)); %make all values above 0 for fitting gaussian
@@ -52,8 +52,8 @@ switch method
         end
         p = fitGauss2(tfaxis, sfaxis, resp);%need smoothing before this
         
-        RF_insilico.DIRSFTF.bestTF = tfaxis(p(1));
-        RF_insilico.DIRSFTF.bestSF = sfaxis(p(2));
+        RF_insilico.DIRSFTF.bestTF = p(1);
+        RF_insilico.DIRSFTF.bestSF = p(2);
         
         if sflog
             RF_insilico.DIRSFTF.bestSF = exp(RF_insilico.DIRSFTF.bestSF);

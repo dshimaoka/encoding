@@ -8,6 +8,7 @@ end
 
 dirList = 180/pi*RF_insilico.DIRSFTF.dirList;
 sfList = RF_insilico.DIRSFTF.sfList;
+tfList = RF_insilico.DIRSFTF.tfList;
 resp = RF_insilico.DIRSFTF.resp;
 respDelay = RF_insilico.DIRSFTF.respDelay;
 

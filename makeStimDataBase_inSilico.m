@@ -135,7 +135,7 @@ for ididx = 1:numel(IDs)
         RF_insilico.DIRSFTF.dirList = dirList(1:end-1);
         SFrange_stim = [0.035 2.5];
         RF_insilico.DIRSFTF.sfList = linspace(SFrange_stim(1), SFrange_stim(2), 12); %12 %[cycles/deg];
-        RF_insilico.DIRSFTF.tfList = [1 2 4]; %[Hz]
+        RF_insilico.DIRSFTF.tfList = [.25 .5 1 2 4]; %[Hz]
         RF_insilico.DIRSFTF.nRepeats = 10;
         RF_insilico.DIRSFTF.dwell = 45; %#stimulus frames
         

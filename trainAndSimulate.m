@@ -65,7 +65,7 @@ if doORSF
 
     RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
         RF_insilico, stimSz, inSilicoORSFStim);
-    showInSilicoORSF(RF_insilico);
+    showInSilicoORSF(RF_insilico, analysisTwin);
     
     RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, analysisTwin, 1);
     screen2png([encodingSaveName(1:end-4) '_ORSF']);
@@ -88,10 +88,10 @@ if doDIRSFTF
 
     RF_insilico = getInSilicoDIRSFTF(gaborBankParamIdx, trained, trainParam, ...
         RF_insilico, stimSz, inSilicoDIRSFTFStim);
-    showInSilicoDIRSFTF(RF_insilico);
+    showInSilicoDIRSFTF(RF_insilico, analysisTwin);
     
     RF_insilico = analyzeInSilicoDIRSFTF(RF_insilico, -1, analysisTwin, 1);
-    screen2png([encodingSaveName(1:end-4) '_ORSF']);
+    screen2png([encodingSaveName(1:end-4) '_DIRSFTF ']);
     close;
     save(encodingSaveName,'RF_insilico','-append');
 end
