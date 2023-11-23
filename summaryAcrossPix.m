@@ -4,7 +4,7 @@ if ~ispc
 end
 
 
-ID = 9;
+ID = 2;
 useGPU = 1;
 rescaleFac = 0.10;
 dsRate = 1;

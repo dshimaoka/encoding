@@ -1,6 +1,6 @@
 
 %% parmaeters
-ID = 9;
+ID = 3;
 ebins = 0:8;
 rescaleFac = 0.1;
 remakeParcellation = 1;
