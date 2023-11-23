@@ -10,4 +10,4 @@
 #SBATCH --mem-per-cpu=130000
 #SBATCH --array=1-5
 module load matlab/r2021a
-matlab -nodisplay -nodesktop -nosplash < makeStimDataBase_insilico.m
+matlab -nodisplay -nodesktop -nosplash < makeStimDataBase_inSilico.m
