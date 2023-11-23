@@ -11,6 +11,8 @@ if isempty(getenv('COMPUTERNAME'))
 else
     narrays = 1;
 end
+%% draw slurm ID for parallel computation specifying ROI position
+pen = getPen;
 
 IDs = [1 2 3 8 9];
 
