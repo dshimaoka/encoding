@@ -8,8 +8,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=80000
-#SBATCH --array=1-1
+#SBATCH --array=1-5
 #SBATCH --gres=gpu:1
 #SBATCH --partition=gpu
 module load matlab
-matlab -nodisplay -nodesktop -nosplash < wrapper_encoding_ID3.m
+matlab -nodisplay -nodesktop -nosplash < wrapper_encoding_allHems.m
