@@ -1,7 +1,14 @@
 IDs = [1 2 3 8 9];
-% labels = 
-areaStats_bestSF_pop = cell(numel(labels),1);
-areaStats_eccentricity_pop = cell(numel(labels),1);
+ label{1} = 'V1';
+    label{2} = 'V2';
+    label{3} = 'DM';
+    label{4} = 'V3';
+    label{5} = 'V4';
+    label{6} = 'DI';
+    lcolor = lines(numel(label));
+
+areaStats_bestSF_pop = cell(numel(label),1);
+areaStats_eccentricity_pop = cell(numel(label),1);
 for iid = 1:5
     ID = IDs(iid);
     ebins = 0:8;
@@ -32,7 +39,7 @@ for iid = 1:5
     coef_bestSF_pop(iid,:) = coef_bestSF(2,:);
     coef_RF_sigma_bin_pop(iid,:) = coef_RF_sigma_bin(2,:);
     coef_RF_sigma_pop(iid,:) = coef_RF_sigma(2,:);
-    for iroi =1:numel(labels)
+    for iroi =1:numel(label)
         areaStats_bestSF_pop{iroi} = cat(1, areaStats_bestSF_pop{iroi}, areaStats_bestSF.bestSF{iroi});
         areaStats_eccentricity_pop{iroi} = cat(1, areaStats_eccentricity_pop{iroi}, areaStats_bestSF.eccentricity{iroi});
     end

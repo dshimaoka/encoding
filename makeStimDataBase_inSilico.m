@@ -14,7 +14,7 @@ end
 %% draw slurm ID for parallel computation specifying ROI position
 pen = getPen;
 
-IDs = [1 2 3 8 9];
+IDs = [8 9];%[1 2 3 8 9];
 
 doRF = 0;
 doORSF = 0;
@@ -24,8 +24,9 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 rescaleFac = 0.1;
 roiSuffix = '';
 
+maxJID = numel(pen:narrays:numel(IDs));
 
-for ididx = 1:numel(IDs)
+for ididx = 1:maxJID
     
     expID = IDs(pen + (ididx-1)*narrays);
     

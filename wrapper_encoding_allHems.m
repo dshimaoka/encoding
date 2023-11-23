@@ -1,8 +1,6 @@
-%wrapper_encoding.m
-%this script loads processed data by makeDataBase.m,
-%fit one pixel with ridge regression
-%evaluate the fit result with in-silico simulation
-
+%wrapper_encoding_allHems.m
+%this script is intended to evaluate the fit result with in-silico simulation
+%using different arrays in Massive
 
 if isempty(getenv('COMPUTERNAME'))
     addpath(genpath('~/git'));
@@ -11,125 +9,130 @@ if isempty(getenv('COMPUTERNAME'))
 else
     narrays = 1;
 end
+%% draw slurm ID for parallel computation specifying ROI position
+pen = getPen;
 
 
-ID = 2;
 doTrain = 0; %train a gabor bank filter or use it for insilico simulation
 doRF = 0;
 doORSF = 0;
 doDIRSFTF = 1;
 subtractImageMeans = 0;
 roiSuffix = '';
-% stimSuffix = '_square30';%
-% regressSuffix = '_nxv';
-aparam = getAnalysisParam(ID);
-stimSuffix = aparam.stimSuffix;
-regressSuffix = aparam.regressSuffix;
-
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.1;
 
-expInfo = getExpInfoNatMov(ID);
+IDs = [1 2 3 8 9];
+maxJID = numel(pen:narrays:numel(IDs));
 
-%% draw slurm ID for parallel computation specifying ROI position
-pen = getPen;
+for ididx = 1:maxJID
+    
+    ID = IDs(pen + (ididx-1)*narrays);
 
-
-%% path
-dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
-dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
-
-inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim.mat'];
-inSilicoORSFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoORSFstim.mat'];
-inSilicoDIRSFTFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoDIRSFTFstim.mat'];
-
-
-load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
-    'gaborBankParamIdx','stimInfo');
-if subtractImageMeans
-    load(dataPaths.imageSaveName, 'imageMeans_proc');
-else
-    imageMeans_proc = [];
-end
-
-
-%% estimate the energy-model parameters w cross validation
-nMovies = numel(stimInfo.stimLabels);
-movDur = stimInfo.duration;%[s]
-trainIdx = [];
-for imov = 1:nMovies
-    trainIdx = [trainIdx (omitSec*dsRate+1:movDur*dsRate)+(imov-1)*movDur*dsRate];
-end
-
-%% estimation of filter-bank coefficients
-trainParam.regressType = 'ridge';
-trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
-trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
-trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
-trainParam.Fs = dsRate; %hz after downsampling
-trainParam.lagFrames = 2:4;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
-trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
-
-%% in-silico simulation
-analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
-
-
-%% stimuli
-%load(dataPaths.imageSaveName,'stimInfo')
-
-%% load neural data
-%TODO: copy timetable data to local
-disp('Loading tabular text datastore');
-ds = tabularTextDatastore(dataPaths.timeTableSaveName);
-
-nTotPix = numel(ds.VariableNames)-1;
-
-%% retrieve unsuccessful analysis
-% varNames = {'trained','trainParam'}; %'RF_insilico',
-% tgtIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix, varNames);
-tgtIdx = 1:nTotPix;
-maxJID = numel(pen:narrays:numel(tgtIdx));
-
-errorID=[];
-for JID = 1:maxJID
-    try
-        disp([num2str(JID) '/' num2str(maxJID)]);
-        
-        roiIdx = tgtIdx(pen + (JID-1)*narrays);
-        
-        %TODO: save data locally
-        encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
-        
-        trainAndSimulate(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
-            gaborBankParamIdx, encodingSaveName, inSilicoRFStimName, ...
-            inSilicoORSFStimName, inSilicoDIRSFTFStimName, analysisTwin,doTrain, doRF, doORSF, doDIRSFTF);
-        
-    catch err
-        disp(err);
-        errorID = [roiIdx errorID];
-        continue
+    aparam = getAnalysisParam(ID);
+    stimSuffix = aparam.stimSuffix;
+    regressSuffix = aparam.regressSuffix;
+    
+    
+    expInfo = getExpInfoNatMov(ID);
+    
+    
+    
+    %% path
+    dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
+    dataPaths.encodingSavePrefix = [dataPaths.encodingSavePrefix regressSuffix];
+    
+    inSilicoRFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoRFstim.mat'];
+    inSilicoORSFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoORSFstim.mat'];
+    inSilicoDIRSFTFStimName = [dataPaths.stimSaveName(1:end-4) '_insilicoDIRSFTFstim.mat'];
+    
+    
+    load( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'dsRate','S_fin',...
+        'gaborBankParamIdx','stimInfo');
+    if subtractImageMeans
+        load(dataPaths.imageSaveName, 'imageMeans_proc');
+    else
+        imageMeans_proc = [];
     end
-end
-
-%% re-run pixels with error
-while ~isempty(errorID)
-    try
-        disp(['remaining ' num2str(errorID)]);
-      
-        roiIdx = errorID(1);
-        encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
-        
-        trainAndSimulate(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
-            gaborBankParamIdx, encodingSaveName, inSilicoRFStimName,...
-            inSilicoORSFStimName, inSilicoDIRSFTFStimName, analysisTwin,doTrain, doRF, doORSF, doDIRSFTF);
-        if numel(errorID)>1
-            errorID = errorID(2:end);
-        elseif numel(errorID)==1
-            errorID=[];
+    
+    
+    %% estimate the energy-model parameters w cross validation
+    nMovies = numel(stimInfo.stimLabels);
+    movDur = stimInfo.duration;%[s]
+    trainIdx = [];
+    for imov = 1:nMovies
+        trainIdx = [trainIdx (omitSec*dsRate+1:movDur*dsRate)+(imov-1)*movDur*dsRate];
+    end
+    
+    %% estimation of filter-bank coefficients
+    trainParam.regressType = 'ridge';
+    trainParam.ridgeParam = 1e6;%logspace(5,7,3); %[1 1e3 1e5 1e7]; %search the best within these values
+    trainParam.KFolds = 5; %cross validation. Only valid if numel(ridgeParam)>1
+    trainParam.tavg = 0; %tavg = 0 requires 32GB ram. if 0, use avg within Param.lagFrames to estimate coefficients
+    trainParam.Fs = dsRate; %hz after downsampling
+    trainParam.lagFrames = 2:4;%2:9;%round(0/dsRate):round(5/dsRate);%frame delays to train a neuron
+    trainParam.useGPU = 1; %for ridgeXs local GPU is not sufficient
+    
+    %% in-silico simulation
+    analysisTwin = [2 trainParam.lagFrames(end)/dsRate];
+    
+    
+    %% stimuli
+    %load(dataPaths.imageSaveName,'stimInfo')
+    
+    %% load neural data
+    %TODO: copy timetable data to local
+    disp('Loading tabular text datastore');
+    ds = tabularTextDatastore(dataPaths.timeTableSaveName);
+    
+    nTotPix = numel(ds.VariableNames)-1;
+    
+    %% retrieve unsuccessful analysis
+    % varNames = {'trained','trainParam'}; %'RF_insilico',
+    % tgtIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix, varNames);
+    tgtIdx = 1:nTotPix;
+    
+    errorID=[];
+    for JID = 1:numel(tgtIdx)
+        try
+            disp([num2str(JID) '/' num2str(numel(tgtIdx))]);
+            
+            %roiIdx = tgtIdx(pen + (JID-1)*narrays);
+            roiIdx = tgtIdx(JID);
+            
+            %TODO: save data locally
+            encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
+            
+            trainAndSimulate(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
+                gaborBankParamIdx, encodingSaveName, inSilicoRFStimName, ...
+                inSilicoORSFStimName, inSilicoDIRSFTFStimName, analysisTwin,doTrain, doRF, doORSF, doDIRSFTF);
+            
+        catch err
+            disp(err);
+            errorID = [roiIdx errorID];
+            continue
         end
-    catch err
-        errorID = [errorID(2:end) errorID(1)];
     end
+    
+    % %% re-run pixels with error
+    % while ~isempty(errorID)
+    %     try
+    %         disp(['remaining ' num2str(errorID)]);
+    %
+    %         roiIdx = errorID(1);
+    %         encodingSaveName = [dataPaths.encodingSavePrefix '_roiIdx' num2str(roiIdx) '.mat'];
+    %
+    %         trainAndSimulate(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, imageMeans_proc, ...
+    %             gaborBankParamIdx, encodingSaveName, inSilicoRFStimName,...
+    %             inSilicoORSFStimName, inSilicoDIRSFTFStimName, analysisTwin,doTrain, doRF, doORSF, doDIRSFTF);
+    %         if numel(errorID)>1
+    %             errorID = errorID(2:end);
+    %         elseif numel(errorID)==1
+    %             errorID=[];
+    %         end
+    %     catch err
+    %         errorID = [errorID(2:end) errorID(1)];
+    %     end
+    % end
+    
 end
-
-
