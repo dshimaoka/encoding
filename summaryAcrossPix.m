@@ -3,7 +3,7 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = [1 2 3 8 9];
+expID = [3 8]; %[1 9]
 for ididx = 1
     ID = expID(ididx);
     useGPU = 1;
@@ -57,6 +57,8 @@ for ididx = 1
         correlation = nan(numel(thisROI),1);
         bestSF = nan(numel(thisROI),1);
         bestOR = nan(numel(thisROI),1);
+        bestSFF = nan(numel(thisROI),1);
+        bestTF = nan(numel(thisROI),1);
         ridgeParam = nan(numel(thisROI),1);
         ngIdx = [];
         tic; %18h for CJ224 @officePC
@@ -117,6 +119,11 @@ for ididx = 1
             catch err
                 ngIdx = [ngIdx ii];
             end
+            
+            %% DIRSFTF
+            bestSFF(ii) = RF_insilico.DIRSFTF.bestSF;
+            bestTF(ii) = RF_insilico.DIRSFTF.bestTF;
+            
             %bestAmp(ii) = amp;
         end
         t = toc;
@@ -129,6 +136,8 @@ for ididx = 1
         RF_peakAmp2 = nan(size(thisROI));
         bestSF2 = nan(size(thisROI));
         bestOR2 = nan(size(thisROI));
+        bestSFF2 = nan(size(thisROI));
+        bestTF2 = nan(size(thisROI));
         expVal2 = nan(size(thisROI));
         correlation2 = nan(size(thisROI));
         ridgeParam2 = nan(size(thisROI));
@@ -146,6 +155,9 @@ for ididx = 1
                 bestOR2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestOR(ii);
                 RF_sigma2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_sigma(ii);
                 RF_peakAmp2(Y(roiIdx(ii)),X(roiIdx(ii))) = RF_peakAmp(ii);
+                
+                bestSFF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestSFF(ii);
+                bestTF2(Y(roiIdx(ii)),X(roiIdx(ii))) = bestTF(ii);
             catch err
                 continue
             end
@@ -167,6 +179,8 @@ for ididx = 1
         summary.RF_mean = RF_mean2;
         summary.bestSF = bestSF2;
         summary.bestOR = bestOR2;
+        summary.bestSFF = bestSFF2;
+        summary.bestTF = bestTF2;
         summary.expVar = expVal2;
         summary.correlation = correlation2;
         summary.thisROI = thisROI;
@@ -210,6 +224,9 @@ for ididx = 1
     [fvY,fvX] = getFoveaPix(ID, rescaleFac);
     summary_adj = summary;
     summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
+    if ID<=3
+        summary_adj.RF_Cy = -summary_adj.RF_Cy;
+    end
     if ID==9
         summary_adj.RF_Cx = -summary_adj.RF_Cx;
     end
@@ -250,16 +267,16 @@ for ididx = 1
     
     
     %% show mRFs on maps of preferred position
-    stimXaxis = stimXaxis_ori - summary.RF_Cx(fvY,fvX);
-    stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
-    for ib = 1:numel(aparam.brainPix)
-        [f_panel, f_location] = showRFpanels(summary_adj, aparam.brainPix(ib).brain_x, ...
-            aparam.brainPix(ib).brain_y, ...
-            stimXaxis, stimYaxis, aparam.showXrange, aparam.showYrange, rescaleFac,...
-            aparam.flipLR);
-        %savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
-        savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg' num2str(ib)], 'w');
-    end
+%     stimXaxis = stimXaxis_ori - summary.RF_Cx(fvY,fvX);
+%     stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
+%     for ib = 1:numel(aparam.brainPix)
+%         [f_panel, f_location] = showRFpanels(summary_adj, aparam.brainPix(ib).brain_x, ...
+%             aparam.brainPix(ib).brain_y, ...
+%             stimXaxis, stimYaxis, aparam.showXrange, aparam.showYrange, rescaleFac,...
+%             aparam.flipLR);
+%         %savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
+%         savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg' num2str(ib)], 'w');
+%     end
     
     
     close all

@@ -22,7 +22,7 @@ roiSuffix = '';
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.1;
 
-IDs = 1;%[1 2 3 8 9];
+IDs = 9;%[1 2 3 8 9];
 maxJID = numel(pen:narrays:numel(IDs));
 
 for ididx = 1:maxJID
