@@ -14,7 +14,7 @@ end
 %% draw slurm ID for parallel computation specifying ROI position
 pen = getPen;
 
-IDs = [1 2 3 8];
+IDs = [1 2 3 8 9];
 
 doRF = 0;
 doORSF = 0;
@@ -135,7 +135,7 @@ for ididx = 1:maxJID
         dirList = pi/180*linspace(0,360,nORs+1)'; %[rad]
         RF_insilico.DIRSFTF.dirList = dirList(1:end-1);
         SFrange_stim = [0.035 2.5];
-        RF_insilico.DIRSFTF.sfList = linspace(SFrange_stim(1), SFrange_stim(2), 10); %12 %[cycles/deg];
+        RF_insilico.DIRSFTF.sfList = linspace(SFrange_stim(1), SFrange_stim(2), 9); %12 %[cycles/deg];
         RF_insilico.DIRSFTF.tfList = [.25 .5 1 2 4 8]; %[Hz]
         RF_insilico.DIRSFTF.nRepeats = 10;
         RF_insilico.DIRSFTF.dwell = 45; %#stimulus frames
