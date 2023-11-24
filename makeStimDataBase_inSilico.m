@@ -14,7 +14,7 @@ end
 %% draw slurm ID for parallel computation specifying ROI position
 pen = getPen;
 
-IDs = [8 9];%[1 2 3 8 9];
+IDs = [9];%[1 2 3 8 9];
 
 doRF = 0;
 doORSF = 0;
