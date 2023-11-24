@@ -3,7 +3,7 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = [3 8]; %[1 9]
+expID = [1]; %[9]
 for ididx = 1
     ID = expID(ididx);
     useGPU = 1;
