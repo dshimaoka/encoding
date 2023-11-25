@@ -21,11 +21,15 @@ end
 
 tflog = 1;
 
+% DIRSFTF.resp: sf x dir x tf
 tidx = find(RF_insilico.DIRSFTF.respDelay>=trange(1) & RF_insilico.DIRSFTF.respDelay<=trange(2));
 resp = squeeze(mean(mean(RF_insilico.DIRSFTF.resp(:,:,:,tidx),4),2)); %sum over directions as in Nishimoto 2011
 resp = peakPolarity*resp;
 resp(resp<0) = 0;
 %resp = resp - min(resp(:)); %make all values above 0 for fitting gaussian
+
+resp_dir = squeeze(mean(mean(mean(RF_insilico.DIRSFTF.resp(:,:,:,tidx),4),3),1));
+resp_dir = peakPolarity*resp_dir;
 
 switch method
     %     case 0 %simply detect the minimum
@@ -62,7 +66,11 @@ switch method
             RF_insilico.DIRSFTF.bestTF = exp(RF_insilico.DIRSFTF.bestTF);
         end
         
-        
+        % fit preferred direction
+
+        pdir = fitoriWrapped( 180/pi*RF_insilico.DIRSFTF.dirList, resp_dir, [], [], '');
+        RF_insilico.DIRSFTF.bestDIR = pdir(1); %[deg]
+        RF_insilico.DIRSFTF.sigmaDIR = pdir(5);
         
         %     case 2 %successive 1D fitting
         %         if sflog
