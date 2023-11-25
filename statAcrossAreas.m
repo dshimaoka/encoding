@@ -1,6 +1,6 @@
 
 %% parmaeters
-ID = 8;
+ID = 9;
 ebins = 0:8;
 rescaleFac = 0.1;
 remakeParcellation = 1;
@@ -19,7 +19,7 @@ aparam = getAnalysisParam(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, aparam.stimSuffix);
 
 encodingSavePrefix = [dataPaths.encodingSavePrefix aparam.regressSuffix];
-saveName = [num2str(ID) '_eccentricity-sigma-sf' suffix];
+saveName = fullfile('statsAcrossAreas',[num2str(ID) '_eccentricity-sigma-sf' suffix]);
 
 load([encodingSavePrefix '_summary'],'summary_adj');
 
@@ -95,8 +95,11 @@ if remakeParcellation
     end
     axis ij equal;
     screen2png([num2str(ID) '_roi']);
+    save(saveName,'areaMatrix','label','lcolor');
+
 else
-    load([encodingSavePrefix '_parcelledArea'],'areaMatrix','label','lcolor');
+    load(saveName,'areaMatrix','label','lcolor');
+%     load([encodingSavePrefix '_parcelledArea'],'areaMatrix','label','lcolor');
 end
 
 %% represent in cortical surface
@@ -186,7 +189,7 @@ for iarea = 1:numel(label)
 end
 subplot(357); set(gca,'ColorOrderIndex',1);ylabel('sigma(deg)');xlabel('eccentricity(deg)');title('pRF size (deg)');
 subplot(358); set(gca,'ColorOrderIndex',1, 'ylim',[0 2.5]);ylabel('SF(cpd)');xlabel('eccentricity(deg)');title('SF (cpd)');
-subplot(359); set(gca,'ColorOrderIndex',1);ylabel('TF(Hz)');xlabel('eccentricity(deg)');title('pRF size (deg)');
+subplot(359); set(gca,'ColorOrderIndex',1);ylabel('TF(Hz)');xlabel('eccentricity(deg)');title('TF (Hz)');
 subplot(3,5,10); set(gca,'ColorOrderIndex',1);ylabel('speed(deg/s)');xlabel('eccentricity(deg)');title('speed (deg/s)');
 
 %% binned eccentricity
@@ -222,7 +225,9 @@ linkaxes(ax,'x');%linkaxes([ax(1) ax(3)],'y');
 screen2png(saveName);
 
 save(saveName, 'areaStats_bestSF','areaStats_RF_sigma','coef_bestSF','coef_bestSF_bin',...
-    'coef_RF_sigma','coef_RF_sigma_bin','mebins','bestSF_bin','RF_sigma_bin');
+    'coef_RF_sigma','coef_RF_sigma_bin','mebins','bestSF_bin','RF_sigma_bin',...
+    'coef_bestTF_bin','coef_bestTF','coef_bestSPD_bin','coef_bestSPD',...
+    'areaMatrix','label','lcolor');
 
 
 

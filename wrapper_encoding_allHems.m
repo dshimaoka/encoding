@@ -5,7 +5,7 @@
 if isempty(getenv('COMPUTERNAME'))
     addpath(genpath('~/git'));
     % addDirPrefs; %BAD IDEA TO write matlabprefs.mat in a batch job!!
-    [~,narrays] = getArray('script_wrapper.sh');
+    [~,narrays] = getArray('script_wrapper_allHems.sh');
 else
     narrays = 1;
 end
@@ -22,7 +22,7 @@ roiSuffix = '';
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.1;
 
-IDs = 9;%[1 2 3 8 9];
+IDs = [1 2 3 8 9];
 maxJID = numel(pen:narrays:numel(IDs));
 
 for ididx = 1:maxJID
