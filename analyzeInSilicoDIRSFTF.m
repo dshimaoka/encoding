@@ -66,7 +66,7 @@ switch method
             RF_insilico.DIRSFTF.bestTF = exp(RF_insilico.DIRSFTF.bestTF);
         end
         
-        % fit preferred direction
+        %% fit preferred direction
 
         pdir = fitoriWrapped( 180/pi*RF_insilico.DIRSFTF.dirList, resp_dir, [], [], '');
         RF_insilico.DIRSFTF.bestDIR = pdir(1); %[deg]
