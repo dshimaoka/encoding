@@ -10,7 +10,7 @@ roiSuffix = '';
 stimSuffix = '_part';
 regressSuffix = '_nxv';
 [fvY, fvX] = getFoveaPix(ID, rescaleFac);
-
+showXrange = [-10 1];
 
 expInfo = getExpInfoNatMov(ID);
 dataPaths = getDataPaths(expInfo,rescaleFac,roiSuffix, stimSuffix);
@@ -26,25 +26,27 @@ stimSz = [stimInfo.height stimInfo.width];
 
 [gaborparams_real, gaborparams, S] = getFilterParams(gparamIdx, screenPix, stimSz);
 [sumCoefs,allIdx] = sort(sum(abs(trained.rre)), 'descend');
-showFiltIdx = allIdx(1:9);
+showFiltIdx = allIdx(1:5);
 showFiltParams(gaborparams, S, showFiltIdx);
 
 %%
-figure
+figure('position',[680   399   973   579]);
 stimXaxis = RF_insilico.noiseRF.xaxis - summary.RF_Cx(fvY,fvX);
 stimYaxis = -(RF_insilico.noiseRF.yaxis - summary.RF_Cy(fvY,fvX));
 
 filtContours = squeeze(S(:,:,round(size(S,3)/2),:));
 for ii = 1:numel(showFiltIdx)
-    subplot_tight(3,3,ii,0.01);
+    subplot_tight(1,numel(showFiltIdx),ii,0.03);
     thisImage = filtContours(:,:,showFiltIdx(ii));
     imagesc(stimXaxis, stimYaxis, thisImage);
-    vline(0,gca,'-'); hline;
+    vline(0,gca,'-','w'); hline(0,gca,'-','w');
+    hold on; plot(showXrange(1):1:showXrange(2),0,'o','markerfacecolor','w','markeredgecolor','k','markersize',5);
     caxis([-max(abs(thisImage(:))) max(abs(thisImage(:)))]);
-    axis equal off;
+    set(gca,'tickdir','out','xtick',[-10 -5 0],'ytick',[-5 0 5]);
+    axis equal tight;
+    xlim(showXrange);ylim([-7.5 7.5]);
 end
 colormap(1-gray);
-axis equal tight on;
 savePaperFigure(gcf,'kernel_panels');
 
 %%

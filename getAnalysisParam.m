@@ -8,7 +8,7 @@ switch ID
         aparam.corrth = 0.26;
         aparam.showXrange = [-7 0]; aparam.showYrange = [-3.8 3.8];
         aparam.flipLR = false;
-        aparam.brainPix(1).brain_y = 32:44;
+        aparam.brainPix(1).brain_y = 30:52;%32:44;
         aparam.brainPix(1).brain_x = 16;
         aparam.brainPix(2).brain_y = 31;
         aparam.brainPix(2).brain_x = 6:18;
@@ -18,7 +18,7 @@ switch ID
         aparam.corrth = 0.24;
         aparam.showXrange = [-10 1]; aparam.showYrange = [-7.5 7.5];
         aparam.flipLR = false;
-        aparam.brainPix(1).brain_y = 22:37;%40;
+        aparam.brainPix(1).brain_y = 22:43;
         aparam.brainPix(1).brain_x = 21;
         aparam.brainPix(2).brain_y = 25;
         aparam.brainPix(2).brain_x = 9:23;
@@ -28,7 +28,7 @@ switch ID
         aparam.corrth=0.29;
         aparam.showXrange = [-7 0]; aparam.showYrange = [-3.8 3.8];
         aparam.flipLR = false;
-        aparam.brainPix(1).brain_y = 26:40;
+        aparam.brainPix(1).brain_y = 27:48;
         aparam.brainPix(1).brain_x = 22;
         aparam.brainPix(2).brain_y = 29;%28;
         aparam.brainPix(2).brain_x = 7:24;
@@ -38,7 +38,7 @@ switch ID
         aparam.corrth=0.3;
         aparam.showXrange = [-10 1]; aparam.showYrange = [-7.5 7.5];
         aparam.flipLR = false;
-        aparam.brainPix(1).brain_y = 22:40;
+        aparam.brainPix(1).brain_y = 22:45;
         aparam.brainPix(1).brain_x = 18;
         aparam.brainPix(2).brain_y = 25;
         aparam.brainPix(2).brain_x = 7:19;%21;

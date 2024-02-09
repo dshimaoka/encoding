@@ -3,14 +3,14 @@ if ~ispc
     addDirPrefs;
 end
 
-expID = [9]; %[9]
-for ididx = 1
+expID = [1 2 3 8 9];
+for ididx = 1:numel(expID)
     ID = expID(ididx);
     useGPU = 1;
     rescaleFac = 0.10;
     dsRate = 1;
-    remakeSummary = 1;
-    reAnalyze = 1;
+    remakeSummary = 0;
+    reAnalyze = 0;
     ORSFfitOption = 1; %3:peakSF,fitOR
     RFfitOption = 0; %1:count #significant pixels
     roiSuffix = '';
@@ -91,7 +91,7 @@ for ididx = 1
             trange = [2 trainParam.lagFrames(end)/dsRate];
             
             if reAnalyze
-                if ID == 1 || ID == 2
+                if ID == 1 %|| ID == 2
                     RF_insilico.noiseRF.maxRFsize=15;%20;%30;%10;%7;%5;%3.5;
                 elseif ID == 8
                     RF_insilico.noiseRF.maxRFsize=10;
@@ -115,7 +115,7 @@ for ididx = 1
                     RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, trange, ORSFfitOption);
                 end
                 bestSF(ii) = RF_insilico.ORSF.bestSF;
-                bestOR(ii) = RF_insilico.ORSF.bestOR;
+                %bestOR(ii) = RF_insilico.ORSF.bestOR;
             catch err
                 ngIdx = [ngIdx ii];
             end
@@ -123,6 +123,7 @@ for ididx = 1
             %% DIRSFTF
             bestSFF(ii) = RF_insilico.DIRSFTF.bestSF;
             bestTF(ii) = RF_insilico.DIRSFTF.bestTF;
+            bestOR(ii) = RF_insilico.DIRSFTF.bestDIR;
             
             %bestAmp(ii) = amp;
         end
@@ -215,67 +216,72 @@ for ididx = 1
         save([encodingSavePrefix '_summary'],'summary');
         
     else
-        load([encodingSavePrefix '_summary'],'summary');
+        load([encodingSavePrefix '_summary'],'summary','summary_adj','fvX','fvY');
         encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(1)) '.mat'];
         load(encodingSaveName, 'RF_insilico');
     end
     
-    %% adjust Cx and Cy, interpolate NANs
-    [fvY,fvX] = getFoveaPix(ID, rescaleFac);
-    summary_adj = summary;
-    summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
-    if ID<=3
-        summary_adj.RF_Cy = -summary_adj.RF_Cy;
-    end
-    if ID==9
-        summary_adj.RF_Cx = -summary_adj.RF_Cx;
-    end
-    summary_adj.RF_Cy = interpNanImages((summary.RF_Cy - summary.RF_Cy(fvY,fvX)));
-    summary_adj.RF_sigma = interpNanImages(summary_adj.RF_sigma);
-    summary_adj.RF_mean = (summary.RF_mean);
-    summary_adj.bestSF = interpNanImages(summary_adj.bestSF);
-    summary_adj.bestOR = interpNanImages(summary_adj.bestOR);
-    summary_adj.correlation = interpNanImages(summary_adj.correlation);
-    summary_adj.expVar = interpNanImages(summary_adj.expVar);
-    
-    stimXaxis_ori = RF_insilico.noiseRF.xaxis;
-    stimYaxis_ori = RF_insilico.noiseRF.yaxis;
-    
-    save([encodingSavePrefix '_summary'],'summary_adj','stimXaxis_ori','stimYaxis_ori',...
-        'fvX','fvY','-append');
+%     %% adjust Cx and Cy, interpolate NANs
+%     [fvY,fvX] = getFoveaPix(ID, rescaleFac);
+%     summary_adj = summary;
+%     summary_adj.RF_Cx = interpNanImages(summary.RF_Cx - summary.RF_Cx(fvY,fvX));
+%     summary_adj.RF_Cy = interpNanImages((summary.RF_Cy - summary.RF_Cy(fvY,fvX)));
+%     %summary_adj.RF_Cy = -summary_adj.RF_Cy;
+%     %summary_adj.vfs = -summary_adj.vfs;
+%     if ID==9
+%         summary_adj.RF_Cx = -summary_adj.RF_Cx;
+%     end
+%     summary_adj.RF_sigma = interpNanImages(summary_adj.RF_sigma);
+%     summary_adj.RF_mean = (summary.RF_mean);
+%     summary_adj.bestSF = interpNanImages(summary_adj.bestSF);
+%     summary_adj.bestOR = interpNanImages(summary_adj.bestOR);
+%     summary_adj.correlation = interpNanImages(summary_adj.correlation);
+%     summary_adj.expVar = interpNanImages(summary_adj.expVar);
+%     
+%     stimXaxis_ori = RF_insilico.noiseRF.xaxis;
+%     stimYaxis_ori = RF_insilico.noiseRF.yaxis;
+%     
+%     save([encodingSavePrefix '_summary'],'summary_adj','stimXaxis_ori','stimYaxis_ori',...
+%         'fvX','fvY','-append');
     
     
     %% summary figure
-    [sumFig, sumAxes]=showSummaryFig(summary, aparam.flipLR);
-    set(sumFig,'position',[0 0 1900 1400]);
-    set(sumAxes(2),'xlim',[min(X) max(X)]);
-    set(sumAxes(2),'ylim',[min(Y) max(Y)]);
-    % set(sumFig,'position',[0 0 1900 1000]);
-    % set(sumAxes(2),'clim', [-8 8]);
-    % set(sumAxes(3),'clim', [-10 10]);
-    savePaperFigure(sumFig,[encodingSavePrefix '_summary']);
+%     [sumFig, sumAxes]=showSummaryFig(summary, aparam.flipLR);
+%     set(sumFig,'position',[0 0 1900 1400]);
+%     set(sumAxes(2),'xlim',[min(X) max(X)]);
+%     set(sumAxes(2),'ylim',[min(Y) max(Y)]);
+%     % set(sumFig,'position',[0 0 1900 1000]);
+%     % set(sumAxes(2),'clim', [-8 8]);
+%     % set(sumAxes(3),'clim', [-10 10]);
+%     savePaperFigure(sumFig,[encodingSavePrefix '_summary']);
+%     
+%     %summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
+%     [sumFig, sumAxes]=showSummaryFig(summary_adj, aparam.flipLR);
+%     set(sumFig,'position',[0 0 1900 1400]);
+%     set(sumAxes(2),'xlim',[min(X) max(X)]);
+%     set(sumAxes(2),'ylim',[min(Y) max(Y)]);
+%     % set(sumFig,'position',[0 0 1900 1000]);
+%     set(sumAxes(2),'clim', aparam.showXrange);%[-7 1]);
+%     set(sumAxes(3),'clim', aparam.showYrange);%[-7 7]);
+%     savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
     
-    %summary_adj.mask = summary.mask .* (summary_adj.correlation>corr_th);
-    [sumFig, sumAxes]=showSummaryFig(summary_adj, aparam.flipLR);
-    set(sumFig,'position',[0 0 1900 1400]);
-    set(sumAxes(2),'xlim',[min(X) max(X)]);
-    set(sumAxes(2),'ylim',[min(Y) max(Y)]);
-    % set(sumFig,'position',[0 0 1900 1000]);
-    set(sumAxes(2),'clim', aparam.showXrange);%[-7 1]);
-    set(sumAxes(3),'clim', aparam.showYrange);%[-7 7]);
-    savePaperFigure(sumFig,[encodingSavePrefix '_summary_adj']);
-    
+    [f_comp, signMap, signBorder, CyBorder, newmask] = ...
+        showCompositeMap(summary_adj, aparam.corrth, aparam.showXrange, ...
+        aparam.showYrange, rescaleFac, aparam.flipLR, aparam.brainPix);
+
+    savePaperFigure(f_comp,[num2str(ID) '_compositeMap'], 'w');
+
     
     %% show mRFs on maps of preferred position
 %     stimXaxis = stimXaxis_ori - summary.RF_Cx(fvY,fvX);
-%     stimYaxis = -(stimYaxis_ori - summary.RF_Cy(fvY,fvX));
+%     stimYaxis = (stimYaxis_ori - summary.RF_Cy(fvY,fvX));
 %     for ib = 1:numel(aparam.brainPix)
 %         [f_panel, f_location] = showRFpanels(summary_adj, aparam.brainPix(ib).brain_x, ...
 %             aparam.brainPix(ib).brain_y, ...
 %             stimXaxis, stimYaxis, aparam.showXrange, aparam.showYrange, rescaleFac,...
 %             aparam.flipLR);
 %         %savePaperFigure(f_panel,[encodingSavePrefix '_mRFs']);
-%         savePaperFigure(f_location,[encodingSavePrefix '_mRFlocs_pwg' num2str(ib)], 'w');
+%         savePaperFigure(f_location,[num2str(ID) '_mRFlocs_pwg' num2str(ib)], 'w');
 %     end
     
     
