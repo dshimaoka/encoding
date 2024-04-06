@@ -1,15 +1,12 @@
-function [fig, signMap, signBorder, CyBorder, newmask] = ...
-    showCompositeMap(summary_adj, corrth, showXrange, showYrange, rescaleFac, ...
-    flipLR, brainPix)
-% [fig, signMap, signBorder] = showCompositeMap(summary_adj)
-% under construction
-
-% mask = zeros(size(summary_adj.thisROI));
-% mask(~isnan(summary_adj.RF_Cx))=1;
-
-% mask = summary_adj.correlation/prctile(summary_adj.correlation(:),99);
-% mask(mask>1)=1;
-
+function [fig, signMap, signBorder, CyBorder, mask] = ...
+    showCompositeMap(summary_adj, corrth, showXrange, showYrange, rescaleFac)
+% [fig, signMap, signBorder, CyBorder, mask] = ...
+%     showCompositeMap(summary_adj, corrth, showXrange, showYrange, rescaleFac)
+% creates maps of 
+%   preferred altitude
+%   preferred azimuth
+%   areal boundary based on visual field sign
+%   brain image
 
 if nargin < 2
     corrth = 0.25;

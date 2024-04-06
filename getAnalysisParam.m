@@ -1,5 +1,18 @@
 function [aparam] = getAnalysisParam(ID)
-%created from alignVFS.m
+%aparam = getAnalysisParam(ID)
+% returns:
+% aparam.stimSuffix 
+% aparam.regressSuffix 
+% aparam.corrth 
+% aparam.showXrange 
+% aparam.showYrange
+% aparam.flipLR;
+% aparam.brainPix(1).brain_y
+% aparam.brainPix(1).brain_x
+% aparam.brainPix(2).brain_y
+% aparam.brainPix(2).brain_x
+%
+% created from alignVFS.m
 
 switch ID
     case 1
