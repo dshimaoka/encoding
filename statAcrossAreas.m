@@ -1,9 +1,9 @@
 
 %% parmaeters
-ID = 8;
+ID = 3;
 ebins = 0:8;
 rescaleFac = 0.1;
-remakeParcellation = 1;
+remakeParcellation = 0; %if 1, create areal boundaries from scratch
 selectPixelTh = 3;
 if ~isempty(selectPixelTh)
     suffix = '_selected';
@@ -15,7 +15,6 @@ end
 roiSuffix = '';
 expInfo = getExpInfoNatMov(ID);
 aparam = getAnalysisParam(ID);
-aparam.stimSuffix = '_square20'; %TEMP
 
 dataPaths = getDataPaths(expInfo,rescaleFac, roiSuffix, aparam.stimSuffix);
 

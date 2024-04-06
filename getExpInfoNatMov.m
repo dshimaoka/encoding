@@ -1,4 +1,10 @@
 function expInfo = getExpInfoNatMov(ID)
+% expInfo = getExpInfoNatMov(ID)
+% returns:
+% expInfo.subject
+% expInfo.date
+% expInfo.nsName
+% expInfo.expID
 
 switch ID
     case 1
@@ -16,28 +22,6 @@ switch ID
         expInfo.expID = 21;
         expInfo.subject = 'CJ229';
         expInfo.date = '20221101';
-%         expInfo.RFxlim = [-inf 5];
-%         expInfo.RFylim = [];
-    case 4
-        expInfo.nsName = 'CJ220.runPassiveMovies.021959';
-        expInfo.expID = 17;
-        expInfo.subject = 'CJ220';
-        expInfo.date = '20220816';
-    case 5
-        expInfo.nsName = 'CJ234.runPassiveMovies.225232';
-        expInfo.expID = 12;
-        expInfo.subject = 'CJ234';
-        expInfo.date = '20230329';
-    case 6
-         expInfo.nsName = 'CJ235.runPassiveMovies.071727';
-        expInfo.expID = 22;
-        expInfo.subject = 'CJ235';
-        expInfo.date = '20230405';
-    case 7
-         expInfo.nsName = 'CJ235.runPassivemovies.223724';
-        expInfo.expID = 13;
-        expInfo.subject = 'CJ235';
-        expInfo.date = '20230404';
     case 8
          expInfo.nsName = 'CJ246.runPassivemovies.052834';
         expInfo.expID = 20;
