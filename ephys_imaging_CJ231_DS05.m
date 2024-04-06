@@ -23,6 +23,7 @@ xrange = [-5 5];
 yrange = [-5 5];
 %Idx_RF = Idx_all(1:30:150);
 Idx_RF = Idx_all(1:30:151);
+Idx_RF(2) = 55;
 
 rescaleFac = 0.10;
 
@@ -97,22 +98,37 @@ newSize = size(summary_adj.RF_Cy);
 xResized = linspace(1, originalSize(2), newSize(2));
 yResized = linspace(1, originalSize(1), newSize(1));
 
-imagesc(xResized, yResized,summary_adj.RF_Cy);
+for ii=1%:2
+    %subplot(1,2,ii);
+    switch ii
+        case 1
+            imagesc(xResized, yResized,summary_adj.RF_Cy);
+            hold on;
+            contour(xResized, yResized, signBorder,[0 0],'k','linewidth',1);
+            [h]=contour(xResized, yResized, CyFilt, [0 0], 'k','linewidth',1);
+            
+            colormap(gca, pwgmap);mcolorbar(gca,.5,'northoutside');
+            caxis([-5 5]);
+        case 2
+            imagesc(xResized, yResized,summary_adj.vfs);
+            hold on;
+            
+            cmap = customcolormap(linspace(0,1,3), ...
+                [0 0 1; 0 0 0; 1 0 0]);
+            colormap(gca, cmap);mcolorbar(gca,.5,'northoutside');
+            caxis([-1 1]);
+    end
+    whitebg('k');
+    c=parula(numel(Idx_all));
+    
+    plot(x(Idx_all),y(Idx_all),'o','color',[.7 .7 .7]);
+    s=scatter(x(Idx_all),y(Idx_all),15,c,'filled');
+    plot(x(Idx_RF),y(Idx_RF),'o','color','r');
+    rectangle('position',[200 250 100 250],'edgecolor','k');
+    axis equal tight off;
+    xlim([1 originalSize(2)]); ylim([1 originalSize(1)]);
+end
 
-hold on;
-contour(xResized, yResized, signBorder,[0 0],'k','linewidth',1);
-[h]=contour(xResized, yResized, CyFilt, [0 0], 'k','linewidth',1);
-
-colormap(gca, pwgmap);mcolorbar(gca,.5,'northoutside');
-caxis([-5 5]);
-whitebg('k');
-c=parula(numel(Idx_all));
-plot(x(Idx_all),y(Idx_all),'o','color',[.7 .7 .7]);
-s=scatter(x(Idx_all),y(Idx_all),15,c,'filled');
-plot(x(Idx_RF),y(Idx_RF),'o','color','r');
-rectangle('position',[200 250 100 250],'edgecolor','k');
-axis equal tight off;
-xlim([1 originalSize(2)]); ylim([1 originalSize(1)]);
 savePaperFigure(gcf,'ephys_imaging_superimposed_s');
 
 
@@ -160,6 +176,7 @@ savePaperFigure(gcf,'ephys_imaging_scatter');
 
 
 %% RF mapping ephys (from CJ231_sparsenoise_figures2.m)
+load('\\ad.monash.edu\home\User006\dshi0006\Documents\MATLAB\2023ImagingPaper\neuropix_tmp\2022\11\30\CJ231.noisegrid.095454_rf.mat');
 r1D = reshape(r2D, size(r2D,1)*size(r2D,2), []);
 meanResp = reshape(mean(r1D),1,1,[]);
 stdResp = reshape(std(r1D),1,1,[]);
