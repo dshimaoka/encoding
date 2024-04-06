@@ -62,48 +62,45 @@ RF_Cy = imresize(summary_adj.RF_Cy, size(baseImage));
 RF_Cx = imresize(summary_adj.RF_Cx, size(baseImage));
 corr = imresize(summary_adj.correlation, size(baseImage));
 
-%ax(1)=subplot(121);
-% imagesc(RF_Cy.*mask);%, 'alphadata',corr,'alphadatamapping','scaled');
-% caxis([-5 5]);
 
-subplot(121);
-imagesc(inputImage_registered);%.*mask); 
+figure('position',[0 0 1000 1000]);
+originalSize = size(inputImage_registered);
+x_ori = 1:originalSize(2);
+y_ori = 1:originalSize(1);
+imagesc(x_ori, y_ori, inputImage_registered);%.*mask); 
 axis equal tight off;
 hold on
 colormap(gray);
+addScaleBar(1);
 c=parula(numel(Idx_all));
 plot(x(Idx_all),y(Idx_all),'o','color',[.7 .7 .7]);
 s=scatter(x(Idx_all),y(Idx_all),15,c,'filled');
 plot(x(Idx_RF),y(Idx_RF),'o','color','r');
-% xlim([200 300]);ylim([250 500]);
-%savePaperFigure(gcf,'ephys_imaging_superimposed');
+rectangle('position',[200 250 100 250],'edgecolor','k');
+xlim([1 originalSize(2)]); ylim([1 originalSize(1)]);
+savePaperFigure(gcf,'ephys_imaging_superimposed');
 
 
 %% superimposed map on 0.1ResizeFac
-%fig = showCompositeMap(summary_adj);
-subplot(122);
-imagesc(summary_adj.RF_Cy);
-% cmap = customcolormap(linspace(0,1,3), ...
-%     [1 0 0; 0 0 0; 0 1 0]);
-colormap(gca, pwgmap);
+figure('position',[0 0 1000 1000]);
+newSize = size(summary_adj.RF_Cy);
+xResized = linspace(1, originalSize(2), newSize(2));
+yResized = linspace(1, originalSize(1), newSize(1));
+
+imagesc(xResized, yResized,summary_adj.RF_Cy);
+hold on;
+colormap(gca, pwgmap);mcolorbar(gca,.5,'northoutside');
 caxis([-5 5]);
 whitebg('k');
-x_r = rescaleFac*x;
-y_r = rescaleFac*y;
-hold on
-plot(x_r(Idx_all),y_r(Idx_all),'o','color',[.7 .7 .7]);
-plot(x_r(Idx_RF),y_r(Idx_RF),'o','color','y');
-s=scatter(x_r(Idx_all),y_r(Idx_all),15,c,'filled');
-
-hold on
-newmask = (summary.mask .* (summary_adj.correlation>.2))~=1;
-imagesc(1-newmask,'alphadata',newmask);
-pixPermm_rescale = getPixPerMm(rescaleFac); %cf note_magnificationFactor.m
-line([45 45],[55 55+pixPermm_rescale], 'linewidth',2,'color','w');
+c=parula(numel(Idx_all));
+plot(x(Idx_all),y(Idx_all),'o','color',[.7 .7 .7]);
+s=scatter(x(Idx_all),y(Idx_all),15,c,'filled');
+plot(x(Idx_RF),y(Idx_RF),'o','color','r');
+rectangle('position',[200 250 100 250],'edgecolor','k');
 axis equal tight off;
-%savePaperFigure(gcf,'ephys_imaging_superimposed_s');
+xlim([1 originalSize(2)]); ylim([1 originalSize(1)]);
+savePaperFigure(gcf,'ephys_imaging_superimposed_s');
 
-savePaperFigure(gcf,'ephys_imaging_superimposed_both');
 
 
 

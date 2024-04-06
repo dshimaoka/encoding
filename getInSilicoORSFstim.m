@@ -78,7 +78,7 @@ S_nm = S_nm'; %predictXs accepts [nVar x nFrames]
 
 insilicoORSFStim.S_nm = S_nm;
 insilicoORSFStim.timeVec_mdlResp = timeVec_mdlResp;
-insilicoORSFStim.stim_is = stim_is;
+%insilicoORSFStim.stim_is = stim_is; %14/11/2023
 insilicoORSFStim.timeVec_stim = timeVec_stim;
 insilicoORSFStim.onFrames = onFrames;
 insilicoORSFStim.oriStream = oriStream;

@@ -13,14 +13,17 @@ else
 end
 
 
-ID = 8;
+ID = 2;
 doTrain = 0; %train a gabor bank filter or use it for insilico simulation
-doRF = 1;
-doORSF = 0;
+doRF = 0;
+doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '';
-stimSuffix = '_square20';%
-regressSuffix = '_nxv';
+% stimSuffix = '_square30';%
+% regressSuffix = '_nxv';
+aparam = getAnalysisParam(ID);
+stimSuffix = aparam.stimSuffix;
+regressSuffix = aparam.regressSuffix;
 
 omitSec = 5; %omit initial XX sec for training
 rescaleFac = 0.1;
@@ -80,8 +83,9 @@ ds = tabularTextDatastore(dataPaths.timeTableSaveName);
 nTotPix = numel(ds.VariableNames)-1;
 
 %% retrieve unsuccessful analysis
-% tgtIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix);
-tgtIdx = [ 185         370         560         745        1155        1340        1530        1745        1970        1978];
+% varNames = {'trained','trainParam'}; %'RF_insilico',
+% tgtIdx = detectNGidx(dataPaths.encodingSavePrefix, nTotPix, varNames);
+tgtIdx = 1:nTotPix;
 maxJID = numel(pen:narrays:numel(tgtIdx));
 
 errorID=[];

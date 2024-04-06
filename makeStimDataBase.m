@@ -18,11 +18,11 @@ end
 pen = getPen; 
 
 
-expID = 9;
+expID = 1;
 
 
 roiSuffix = '';
-stimSuffix = '_square30_2';
+stimSuffix = '_square15';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -33,7 +33,7 @@ rebuildImageData = false;
 makeMask = false;%true;
 uploadResult = true;
 dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
-useGPU = 0;
+useGPU = 1;
 
 %% stimulus parameters
 %ID1,3
@@ -76,8 +76,11 @@ useGPU = 0;
 %x = [-4~+24]
 % stimXrange = [850:(850+756)];
 % stimYrange = [297:1053];
-stimXrange = [816:1616];
-stimYrange = [280:1080];
+%stimXrange = [816:1616];
+%stimYrange = [280:1080];
+%ID1 2nd trial
+stimXrange = 13:156; 
+stimYrange = 1:144; 
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;
@@ -105,12 +108,41 @@ if ~exist(dataPaths.stimSaveName,'file')
     
     %% prepare model output SLOW
     theseTrials = pen:narrays:cic.nrTrials;
-    [S_fin, TimeVec_stim_cat] = saveGaborBankOut(dataPaths.moviePath, cic, ...
-        dsRate, gaborBankParamIdx, 0, stimYrange, stimXrange, theseTrials, useGPU);
+    saveGaborBankOut(dataPaths, cic, dsRate, gaborBankParamIdx, ...
+        stimYrange, stimXrange, theseTrials, useGPU);
+    
+    %% check if all data is processed
+    [~,prefix] = fileparts(dataPaths.stimSaveName);
+    fileExists = zeros(cic.nrTrials,1);
+    for itr = 1:cic.nrTrials
+        tempData = [prefix '_temp_' num2str(itr) '.mat'];
         
-    %% save gabor filter output as .mat
-    save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
-        'gaborBankParamIdx', 'dsRate','cic','stimInfo');
+        fileExists(itr)=exist(tempData, 'file');
+    end
+    
+    if all(fileExists)
+        %% append across trials
+        S_fin = [];TimeVec_stim_cat=[];
+        for itr = 1:cic.nrTrials
+            %tempData = ['preprocAll_temp_' num2str(itr)];
+            [~,prefix] = fileparts(dataPaths.stimSaveName);
+            tempData = [prefix '_temp_' num2str(itr) '.mat'];
+            load(tempData,'frames_fin','TimeVec_stim');
+            
+            S_fin = cat(1,S_fin, frames_fin);
+            if itr==1
+                TimeVec_stim_cat = TimeVec_stim;
+            else
+                TimeVec_stim_cat = cat(1, TimeVec_stim_cat, TimeVec_stim_cat(end) + 1/dsRate + TimeVec_stim);
+            end
+        end
+        
+        %% save gabor filter output as .mat
+        save( dataPaths.stimSaveName, 'TimeVec_stim_cat', 'S_fin', ...
+            'gaborBankParamIdx', 'dsRate','cic','stimInfo');
+        
+        delete([prefix '*.mat']); %delete temporary files
+    end
 else
     save( dataPaths.stimSaveName, 'cic','stimInfo','-append');
 end

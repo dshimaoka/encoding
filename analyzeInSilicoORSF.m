@@ -10,7 +10,14 @@ if nargin < 4
     method = 0;
 end
 
-sflog = 1;
+%judge if sfList is log scale or linear scale
+tolerance = 0.1;
+differences = diff(RF_insilico.ORSF.sfList);
+if all(abs(differences - mean(differences)) < tolerance)
+    sflog = 0;
+else
+    sflog = 1;
+end
 
 tidx = find(RF_insilico.ORSF.respDelay>=trange(1) & RF_insilico.ORSF.respDelay<=trange(2));
 resp = mean(RF_insilico.ORSF.resp(:,:,tidx),3);
@@ -28,11 +35,17 @@ switch method
         
     case 1 %2D fitting
         if sflog
-            p = fitGaussOri180(log(double(RF_insilico.ORSF.sfList)), 180/pi*RF_insilico.ORSF.oriList, resp');
+            bounds = [prctile(log(double(RF_insilico.ORSF.sfList)),[0 100])' inf*ones(2,7)];
+            bounds(1,2:8) = -bounds(1,2:8);
+            p = fitGaussOri180(log(double(RF_insilico.ORSF.sfList)), 180/pi*RF_insilico.ORSF.oriList, resp',...
+                bounds);
             RF_insilico.ORSF.bestSF = exp(p(1));
             RF_insilico.ORSF.sigmaSF = exp(p(4));
         else
-            p = fitGaussOri180(double(RF_insilico.ORSF.sfList), 180/pi*RF_insilico.ORSF.oriList, resp');
+            bounds = [prctile(double(RF_insilico.ORSF.sfList),[0 100])' inf*ones(2,7)];
+            bounds(1,2:8) = -bounds(1,2:8);
+            p = fitGaussOri180(double(RF_insilico.ORSF.sfList), 180/pi*RF_insilico.ORSF.oriList, resp',...
+                bounds);
             RF_insilico.ORSF.bestSF = p(1);
             RF_insilico.ORSF.sigmaSF = p(4);
         end

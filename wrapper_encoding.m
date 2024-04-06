@@ -14,12 +14,12 @@ end
 
 
 ID = 9;
-doTrain = 0; %train a gabor bank filter or use it for insilico simulation
+doTrain = 1; %train a gabor bank filter or use it for insilico simulation
 doRF = 1;
-doORSF = 0;
+doORSF = 1;
 subtractImageMeans = 0;
 roiSuffix = '';
-stimSuffix = '_square28';%
+stimSuffix = '_square30_2';%
 regressSuffix = '_nxv';
 
 omitSec = 5; %omit initial XX sec for training

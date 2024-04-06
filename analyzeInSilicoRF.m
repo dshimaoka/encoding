@@ -74,6 +74,8 @@ end
 
 RF_insilico.noiseRF.RF_Cx = p(1);
 RF_insilico.noiseRF.RF_Cy = p(2);
+RF_insilico.noiseRF.peakAmp = p(6);
+
 if method == 0
     RF_insilico.noiseRF.sigma = (p(3)+p(4))/2;
 elseif method == 1

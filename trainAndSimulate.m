@@ -1,7 +1,7 @@
 function trainAndSimulate(trainParam, ds, S_fin, roiIdx, trainIdx, stimInfo, ...
     imageMeans_proc, gaborBankParamIdx, encodingSaveName, inSilicoRFStimName,...
-    inSilicoORSFStimName,analysisTwin,...
-    doTrain, doRF, doORSF)
+    inSilicoORSFStimName, inSilicoDIRSFTFStimName,analysisTwin,...
+    doTrain, doRF, doORSF, doDIRSFTF)
 
 %from wrapper_encoding.m
 
@@ -20,7 +20,7 @@ if doTrain
     %clear S_fin
     save(encodingSaveName,'trained','trainParam');
 else
-    load(encodingSaveName,'trained','trainParam');
+    load(encodingSaveName,'trained','trainParam','RF_insilico');
 end
 
 
@@ -50,7 +50,7 @@ if doRF
     save(encodingSaveName,'RF_insilico','-append');
 end
 
-%% in-silico simulation to obtain ORSF
+%% in-silico simulation to obtain OR/SF
 if doORSF
     if exist(inSilicoORSFStimName,'file') && ~exist('inSilicoORSFStim','var')
         ORSFStim = load(inSilicoORSFStimName, 'inSilicoORSFStim','RF_insilico');
@@ -65,11 +65,36 @@ if doORSF
 
     RF_insilico = getInSilicoORSF(gaborBankParamIdx, trained, trainParam, ...
         RF_insilico, stimSz, inSilicoORSFStim);
-    showInSilicoORSF(RF_insilico);
+    showInSilicoORSF(RF_insilico, analysisTwin);
     
     RF_insilico = analyzeInSilicoORSF(RF_insilico, -1, analysisTwin, 1);
     screen2png([encodingSaveName(1:end-4) '_ORSF']);
     close;
     save(encodingSaveName,'RF_insilico','-append');
 end
+
+%% in-silico simulation to obtain DIR/SF/TF
+if doDIRSFTF
+    if exist(inSilicoDIRSFTFStimName,'file') && ~exist('inSilicoORSFStim','var')
+        DIRSFTFStim = load(inSilicoDIRSFTFStimName, 'inSilicoDIRSFTFStim','RF_insilico');
+        inSilicoDIRSFTFStim = DIRSFTFStim.inSilicoDIRSFTFStim;
+        RF_insilico.DIRSFTF = DIRSFTFStim.RF_insilico.DIRSFTF;
+        clear DIRSFTF
+    elseif  ~exist(inSilicoDIRSFTFStimName,'file')
+        disp(['Missing ' inSilicoDIRSFTFStimName]);
+    end
+    
+    stimSz = [stimInfo.height stimInfo.width];
+
+    RF_insilico = getInSilicoDIRSFTF(gaborBankParamIdx, trained, trainParam, ...
+        RF_insilico, stimSz, inSilicoDIRSFTFStim);
+    showInSilicoDIRSFTF(RF_insilico, analysisTwin);
+    
+    RF_insilico = analyzeInSilicoDIRSFTF(RF_insilico, -1, analysisTwin, 1);
+    screen2png([encodingSaveName(1:end-4) '_DIRSFTF ']);
+    close;
+    save(encodingSaveName,'RF_insilico','-append');
+end
+
+
 end

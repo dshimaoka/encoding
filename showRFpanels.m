@@ -65,7 +65,7 @@ end
 
 for ix = 1:numel(brain_x)
     for iy = 1:numel(brain_y)
-        plot(summary.RF_Cx(brain_y(iy), brain_x(ix)),summary.RF_Cy(brain_y(iy), brain_x(ix)), 'ro');
+        plot(summary.RF_Cx(brain_y(iy), brain_x(ix)),summary.RF_Cy(brain_y(iy), brain_x(ix)), 'rs');
         hold on;
     end
 end
@@ -74,6 +74,7 @@ axis equal;
 xlim(showXrange);
 ylim(showYrange);
 vline(0,gca,'-','k');hline(0,gca,[],'k');
+hold on; plot(showXrange(1):.5:showXrange(2),0,'o','markerfacecolor','w','color','k');
 set(gca,'tickdir','out');
 xlabel('azimuth [deg]'); ylabel('altitude [deg]');
 

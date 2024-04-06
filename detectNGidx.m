@@ -1,5 +1,9 @@
-function ngIdx = detectNGidx(encodingSavePrefix, numIdx)
+function ngIdx = detectNGidx(encodingSavePrefix, numIdx, varNames)
 % ngIdx = detectNGidx(encodingSavePrefix, numIdx)
+
+if nargin < 3
+    varNames = {'RF_insilico','trained','trainParam'};
+end
 
 verbose = 0; 
 
@@ -10,7 +14,7 @@ for ii = 1:numel(roiIdx)
     encodingSaveName = [encodingSavePrefix '_roiIdx' num2str(roiIdx(ii)) '.mat'];
     if exist(encodingSaveName,'file')
         try
-            encodingResult = load(encodingSaveName, 'RF_insilico','trained','trainParam');
+            encodingResult = load(encodingSaveName, varNames{:});
            catch err
             if verbose
                disp(['MISSING ' encodingSaveName]);
