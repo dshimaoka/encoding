@@ -1,4 +1,5 @@
 function thisAx = addScaleBar(rescaleFac, thisAx, color, location)
+%thisAx = addScaleBar(rescaleFac, thisAx, color, location)
 
 if nargin < 4
     location = 'left bottom';

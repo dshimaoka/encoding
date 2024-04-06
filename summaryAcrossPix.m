@@ -14,7 +14,7 @@ for ididx = 1:numel(expID)
     ORSFfitOption = 1; %3:peakSF,fitOR
     RFfitOption = 0; %1:count #significant pixels
     roiSuffix = '';
-    aparam = getAnalysisParam(ID);
+    aparam = getAnalysisParam(ID, stimSuffix);
     
     %% path
     expInfo = getExpInfoNatMov(ID);
@@ -28,19 +28,6 @@ for ididx = 1:numel(expID)
     
     load(dataPaths.stimSaveName,'stimInfo')
     stimSz = [stimInfo.height stimInfo.width];
-    if ID==3
-        xlim = [-5 1]-3;
-        ylim = [-4 6];
-    elseif ID==8
-        xlim = [-6 2];%[-7 2];%[-8 2];
-        ylim = [-13 9.14];
-    elseif ID==9 || ID==8
-        xlim = [-10 2];%[-7 2];%[-8 2];
-        ylim = [-15 9.14];
-    else
-        xlim = prctile(stimInfo.stimXdeg,[0 100]);
-        ylim = prctile(stimInfo.stimYdeg,[0 100]);
-    end
     clear stimInfo;
     
     load( dataPaths.stimSaveName, 'gaborBankParamIdx');
@@ -96,7 +83,8 @@ for ididx = 1:numel(expID)
                 elseif ID == 8
                     RF_insilico.noiseRF.maxRFsize=10;
                 end
-                RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, xlim, ylim, RFfitOption);
+                RF_insilico = analyzeInSilicoRF(RF_insilico, -1, trange, ...
+                    aparam.xlim, aparam.ylim, RFfitOption);
                 %showInSilicoRF(RF_insilico, trange);
             end
             

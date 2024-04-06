@@ -1,6 +1,7 @@
 function [avg_bin, coef, npix_bin, mebins, ste_bin] = fitByEccentricityBin(ebins, areaStats, statName)
 % [stat_bin, coef, npix_bin, mebins] = fitByEccentricityBin(ebins, areaStats, statName)
 % stat_bin: bin x area
+% returns average and standard error across pixels within a bin
 %created from fitByEccentricityBin(ebins, areaStats, statName)
 mebins = ebins(1:end-1)+.5*mean(diff(ebins));
 nAreas = numel(areaStats.eccentricity);

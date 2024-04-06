@@ -1,4 +1,5 @@
 function [areaStats, excPercent] = getAreaStats(summary_adj, areaMatrix, statName, selectPixelTh)
+%[areaStats, excPercent] = getAreaStats(summary_adj, areaMatrix, statName, selectPixelTh)
 % %INPUT
 % summary_adj
 % areaMatrix

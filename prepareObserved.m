@@ -1,6 +1,7 @@
 function [observed, TimeVec_ds_c] = prepareObserved(imageProc, dsRate)
 %observed = prepareObserved(imageProc, dsRate)
-% returns observed signal (time x pixel) at dsRate [Hz]
+% returns observed signal (time x pixel) at dsRate [Hz] after
+% preprocDownSample and preprocNormalize
 % from result of saveImageProcess.m
 %
 % 2023 - 02 - 09 DS created from quickAnalysisCJ224_runPassiveMovies2.m

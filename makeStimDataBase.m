@@ -22,7 +22,6 @@ expID = 1;
 
 
 roiSuffix = '';
-stimSuffix = '_square15';
 
 %% imaging parameters
 rescaleFac = 0.1;
@@ -36,51 +35,10 @@ dsRate = 1;%[Hz] %sampling rate of hemodynamic coupling function
 useGPU = 1;
 
 %% stimulus parameters
-%ID1,3
-%stimXrange = 24:156; %201:256; %1:left
-%stimYrange = 5:139; %72-28+1:72+28;  %1:top
-%ID2
-%stimXrange = 161:238;
-%stimYrange = 29:108;
-%ID8,9
-%test1
-% stimXrange = 293:293+247;
-% stimYrange = 378:378+247;
-%test2
-% stimXrange =768:768+247;
-% stimYrange = 378:378+247;
-%test3 square18
-%stimXrange = 800-247:800+247;
-%stimYrange = 540-247:540+247;
-%test4: rect18-40 ... Sfin = [7200 x 14375]
-%stimXrange = 800-247:800+247;
-%stimYrange = 1:1080;
-%test5: rect10-40 ... Sfin = [7200 x 6555]
-%stimXrange = 1047-275:1047;
-%stimYrange = 540-247:1080;
-%test6: square30
-%stimXrange = 293:1080;
-%stimYrange = 293:1080;
-%test7: square20
-% y: [-13 +7]
-% x: [12 +8]
-%stimXrange = 631:1171;
-%stimYrange = 351:891;
-%test8: square24
-% y: [-17 ~ +7]
-% x: [-16 ~ +8]
-%stimXrange = 493:1141;
-%stimYrange = 324:972;
-%test9 for left hem
-%y = [-19~+9]
-%x = [-4~+24]
-% stimXrange = [850:(850+756)];
-% stimYrange = [297:1053];
-%stimXrange = [816:1616];
-%stimYrange = [280:1080];
-%ID1 2nd trial
-stimXrange = 13:156; 
-stimYrange = 1:144; 
+aparam = getAnalysisParam(ID);
+stimXrange = aparam.stimXrange;
+stimYrange = aparam.stimYrange;
+stimSuffix = aparam.stimSuffix;
 
 % gabor bank filter 
 gaborBankParamIdx.cparamIdx = 1;

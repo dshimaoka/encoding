@@ -32,27 +32,7 @@ for ididx = 1:maxJID
     
     aparam = getAnalysisParam(expID);
     stimSuffix = aparam.stimSuffix;
-    
-    
-    %stimulus parameters - must be identical to ones in makeStimDataBase.m
-    switch expID
-        case 1
-            stimXrange = 24:156; %201:256; %1:left
-            stimYrange = 5:139; %72-28+1:72+28;  %1:top
-        case 2
-            stimXrange = 161:238;
-            stimYrange = 29:108;
-        case 3
-            stimXrange = 24:156; %201:256; %1:left
-            stimYrange = 5:139; %72-28+1:72+28;  %1:top
-        case 8
-            stimXrange = 293:1080;
-            stimYrange = 293:1080;
-        case 9
-            stimXrange = 816:1616;
-            stimYrange = 280:1080;
-    end
-    
+      
     % gabor bank filter
     gaborBankParamIdx.cparamIdx = 1;
     gaborBankParamIdx.gparamIdx = 2; %4 for only small RFs
@@ -68,8 +48,8 @@ for ididx = 1:maxJID
     load(dataPaths.imageSaveName,'cic','stimInfo');
     
     %% modify stimInfo
-    [stimInfo.stimXdeg, stimInfo.stimYdeg] = stimPix2Deg(stimInfo, stimXrange, stimYrange);
-    screenPixNew = [max(stimYrange)-min(stimYrange)+1 max(stimXrange)-min(stimXrange)+1];
+    [stimInfo.stimXdeg, stimInfo.stimYdeg] = stimPix2Deg(stimInfo, aparam.stimXrange, aparam.stimYrange);
+    screenPixNew = [max(aparam.stimYrange)-min(aparam.stimYrange)+1 max(aparam.stimXrange)-min(aparam.stimXrange)+1];
     stimInfo.width = stimInfo.width * screenPixNew(2)/stimInfo.screenPix(2);
     stimInfo.height = stimInfo.height * screenPixNew(1)/stimInfo.screenPix(1);
     stimInfo.screenPix = screenPixNew;
