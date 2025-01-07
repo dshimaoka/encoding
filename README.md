@@ -28,7 +28,7 @@
 - saveGaborBankOut.m: save output of the energy model, called in makeStimDataBase
 - makeStimDataBase.m: save output of saveGaborBank across all movies
 - makeDataBase.m: create timeTable data. this script uses:
-analysisImaging/saveImageProcess, getOETimes
+[analysisImaging](https://github.com/SysNeuroHub/analysisImaging/)/saveImageProcess, getOETimes
 - trainAneuron.m: train an encoding model, called in trainAndSimulate
 - trainAndSimulate.m: train an en encoding model then run in silico simulations, called in wrapper_encoding.m
 - detectNGidx: check if a training result exists in a designated directory. called by wrapper_encoding
